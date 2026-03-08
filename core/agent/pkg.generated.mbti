@@ -1,0 +1,24 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "lonen44/aswitch/core/agent"
+
+import {
+  "lonen44/aswitch/core/provider",
+}
+
+// Values
+pub fn create(String) -> &Agent?
+
+// Errors
+
+// Types and methods
+pub struct ClaudeCode {
+}
+pub impl Agent for ClaudeCode
+
+// Type aliases
+
+// Traits
+pub(open) trait Agent {
+  apply_provider(Self, @provider.Provider) -> Unit raise
+}
+

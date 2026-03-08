@@ -1,0 +1,8 @@
+import {
+  "lonen44/aswitch/cmd/main/command",
+  "moonbitlang/x/sys",
+}
+
+options(
+  "is-main": true,
+)
