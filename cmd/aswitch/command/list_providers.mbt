@@ -9,7 +9,6 @@ pub fn list_providers() -> Int {
     println(load_config_result.unwrap_err())
     EXIT_CODE_CONFIG_ERROR
   }
-
   if config.providers.is_empty() {
     println("No providers configured")
   } else {

@@ -5,6 +5,10 @@ This is a [MoonBit](https://docs.moonbitlang.com) project.
 You can browse and install extra skills here:
 <https://github.com/moonbitlang/skills>
 
+## Project Overview
+
+This is a repository for a command line program used to switch the model provider of the AI Agents such as Claude Code, OpenCode, OpenClaw and so on.
+
 ## Project Structure
 
 - MoonBit packages are organized per directory; each directory contains a

@@ -5,8 +5,10 @@ pub(all) struct Provider {
   name : String
   /// API key for the provider
   api_key : String
-  /// Base URL for the API endpoint
-  base_url : String
+  /// OpenAI-compatible API base URL (e.g., https://api.openai.com/v1)
+  openai_base_url : String?
+  /// Anthropic-compatible API base URL (e.g., https://api.anthropic.com)
+  anthropic_base_url : String?
   /// Model name to use
   models : Array[String]
 } derive(Show, Eq, ToJson, FromJson)

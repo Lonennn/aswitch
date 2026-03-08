@@ -7,27 +7,27 @@ pub fn print_help() -> Int {
   println("")
   println("Commands:")
   println("  init                        Initialize configuration file")
-  println("  add <name> <api_key> <base_url> <model>")
-  println(
-    "                              Add or update a provider configuration",
-  )
   println("  list, ls                    List all configured providers")
   println(
     "  switch <agent name> <provider_name>               Switch to a different provider",
   )
-  println("  remove, rm <name>           Remove a provider")
-  println("  current                     Show the current active provider")
-  println("  export <agent>              Export config for agent (claude-code)")
+  // println("  add <name> <api_key> <base_url> <model>")
+  // println(
+  //   "                              Add or update a provider configuration",
+  // )
+  // println("  remove, rm <name>           Remove a provider")
+  // println("  current                     Show the current active provider")
+  // println("  export <agent>              Export config for agent (claude-code)")
   println("  help, -h, --help            Show this help message")
   println("  version, -v, --version      Show version information")
   println("")
   println("Examples:")
   println("  aswitch init")
-  println("  aswitch add openai sk-xxx https://api.openai.com/v1 gpt-4")
-  println(
-    "  aswitch add anthropic sk-xxx https://api.anthropic.com claude-3-opus",
-  )
-  println("  aswitch switch openai")
-  println("  aswitch export claude-code")
+  println("  aswitch switch claude glm")
+  // println("  aswitch add openai sk-xxx https://api.openai.com/v1 gpt-4")
+  // println(
+  //   "  aswitch add anthropic sk-xxx https://api.anthropic.com claude-3-opus",
+  // )
+  // println("  aswitch export claude-code")
   0
 }

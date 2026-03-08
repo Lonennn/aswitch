@@ -13,7 +13,8 @@ import {
 pub(all) struct Provider {
   name : String
   api_key : String
-  base_url : String
+  openai_base_url : String?
+  anthropic_base_url : String?
   models : Array[String]
 }
 pub impl Eq for Provider

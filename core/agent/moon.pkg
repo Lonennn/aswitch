@@ -1,3 +1,6 @@
 import {
   "lonen44/aswitch/core/provider",
+  "moonbitlang/x/sys",
+  "moonbitlang/x/fs",
+  "moonbitlang/core/json",
 }

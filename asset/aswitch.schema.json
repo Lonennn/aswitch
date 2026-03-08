@@ -1,0 +1,52 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/lonen44/aswitch/core/aswitch.schema.json",
+  "title": "ASwitch Configuration",
+  "description": "Configuration file for ASwitch - AI model provider switcher",
+  "type": "object",
+  "properties": {
+    "providers": {
+      "type": "array",
+      "description": "List of AI provider configurations",
+      "items": {
+        "$ref": "#/$defs/Provider"
+      }
+    }
+  },
+  "required": ["providers"],
+  "$defs": {
+    "Provider": {
+      "type": "object",
+      "description": "AI model provider configuration",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Provider name/alias for display"
+        },
+        "api_key": {
+          "type": "string",
+          "description": "API key for the provider"
+        },
+        "openai_base_url": {
+          "type": "string",
+          "description": "OpenAI-compatible API base URL (e.g., https://api.openai.com/v1)",
+          "examples": ["https://api.openai.com/v1", "https://api.moonshot.ai/v1"]
+        },
+        "anthropic_base_url": {
+          "type": "string",
+          "description": "Anthropic-compatible API base URL (e.g., https://api.anthropic.com)",
+          "examples": ["https://api.anthropic.com"]
+        },
+        "models": {
+          "type": "array",
+          "description": "Model names to use for this provider",
+          "items": {
+            "type": "string"
+          },
+          "examples": [["gpt-4", "gpt-3.5-turbo"], ["claude-3-opus-20240229"]]
+        }
+      },
+      "required": ["name", "api_key", "models"]
+    }
+  }
+}

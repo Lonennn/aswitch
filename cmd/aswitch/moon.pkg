@@ -1,5 +1,5 @@
 import {
-  "lonen44/aswitch/cmd/main/command",
+  "lonen44/aswitch/cmd/aswitch/command",
   "moonbitlang/x/sys",
 }
 

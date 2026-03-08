@@ -9,6 +9,9 @@ import {
 pub fn create(String) -> &Agent?
 
 // Errors
+pub suberror ProviderLackUrlError {
+  ProviderLackUrlError(String)
+}
 
 // Types and methods
 pub struct ClaudeCode {
@@ -19,6 +22,7 @@ pub impl Agent for ClaudeCode
 
 // Traits
 pub(open) trait Agent {
+  name(Self) -> String
   apply_provider(Self, @provider.Provider) -> Unit raise
 }
 

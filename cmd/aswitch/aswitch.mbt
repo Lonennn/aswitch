@@ -9,21 +9,20 @@ fn main {
     [_, .. rest] => rest.to_array()
     [] => []
   }
-
-  let command = parse_args(cmd_args)
+  let command = @command.parse_args(cmd_args)
   @sys.exit(execute_command(command))
 }
 
 ///|
-fn execute_command(command : Command) -> Int {
+fn execute_command(command : @command.Command) -> Int {
   match command {
-    Command::Init => @command.init_config()
-    Command::ListProviders => @command.list_providers()
-    Command::SwitchProvider(agent~, provider~) =>
+    @command.Command::Init => @command.init_config()
+    @command.Command::ListProviders => @command.list_providers()
+    @command.Command::SwitchProvider(agent~, provider~) =>
       @command.switch_provider(agent, provider)
-    Command::Help => @command.print_help()
-    Command::Version => print_version()
-    Command::Unknown(cmd) => {
+    @command.Command::Help => @command.print_help()
+    @command.Command::Version => print_version()
+    @command.Command::Unknown(cmd) => {
       println("Unknown command: \{cmd}")
       println("Use 'aswitch help' for usage information")
       1

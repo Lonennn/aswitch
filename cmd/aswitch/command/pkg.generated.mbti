@@ -1,10 +1,16 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "lonen44/aswitch/cmd/main"
+package "lonen44/aswitch/cmd/aswitch/command"
 
 // Values
+pub fn init_config() -> Int
+
+pub fn list_providers() -> Int
+
 pub fn parse_args(Array[String]) -> Command
 
-pub fn print_version() -> Int
+pub fn print_help() -> Int
+
+pub fn switch_provider(String, String) -> Int
 
 // Errors
 
