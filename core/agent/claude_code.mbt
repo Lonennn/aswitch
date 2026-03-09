@@ -7,21 +7,22 @@ pub struct ClaudeCode {}
 ///|
 /// Get the Claude Code configuration file path (~/.claude/settings.json)
 fn get_claude_code_config_path() -> String {
-  let home = match @sys.get_env_var("HOME") {
-    Some(h) => h
-    None => "."
-  }
-  home + "/.claude/settings.json"
+  get_claude_code_dir_path() + "/settings.json"
 }
 
 ///|
 /// Get the Claude Code directory path (~/.claude)
+/// Supports Unix/macOS (HOME) and Windows (USERPROFILE)
 fn get_claude_code_dir_path() -> String {
-  let home = match @sys.get_env_var("HOME") {
-    Some(h) => h
-    None => "."
+  // Try HOME (Unix/macOS) or USERPROFILE (Windows)
+  match @sys.get_env_var("HOME") {
+    Some(home) => home + "/.claude"
+    None =>
+      match @sys.get_env_var("USERPROFILE") {
+        Some(home) => home + "/.claude"
+        None => ".claude"
+      }
   }
-  home + "/.claude"
 }
 
 ///|
