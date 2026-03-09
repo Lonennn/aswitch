@@ -6,14 +6,14 @@ pub struct ClaudeCode {}
 
 ///|
 /// Get the Claude Code configuration file path (~/.claude/settings.json)
-fn get_claude_code_config_path() -> String {
-  get_claude_code_dir_path() + "/settings.json"
+fn ClaudeCode::get_config_file_path() -> String {
+  ClaudeCode::get_config_dir() + "/settings.json"
 }
 
 ///|
 /// Get the Claude Code directory path (~/.claude)
 /// Supports Unix/macOS (HOME) and Windows (USERPROFILE)
-fn get_claude_code_dir_path() -> String {
+fn ClaudeCode::get_config_dir() -> String {
   // Try HOME (Unix/macOS) or USERPROFILE (Windows)
   match @sys.get_env_var("HOME") {
     Some(home) => home + "/.claude"
@@ -29,7 +29,7 @@ fn get_claude_code_dir_path() -> String {
 /// Apply provider settings to a Json object in memory
 /// This function modifies the "env" object within the settings JSON
 /// while preserving all other properties
-fn apply_provider_to_json(
+fn ClaudeCode::apply_provider_to_json(
   settings_json : Json,
   provider : @provider.Provider,
 ) -> Json raise Error {
@@ -92,8 +92,8 @@ fn apply_provider_to_json(
 
 ///|
 pub impl Agent for ClaudeCode with apply_provider(_self, provider) -> Unit raise Error {
-  let config_path = get_claude_code_config_path()
-  let dir_path = get_claude_code_dir_path()
+  let config_path = ClaudeCode::get_config_file_path()
+  let dir_path = ClaudeCode::get_config_dir()
 
   // Create directory if needed
   if !@fs.path_exists(dir_path) {
@@ -113,7 +113,7 @@ pub impl Agent for ClaudeCode with apply_provider(_self, provider) -> Unit raise
   }
 
   // Apply provider settings in memory
-  let updated_json = apply_provider_to_json(settings_json, provider)
+  let updated_json = ClaudeCode::apply_provider_to_json(settings_json, provider)
 
   // Write back to file
   let content = updated_json.stringify(indent=2)

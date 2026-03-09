@@ -99,7 +99,7 @@ test "apply_provider_to_json - updates env and preserves all other properties" {
     models: ["new-opus", "new-sonnet", "new-haiku"],
   }
   let original_json = sample_settings_json()
-  let updated_json = apply_provider_to_json(original_json, provider)
+  let updated_json = ClaudeCode::apply_provider_to_json(original_json, provider)
 
   // Verify the updated JSON structure
   match updated_json {
@@ -202,7 +202,7 @@ test "apply_provider_to_json - with 2 models uses last model for sonnet and haik
     models: ["model-a", "model-b"],
   }
   let original_json = sample_settings_json()
-  let updated_json = apply_provider_to_json(original_json, provider)
+  let updated_json = ClaudeCode::apply_provider_to_json(original_json, provider)
   match updated_json {
     {
       "env": env_obj,
@@ -274,7 +274,7 @@ test "apply_provider_to_json - with 1 model uses same model for all" {
     models: ["only-model"],
   }
   let original_json = sample_settings_json()
-  let updated_json = apply_provider_to_json(original_json, provider)
+  let updated_json = ClaudeCode::apply_provider_to_json(original_json, provider)
   match updated_json {
     {
       "env": env_obj,
@@ -331,7 +331,7 @@ test "apply_provider_to_json - raises error when anthropic_base_url is None" {
     models: ["model-1"],
   }
   let original_json = sample_settings_json()
-  let result = try? apply_provider_to_json(original_json, provider)
+  let result = try? ClaudeCode::apply_provider_to_json(original_json, provider)
   match result {
     Err(_) =>
       inspect("error raised as expected", content="error raised as expected")
@@ -349,7 +349,7 @@ test "apply_provider_to_json - raises error when models is empty" {
     models: [],
   }
   let original_json = sample_settings_json()
-  let result = try? apply_provider_to_json(original_json, provider)
+  let result = try? ClaudeCode::apply_provider_to_json(original_json, provider)
   match result {
     Err(_) =>
       inspect("error raised as expected", content="error raised as expected")
@@ -373,7 +373,7 @@ test "apply_provider_to_json - works with minimal settings (no hooks/plugins)" {
     anthropic_base_url: Some("https://new.example.com/api"),
     models: ["opus-model", "sonnet-model", "haiku-model"],
   }
-  let updated_json = apply_provider_to_json(minimal_json, provider)
+  let updated_json = ClaudeCode::apply_provider_to_json(minimal_json, provider)
 
   // Verify the minimal structure is preserved and updated
   match updated_json {
