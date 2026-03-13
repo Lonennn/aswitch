@@ -14,15 +14,24 @@ pub suberror ProviderLackUrlError {
 }
 
 // Types and methods
+pub(all) enum ApiFormat {
+  OpenAI
+  Anthropic
+}
+
 pub struct ClaudeCode {
 }
 pub impl Agent for ClaudeCode
+
+pub struct OpenCode {
+}
+pub impl Agent for OpenCode
 
 // Type aliases
 
 // Traits
 pub(open) trait Agent {
   name(Self) -> String
-  apply_provider(Self, @provider.Provider) -> Unit raise
+  apply_provider(Self, @provider.Provider, ApiFormat?) -> Unit raise
 }
 

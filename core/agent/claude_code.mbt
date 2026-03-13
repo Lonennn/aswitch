@@ -14,14 +14,11 @@ fn ClaudeCode::get_config_file_path() -> String {
 /// Get the Claude Code directory path (~/.claude)
 /// Supports Unix/macOS (HOME) and Windows (USERPROFILE)
 fn ClaudeCode::get_config_dir() -> String {
-  // Try HOME (Unix/macOS) or USERPROFILE (Windows)
-  match @sys.get_env_var("HOME") {
-    Some(home) => home + "/.claude"
-    None =>
-      match @sys.get_env_var("USERPROFILE") {
-        Some(home) => home + "/.claude"
-        None => ".claude"
-      }
+  let home = @util.get_user_home()
+  if home == "." {
+    ".claude"
+  } else {
+    home + "/.claude"
   }
 }
 
@@ -91,7 +88,7 @@ fn ClaudeCode::apply_provider_to_json(
 }
 
 ///|
-pub impl Agent for ClaudeCode with apply_provider(_self, provider) -> Unit raise Error {
+pub impl Agent for ClaudeCode with apply_provider(_, provider, _) -> Unit raise Error {
   let config_path = ClaudeCode::get_config_file_path()
   let dir_path = ClaudeCode::get_config_dir()
 

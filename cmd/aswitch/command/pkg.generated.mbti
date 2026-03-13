@@ -1,6 +1,10 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "lonen44/aswitch/cmd/aswitch/command"
 
+import {
+  "lonen44/aswitch/core/agent",
+}
+
 // Values
 pub fn init_config() -> Int
 
@@ -10,7 +14,7 @@ pub fn parse_args(Array[String]) -> Command
 
 pub fn print_help() -> Int
 
-pub fn switch_provider(String, String) -> Int
+pub fn switch_provider(String, String, @agent.ApiFormat?) -> Int
 
 // Errors
 
@@ -18,10 +22,11 @@ pub fn switch_provider(String, String) -> Int
 pub enum Command {
   Init
   ListProviders
-  SwitchProvider(agent~ : String, provider~ : String)
+  SwitchProvider(agent~ : String, provider~ : String, api_format~ : @agent.ApiFormat?)
   Help
   Version
   Unknown(String)
+  ErrorParameter(String)
 }
 
 // Type aliases

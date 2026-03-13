@@ -3,7 +3,12 @@
 
 ///|
 /// Switch an agent to a different provider
-pub fn switch_provider(agent_name : String, provider : String) -> Int {
+/// api_format is optional and only used by some agents (e.g., OpenCode)
+pub fn switch_provider(
+  agent_name : String,
+  provider_name : String,
+  api_format : @agent.ApiFormat?,
+) -> Int {
   // Validate agent name
   let agent_result = @agent.create(agent_name)
   guard agent_result is Some(agent) else {
@@ -21,17 +26,18 @@ pub fn switch_provider(agent_name : String, provider : String) -> Int {
   }
 
   // Get the provider by name
-  let provider_result = config.get_provider(provider)
+  let provider_result = config.get_provider(provider_name)
   guard provider_result is Some(provider) else {
-    println("Error: Unknown provider '\{provider}'")
+    println("Error: Unknown provider '\{provider_name}'")
     EXIT_CODE_UNKNOWN_PROVIDER
   }
 
-  // Apply the provider to the agent
-  let apply_result = try? agent.apply_provider(provider)
+  // Apply the provider to the agent (with optional api_format)
+  let apply_result = try? agent.apply_provider(provider, api_format)
   guard apply_result is Ok(_) else {
+    let err = apply_result.unwrap_err()
     println(
-      "Error: Failed to apply provider '\{provider.name}' to agent '\{agent.name()}'",
+      "Error: Failed to apply provider '\{provider.name}' to agent '\{agent.name()}', \{err}",
     )
     EXIT_CODE_CONFIG_ERROR
   }

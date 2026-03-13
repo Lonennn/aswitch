@@ -18,13 +18,17 @@ fn execute_command(command : @command.Command) -> Int {
   match command {
     @command.Command::Init => @command.init_config()
     @command.Command::ListProviders => @command.list_providers()
-    @command.Command::SwitchProvider(agent~, provider~) =>
-      @command.switch_provider(agent, provider)
+    @command.Command::SwitchProvider(agent~, provider~, api_format~) =>
+      @command.switch_provider(agent, provider, api_format)
     @command.Command::Help => @command.print_help()
     @command.Command::Version => print_version()
     @command.Command::Unknown(cmd) => {
       println("Unknown command: \{cmd}")
       println("Use 'aswitch help' for usage information")
+      1
+    }
+    @command.Command::ErrorParameter(err) => {
+      println(err)
       1
     }
   }

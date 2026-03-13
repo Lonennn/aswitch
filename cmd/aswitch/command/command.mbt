@@ -5,14 +5,20 @@ pub enum Command {
   Init
   /// List all providers
   ListProviders
-  /// Switch active provider
-  SwitchProvider(agent~ : String, provider~ : String)
+  /// Switch active provider (optional api_format: "openai" or "anthropic")
+  SwitchProvider(
+    agent~ : String,
+    provider~ : String,
+    api_format~ : @agent.ApiFormat?
+  )
   /// Show help
   Help
   /// Show version
   Version
   /// Unknown command
   Unknown(String)
+  /// Some parameters error
+  ErrorParameter(String)
   /// Add a new provider
   // AddProvider(String, String, String, String)
   /// Remove a provider
@@ -31,13 +37,30 @@ pub fn parse_args(args : Array[String]) -> Command {
       Command::Help
     }
     ["list" | "ls"] => Command::ListProviders
-    ["switch", agent, provider] => Command::SwitchProvider(agent~, provider~)
+    ["switch", agent, provider, .. rest] =>
+      if rest.length() == 0 {
+        Command::SwitchProvider(agent~, provider~, api_format=None)
+      } else {
+        let api_format = match rest[0].to_lower() {
+          "openai" => @agent.OpenAI
+          "anthropic" => @agent.Anthropic
+          _ =>
+            return Command::ErrorParameter(
+              "Unknown API format \{rest[0]}, the selectable values are 'openai' and 'anthropic'",
+            )
+        }
+        Command::SwitchProvider(agent~, provider~, api_format=Some(api_format))
+      }
     ["switch", _] => {
-      println("Error: 'switch' requires 2 arguments: <agent> <provider>")
+      println(
+        "Error: 'switch' requires at least 2 arguments: <agent> <provider>",
+      )
       Command::Help
     }
     ["switch"] => {
-      println("Error: 'switch' requires 2 arguments: <agent> <provider>")
+      println(
+        "Error: 'switch' requires at least 2 arguments: <agent> <provider>",
+      )
       Command::Help
     }
     ["remove" | "rm"] => {

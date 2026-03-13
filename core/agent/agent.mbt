@@ -1,13 +1,21 @@
 ///|
+/// API format type for agents that support multiple API formats
+pub(all) enum ApiFormat {
+  OpenAI
+  Anthropic
+}
+
+///|
 pub(open) trait Agent {
   name(Self) -> String
-  apply_provider(Self, @provider.Provider) -> Unit raise Error
+  apply_provider(Self, @provider.Provider, ApiFormat?) -> Unit raise Error
 }
 
 ///|
 pub fn create(agent_name : String) -> &Agent? {
   match agent_name.to_lower() {
     "claude" | "claudecode" => Some(ClaudeCode::{  })
+    "opencode" | "open-code" => Some(OpenCode::{  })
     _ => None
   }
 }

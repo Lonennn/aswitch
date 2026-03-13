@@ -5,7 +5,8 @@
       "Bash(moon ide doc:*)",
       "Bash(moon ide doc *)",
       "Bash(moon update)",
-      "Bash(moon info)"
+      "Bash(moon info)",
+      "Bash(moon test)"
     ]
   }
 }
