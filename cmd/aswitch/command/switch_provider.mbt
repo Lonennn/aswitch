@@ -21,7 +21,9 @@ pub fn switch_provider(
   println("Loading configuration from: \{config_path}")
   let load_config_result = try? @core.load_config()
   guard load_config_result is Ok(config) else {
-    println("Error: Failed to load config file")
+    println(
+      "Error: Failed to load config file, \{load_config_result.unwrap_err()}",
+    )
     EXIT_CODE_CONFIG_ERROR
   }
 

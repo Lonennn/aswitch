@@ -57,7 +57,10 @@ test "apply_provider_to_json - adds new provider and preserves all other propert
     api_key: "sk-new-provider-api-key",
     openai_base_url: None,
     anthropic_base_url: Some("https://new-provider.example.com/api/v1"),
-    models: ["model-alpha", "model-beta"],
+    models: [
+      @provider.Model::new(name="model-alpha"),
+      @provider.Model::new(name="model-beta"),
+    ],
   }
   let original_json = sample_opencode_json()
   let updated_json = OpenCode::apply_provider_to_json(
@@ -136,7 +139,7 @@ test "apply_provider_to_json - adds new provider and preserves all other propert
                 { "model-alpha": model_alpha, "model-beta": _, .. } =>
                   // Verify model-alpha exists with correct structure
                   match model_alpha {
-                    { "name": model_name_val, "modalities": _, .. } =>
+                    { "name": model_name_val, .. } =>
                       inspect(
                         model_name_val,
                         content=(
@@ -170,7 +173,10 @@ test "apply_provider_to_json - updates existing provider" {
     api_key: "sk-updated-api-key",
     openai_base_url: None,
     anthropic_base_url: Some("https://updated.example.com/api"),
-    models: ["new-model-1", "new-model-2"],
+    models: [
+      @provider.Model::new(name="new-model-1"),
+      @provider.Model::new(name="new-model-2"),
+    ],
   }
   let original_json = sample_opencode_json()
   let updated_json = OpenCode::apply_provider_to_json(
@@ -241,7 +247,7 @@ test "apply_provider_to_json - raises error when no base URL is provided" {
     api_key: "some-key",
     openai_base_url: None,
     anthropic_base_url: None,
-    models: ["model-1"],
+    models: [@provider.Model::new(name="model-1")],
   }
   let original_json = sample_opencode_json()
   let result = try? OpenCode::apply_provider_to_json(
@@ -286,7 +292,7 @@ test "apply_provider_to_json - works with empty JSON (creates new structure)" {
     api_key: "new-key",
     openai_base_url: None,
     anthropic_base_url: Some("https://new.example.com/api"),
-    models: ["test-model"],
+    models: [@provider.Model::new(name="test-model")],
   }
   let updated_json = OpenCode::apply_provider_to_json(
     empty_json,
@@ -320,7 +326,10 @@ test "apply_provider_to_json - OpenAI API format" {
     api_key: "sk-openai-key",
     openai_base_url: Some("https://api.openai.com/v1"),
     anthropic_base_url: None,
-    models: ["gpt-4", "gpt-3.5-turbo"],
+    models: [
+      @provider.Model::new(name="gpt-4"),
+      @provider.Model::new(name="gpt-3.5-turbo"),
+    ],
   }
   let original_json = sample_opencode_json()
   let updated_json = OpenCode::apply_provider_to_json(
@@ -371,7 +380,7 @@ test "apply_provider_to_json - None api_format (defaults to OpenAI with anthropi
     api_key: "sk-default-key",
     openai_base_url: None,
     anthropic_base_url: Some("https://anthropic.example.com/v1"),
-    models: ["claude-3-opus"],
+    models: [@provider.Model::new(name="claude-3-opus")],
   }
   let original_json = sample_opencode_json()
   let updated_json = OpenCode::apply_provider_to_json(
@@ -417,7 +426,7 @@ test "apply_provider_to_json - None api_format uses openai_base_url when anthrop
     api_key: "sk-fallback-key",
     openai_base_url: Some("https://fallback.example.com/v1"),
     anthropic_base_url: None,
-    models: ["fallback-model"],
+    models: [@provider.Model::new(name="fallback-model")],
   }
   let original_json = sample_opencode_json()
   let updated_json = OpenCode::apply_provider_to_json(
@@ -451,34 +460,90 @@ test "apply_provider_to_json - None api_format uses openai_base_url when anthrop
 
 ///|
 test "create_model_entry - creates correct model structure" {
-  let model_entry = OpenCode::create_model_entry("test-model-123")
+  let model = @provider.Model::new(name="test-model-123")
+  let model_entry = OpenCode::create_model_entry(model)
   match model_entry {
-    { "name": name_val, "modalities": modalities_obj, .. } => {
+    { "name": name_val, .. } =>
       inspect(
         name_val,
         content=(
           #|String("test-model-123")
         ),
       )
+    _ => fail("model structure mismatch")
+  }
+}
+
+///|
+test "create_model_entry - includes context_limit and output_limit when set" {
+  let model = @provider.Model::{
+    name: "test-model",
+    context_limit: Some(100000),
+    output_limit: Some(4000),
+    input_modality: [@provider.Modality::Text],
+    output_modality: [@provider.Modality::Text],
+  }
+  let model_entry = OpenCode::create_model_entry(model)
+  match model_entry {
+    {
+      "name": name_val,
+      "context_limit": context_val,
+      "output_limit": output_val,
+      ..
+    } => {
+      inspect(
+        name_val,
+        content=(
+          #|String("test-model")
+        ),
+      )
+      inspect(
+        context_val,
+        content=(
+          #|Number(100000)
+        ),
+      )
+      inspect(
+        output_val,
+        content=(
+          #|Number(4000)
+        ),
+      )
+    }
+    _ => fail("model structure mismatch")
+  }
+}
+
+///|
+test "create_model_entry - includes modalities when non-default" {
+  let model = @provider.Model::{
+    name: "vision-model",
+    context_limit: None,
+    output_limit: None,
+    input_modality: [@provider.Modality::Text, @provider.Modality::Vision],
+    output_modality: [@provider.Modality::Text],
+  }
+  let model_entry = OpenCode::create_model_entry(model)
+  match model_entry {
+    { "name": name_val, "modalities": modalities_obj, .. } => {
+      inspect(
+        name_val,
+        content=(
+          #|String("vision-model")
+        ),
+      )
       match modalities_obj {
-        { "input": input_arr, "output": output_arr, .. } => {
+        { "input": input_arr, .. } =>
           inspect(
             input_arr,
             content=(
-              #|Array([String("text")])
+              #|Array([String("text"), String("vision")])
             ),
           )
-          inspect(
-            output_arr,
-            content=(
-              #|Array([String("text")])
-            ),
-          )
-        }
         _ => fail("modalities structure mismatch")
       }
     }
-    _ => fail("model entry structure mismatch")
+    _ => fail("model structure mismatch")
   }
 }
 
@@ -505,7 +570,7 @@ test "apply_provider_to_json - preserves schema if already present" {
     api_key: "sk-schema-key",
     openai_base_url: Some("https://schema.example.com/v1"),
     anthropic_base_url: None,
-    models: ["schema-model"],
+    models: [@provider.Model::new(name="schema-model")],
   }
   let updated_json = OpenCode::apply_provider_to_json(
     custom_schema_json,
@@ -528,5 +593,151 @@ test "apply_provider_to_json - preserves schema if already present" {
       )
     }
     _ => fail("schema was not preserved")
+  }
+}
+
+///|
+test "apply_provider_to_json - picks correct base URL when both are provided" {
+  let provider = @provider.Provider::{
+    name: "dual-base-provider",
+    api_key: "sk-dual-key",
+    openai_base_url: Some("https://openai.example.com/v1"),
+    anthropic_base_url: Some("https://anthropic.example.com/v1"),
+    models: [@provider.Model::new(name="dual-model")],
+  }
+
+  // Test with Anthropic format
+  let anthropic_json = OpenCode::apply_provider_to_json(
+    sample_opencode_json(),
+    provider,
+    Some(Anthropic),
+  )
+  match anthropic_json {
+    {
+      "provider": {
+        "dual-base-provider": { "options": { "baseURL": url_val, .. }, .. },
+        ..
+      },
+      ..
+    } =>
+      inspect(
+        url_val,
+        content=(
+          #|String("https://anthropic.example.com/v1")
+        ),
+      )
+    _ => fail("Anthropic base URL not used for Anthropic format")
+  }
+
+  // Test with OpenAI format
+  let openai_json = OpenCode::apply_provider_to_json(
+    sample_opencode_json(),
+    provider,
+    Some(OpenAI),
+  )
+  match openai_json {
+    {
+      "provider": {
+        "dual-base-provider": { "options": { "baseURL": url_val, .. }, .. },
+        ..
+      },
+      ..
+    } =>
+      inspect(
+        url_val,
+        content=(
+          #|String("https://openai.example.com/v1")
+        ),
+      )
+    _ => fail("OpenAI base URL not used for OpenAI format")
+  }
+}
+
+///|
+test "create_model_entry - supports multiple output modalities" {
+  let model = @provider.Model::{
+    name: "multi-modal-model",
+    context_limit: None,
+    output_limit: None,
+    input_modality: [@provider.Modality::Text, @provider.Modality::Vision],
+    output_modality: [@provider.Modality::Text, @provider.Modality::Audio],
+  }
+  let model_entry = OpenCode::create_model_entry(model)
+  match model_entry {
+    { "modalities": { "input": input_arr, "output": output_arr, .. }, .. } => {
+      inspect(
+        input_arr,
+        content=(
+          #|Array([String("text"), String("vision")])
+        ),
+      )
+      inspect(
+        output_arr,
+        content=(
+          #|Array([String("text"), String("audio")])
+        ),
+      )
+    }
+    _ => fail("multi-modal structure mismatch")
+  }
+}
+
+///|
+test "apply_provider_to_json - preserves unknown top-level fields" {
+  let json_with_custom_fields : Json = {
+    "$schema": "https://opencode.ai/config.json",
+    "provider": {},
+    "custom-setting": "custom-value",
+    "feature-flags": { "beta": true, "experimental": false },
+  }
+  let provider = @provider.Provider::{
+    name: "custom-field-provider",
+    api_key: "sk-custom-key",
+    openai_base_url: Some("https://custom.example.com/v1"),
+    anthropic_base_url: None,
+    models: [@provider.Model::new(name="custom-model")],
+  }
+  let updated_json = OpenCode::apply_provider_to_json(
+    json_with_custom_fields,
+    provider,
+    Some(OpenAI),
+  )
+  match updated_json {
+    { "custom-setting": custom_val, "feature-flags": flags_val, .. } => {
+      inspect(
+        custom_val,
+        content=(
+          #|String("custom-value")
+        ),
+      )
+      inspect(
+        flags_val,
+        content=(
+          #|Object({"beta": True, "experimental": False})
+        ),
+      )
+    }
+    _ => fail("custom top-level fields not preserved")
+  }
+}
+
+///|
+test "apply_provider_to_json - errors when Anthropic format has no anthropic base URL" {
+  let provider = @provider.Provider::{
+    name: "invalid-anthropic-provider",
+    api_key: "sk-test-key",
+    openai_base_url: Some("https://openai.example.com/v1"),
+    anthropic_base_url: None,
+    models: [@provider.Model::new(name="test-model")],
+  }
+  let result = try? OpenCode::apply_provider_to_json(
+    sample_opencode_json(),
+    provider,
+    Some(Anthropic),
+  )
+  match result {
+    Err(_) =>
+      inspect("error raised as expected", content="error raised as expected")
+    Ok(_) => fail("should have raised error for missing anthropic base URL")
   }
 }

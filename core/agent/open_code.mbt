@@ -61,22 +61,58 @@ fn OpenCode::get_base_url(
 }
 
 ///|
-/// Create a default model entry for a model name
-fn OpenCode::create_model_entry(model_name : String) -> Json {
-  Json::object(
-    Map::from_array([
-      ("name", Json::string(model_name)),
-      (
-        "modalities",
-        Json::object(
-          Map::from_array([
-            ("input", Json::array([Json::string("text")])),
-            ("output", Json::array([Json::string("text")])),
-          ]),
-        ),
-      ),
-    ]),
-  )
+/// Create a model entry from a Model object, excluding null fields
+fn OpenCode::create_model_entry(model : @provider.Model) -> Json {
+  let entries = Map::new()
+  entries["name"] = Json::string(model.name)
+
+  // Only add optional fields if they are set
+  match model.context_limit {
+    Some(limit) => entries["context_limit"] = Json::number(limit.to_double())
+    _ => ()
+  }
+  match model.output_limit {
+    Some(limit) => entries["output_limit"] = Json::number(limit.to_double())
+    _ => ()
+  }
+
+  // Only add modalities if they differ from default [Text]
+  let is_default_text_modality = fn(arr : Array[@provider.Modality]) -> Bool {
+    arr.length() == 1 && arr[0] == @provider.Modality::Text
+  }
+  let input_is_default = is_default_text_modality(model.input_modality)
+  let output_is_default = is_default_text_modality(model.output_modality)
+
+  if not(input_is_default) || not(output_is_default) {
+    let modalities_map = Map::new()
+    if not(input_is_default) {
+      let input_strs = model.input_modality.map(fn(m) {
+        match m {
+          @provider.Modality::Text => "text"
+          @provider.Modality::Vision => "vision"
+          @provider.Modality::Audio => "audio"
+        }
+      })
+      modalities_map["input"] = Json::array(
+        input_strs.map(fn(s) { Json::string(s) }),
+      )
+    }
+    if not(output_is_default) {
+      let output_strs = model.output_modality.map(fn(m) {
+        match m {
+          @provider.Modality::Text => "text"
+          @provider.Modality::Vision => "vision"
+          @provider.Modality::Audio => "audio"
+        }
+      })
+      modalities_map["output"] = Json::array(
+        output_strs.map(fn(s) { Json::string(s) }),
+      )
+    }
+    entries["modalities"] = Json::object(modalities_map)
+  }
+
+  Json::object(entries)
 }
 
 ///|
@@ -163,8 +199,9 @@ fn OpenCode::apply_provider_to_json(
   }
 
   // Add each model from the provider
-  for model_name in provider.models {
-    models_map[model_name] = OpenCode::create_model_entry(model_name)
+  for model in provider.models {
+    let model_name = model.name
+    models_map[model_name] = OpenCode::create_model_entry(model)
   }
   provider_entry["models"] = Json::object(models_map)
 

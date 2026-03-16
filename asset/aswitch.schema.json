@@ -39,14 +39,51 @@
         },
         "models": {
           "type": "array",
-          "description": "Model names to use for this provider",
+          "description": "Models to use for this provider",
           "items": {
-            "type": "string"
+            "$ref": "#/$defs/Model"
           },
-          "examples": [["gpt-4", "gpt-3.5-turbo"], ["claude-3-opus-20240229"]]
+          "examples": [[{"name": "gpt-4"}, {"name": "gpt-3.5-turbo"}], [{"name": "claude-3-opus-20240229"}]]
         }
       },
       "required": ["name", "api_key", "models"]
+    },
+    "Model": {
+      "type": "object",
+      "description": "Model configuration",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Model name"
+        },
+        "context_limit": {
+          "type": "integer",
+          "description": "Optional context window limit (in tokens)"
+        },
+        "output_limit": {
+          "type": "integer",
+          "description": "Optional output limit (in tokens)"
+        },
+        "input_modality": {
+          "type": "array",
+          "description": "Input modalities",
+          "items": {
+            "type": "string",
+            "enum": ["Text", "Vision", "Audio"]
+          },
+          "default": ["Text"]
+        },
+        "output_modality": {
+          "type": "array",
+          "description": "Output modalities",
+          "items": {
+            "type": "string",
+            "enum": ["Text", "Vision", "Audio"]
+          },
+          "default": ["Text"]
+        }
+      },
+      "required": ["name"]
     }
   }
 }

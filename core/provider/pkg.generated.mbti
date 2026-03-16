@@ -10,12 +10,34 @@ import {
 // Errors
 
 // Types and methods
+pub(all) enum Modality {
+  Text
+  Vision
+  Audio
+}
+pub impl Eq for Modality
+pub impl Show for Modality
+pub impl ToJson for Modality
+pub impl @json.FromJson for Modality
+
+pub(all) struct Model {
+  name : String
+  context_limit : Int?
+  output_limit : Int?
+  input_modality : Array[Modality]
+  output_modality : Array[Modality]
+}
+pub fn Model::new(name~ : String, context_limit? : Int, output_limit? : Int) -> Self
+pub impl Eq for Model
+pub impl Show for Model
+pub impl ToJson for Model
+
 pub(all) struct Provider {
   name : String
   api_key : String
   openai_base_url : String?
   anthropic_base_url : String?
-  models : Array[String]
+  models : Array[Model]
 }
 pub impl Eq for Provider
 pub impl Show for Provider

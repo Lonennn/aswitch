@@ -62,19 +62,25 @@ fn ClaudeCode::apply_provider_to_json(
       "at least one model is required for Claude Code agent",
     )
   }
-  env_map["ANTHROPIC_DEFAULT_OPUS_MODEL"] = Json::string(provider.models[0])
+  env_map["ANTHROPIC_DEFAULT_OPUS_MODEL"] = Json::string(
+    provider.models[0].name,
+  )
   if model_count > 1 {
-    env_map["ANTHROPIC_DEFAULT_SONNET_MODEL"] = Json::string(provider.models[1])
+    env_map["ANTHROPIC_DEFAULT_SONNET_MODEL"] = Json::string(
+      provider.models[1].name,
+    )
   } else {
     env_map["ANTHROPIC_DEFAULT_SONNET_MODEL"] = Json::string(
-      provider.models[model_count - 1],
+      provider.models[model_count - 1].name,
     )
   }
   if model_count > 2 {
-    env_map["ANTHROPIC_DEFAULT_HAIKU_MODEL"] = Json::string(provider.models[2])
+    env_map["ANTHROPIC_DEFAULT_HAIKU_MODEL"] = Json::string(
+      provider.models[2].name,
+    )
   } else {
     env_map["ANTHROPIC_DEFAULT_HAIKU_MODEL"] = Json::string(
-      provider.models[model_count - 1],
+      provider.models[model_count - 1].name,
     )
   }
 

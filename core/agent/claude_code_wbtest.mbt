@@ -96,7 +96,11 @@ test "apply_provider_to_json - updates env and preserves all other properties" {
     api_key: "new-api-key-12345",
     openai_base_url: None,
     anthropic_base_url: Some("https://new-provider.example.com/api/v1"),
-    models: ["new-opus", "new-sonnet", "new-haiku"],
+    models: [
+      @provider.Model::new(name="new-opus"),
+      @provider.Model::new(name="new-sonnet"),
+      @provider.Model::new(name="new-haiku"),
+    ],
   }
   let original_json = sample_settings_json()
   let updated_json = ClaudeCode::apply_provider_to_json(original_json, provider)
@@ -199,7 +203,10 @@ test "apply_provider_to_json - with 2 models uses last model for sonnet and haik
     api_key: "two-model-key",
     openai_base_url: None,
     anthropic_base_url: Some("https://two-model.example.com/api"),
-    models: ["model-a", "model-b"],
+    models: [
+      @provider.Model::new(name="model-a"),
+      @provider.Model::new(name="model-b"),
+    ],
   }
   let original_json = sample_settings_json()
   let updated_json = ClaudeCode::apply_provider_to_json(original_json, provider)
@@ -271,7 +278,7 @@ test "apply_provider_to_json - with 1 model uses same model for all" {
     api_key: "single-model-key",
     openai_base_url: None,
     anthropic_base_url: Some("https://single.example.com/api"),
-    models: ["only-model"],
+    models: [@provider.Model::new(name="only-model")],
   }
   let original_json = sample_settings_json()
   let updated_json = ClaudeCode::apply_provider_to_json(original_json, provider)
@@ -328,7 +335,7 @@ test "apply_provider_to_json - raises error when anthropic_base_url is None" {
     api_key: "some-key",
     openai_base_url: Some("https://openai.example.com/v1"),
     anthropic_base_url: None,
-    models: ["model-1"],
+    models: [@provider.Model::new(name="model-1")],
   }
   let original_json = sample_settings_json()
   let result = try? ClaudeCode::apply_provider_to_json(original_json, provider)
@@ -371,7 +378,11 @@ test "apply_provider_to_json - works with minimal settings (no hooks/plugins)" {
     api_key: "new-key",
     openai_base_url: None,
     anthropic_base_url: Some("https://new.example.com/api"),
-    models: ["opus-model", "sonnet-model", "haiku-model"],
+    models: [
+      @provider.Model::new(name="opus-model"),
+      @provider.Model::new(name="sonnet-model"),
+      @provider.Model::new(name="haiku-model"),
+    ],
   }
   let updated_json = ClaudeCode::apply_provider_to_json(minimal_json, provider)
 

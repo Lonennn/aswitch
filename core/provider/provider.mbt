@@ -9,6 +9,14 @@ pub(all) struct Provider {
   openai_base_url : String?
   /// Anthropic-compatible API base URL (e.g., https://api.anthropic.com)
   anthropic_base_url : String?
-  /// Model name to use
-  models : Array[String]
+  /// Models to use
+  models : Array[Model]
+} derive(Show, Eq, ToJson, FromJson)
+
+///|
+/// Modality enum for model input/output capabilities
+pub(all) enum Modality {
+  Text
+  Vision
+  Audio
 } derive(Show, Eq, ToJson, FromJson)
