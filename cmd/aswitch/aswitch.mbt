@@ -37,6 +37,6 @@ fn execute_command(command : @command.Command) -> Int {
 ///|
 /// Print version information
 pub fn print_version() -> Int {
-  println("aswitch v0.2.0")
+  println("aswitch v0.3.0")
   0
 }
