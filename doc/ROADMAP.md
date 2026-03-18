@@ -65,11 +65,13 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 | Epic | Hypothesis | Success Metric | Effort |
 |------|------------|----------------|--------|
 | **OpenCode Support** | We believe that supporting OpenCode will expand our addressable user base by 30% because OpenCode is the second most popular AI coding agent. | Active OpenCode users | M (3-4 weeks) |
+| **Zed Editor Support** | We believe that supporting Zed editor will capture the modern IDE segment because Zed is a popular next-generation editor with built-in AI capabilities. | Active Zed users | S (2 weeks) |
 | **OpenClaw Support** | We believe that supporting OpenClaw will capture the open-source community segment because OpenClaw is gaining traction in OSS projects. | GitHub stars / mentions | S (2 weeks) |
 | **Generic Agent Framework** | We believe that a plugin-style agent framework will enable community contributions because maintainers can't support every new agent. | Community-contributed agents | L (6-8 weeks) |
 
 **Key Deliverables:**
 - [x] OpenCode agent implementation
+- [ ] Zed editor agent implementation
 - [ ] OpenClaw agent implementation
 - [ ] Agent capability detection (auto-discover installed agents)
 - [ ] Generic agent configuration template system
@@ -132,6 +134,7 @@ Q1 2026 (Now - Foundation):
 
 Q2 2026 (Next - Agent Expansion):
 ├── OpenCode Agent Support ✅
+├── Zed Editor Agent Support
 ├── OpenClaw Agent Support
 └── Generic Agent Plugin Framework
 
@@ -154,7 +157,7 @@ Q4 2026 (Exploration - Advanced):
 
 | Metric | Current | Q1 Target | Q2 Target | Q4 Target |
 |--------|---------|-----------|-----------|-----------|
-| Supported Agents | 2 | 2 | 3+ | 5+ |
+| Supported Agents | 2 | 2 | 4+ | 6+ |
 | Supported Providers | ∞ (manual) | ∞ (CLI) | 5 presets | 10 presets |
 | Setup Time | 10 min | 2 min | 2 min | 1 min |
 | Active Users | - | 100 | 500 | 2000 |
@@ -177,7 +180,7 @@ Q4 2026 (Exploration - Advanced):
 ## Open Questions
 
 1. Should we support non-OpenAI-compatible API formats natively?
-2. What's the priority order for additional agents (Cursor, Copilot, etc.)?
+2. What's the priority order for additional agents (Zed completed, next: Cursor, Copilot, etc.)?
 3. Should we support agent-specific configuration beyond environment variables?
 4. Is there demand for a Homebrew/apt package distribution?
 
@@ -194,5 +197,5 @@ Q4 2026 (Exploration - Advanced):
 
 ---
 
-*Last updated: 2026-03-16*
-*Roadmap version: 1.0*
+*Last updated: 2026-03-18*
+*Roadmap version: 1.1*
