@@ -1,10 +1,10 @@
 ///|
-/// Switch provider for an agent
+/// Set provider for an agent
 
 ///|
-/// Switch an agent to a different provider
+/// Set an agent to use a different provider
 /// api_format is optional and only used by some agents (e.g., OpenCode)
-pub fn switch_provider(
+pub fn set_provider(
   agent_name : String,
   provider_name : String,
   api_format : @agent.ApiFormat?,
@@ -43,6 +43,6 @@ pub fn switch_provider(
     )
     EXIT_CODE_CONFIG_ERROR
   }
-  println("Successfully switch \{agent.name()} to use \{provider.name}")
+  println("Successfully set \{agent.name()} to use \{provider.name}")
   EXIT_CODE_SUCCESS
 }

@@ -9,7 +9,7 @@ pub fn print_help() -> Int {
   println("  init                        Initialize configuration file")
   println("  list, ls                    List all configured providers")
   println(
-    "  switch <agent name> <provider_name>               Switch to a different provider",
+    "  set <agent name> <provider_name>                  Set to a different provider",
   )
   // println("  add <name> <api_key> <base_url> <model>")
   // println(
@@ -23,7 +23,7 @@ pub fn print_help() -> Int {
   println("")
   println("Examples:")
   println("  aswitch init")
-  println("  aswitch switch claude glm")
+  println("  aswitch set claude glm")
   // println("  aswitch add openai sk-xxx https://api.openai.com/v1 gpt-4")
   // println(
   //   "  aswitch add anthropic sk-xxx https://api.anthropic.com claude-3-opus",

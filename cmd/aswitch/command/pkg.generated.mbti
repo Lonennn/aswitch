@@ -14,7 +14,7 @@ pub fn parse_args(Array[String]) -> Command
 
 pub fn print_help() -> Int
 
-pub fn switch_provider(String, String, @agent.ApiFormat?) -> Int
+pub fn set_provider(String, String, @agent.ApiFormat?) -> Int
 
 // Errors
 
@@ -22,7 +22,7 @@ pub fn switch_provider(String, String, @agent.ApiFormat?) -> Int
 pub enum Command {
   Init
   ListProviders
-  SwitchProvider(agent~ : String, provider~ : String, api_format~ : @agent.ApiFormat?)
+  SetProvider(agent~ : String, provider~ : String, api_format~ : @agent.ApiFormat?)
   Help
   Version
   Unknown(String)
