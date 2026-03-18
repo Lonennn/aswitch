@@ -374,7 +374,7 @@ test "apply_provider_to_json - OpenAI API format" {
 }
 
 ///|
-test "apply_provider_to_json - None api_format (defaults to OpenAI with anthropic_base_url)" {
+test "apply_provider_to_json - None api_format uses Anthropic SDK when only anthropic_base_url provided" {
   let provider = @provider.Provider::{
     name: "default-provider",
     api_key: "sk-default-key",
@@ -397,7 +397,7 @@ test "apply_provider_to_json - None api_format (defaults to OpenAI with anthropi
               inspect(
                 npm_val,
                 content=(
-                  #|String("@ai-sdk/openai-compatible")
+                  #|String("@ai-sdk/anthropic")
                 ),
               )
               match options_obj {
@@ -593,6 +593,77 @@ test "apply_provider_to_json - preserves schema if already present" {
       )
     }
     _ => fail("schema was not preserved")
+  }
+}
+
+///|
+test "apply_provider_to_json - None api_format uses OpenAI SDK when only openai_base_url provided" {
+  let provider = @provider.Provider::{
+    name: "openai-only-provider",
+    api_key: "sk-openai-key",
+    openai_base_url: Some("https://openai.example.com/v1"),
+    anthropic_base_url: None,
+    models: [@provider.Model::new(name="gpt-4")],
+  }
+  let original_json = sample_opencode_json()
+  let updated_json = OpenCode::apply_provider_to_json(
+    original_json,
+    provider,
+    None,
+  )
+  match updated_json {
+    { "provider": provider_obj, .. } =>
+      match provider_obj {
+        { "openai-only-provider": openai_provider, .. } =>
+          match openai_provider {
+            { "npm": npm_val, "options": options_obj, .. } => {
+              inspect(
+                npm_val,
+                content=(
+                  #|String("@ai-sdk/openai-compatible")
+                ),
+              )
+              match options_obj {
+                { "baseURL": base_url_val, .. } =>
+                  inspect(
+                    base_url_val,
+                    content=(
+                      #|String("https://openai.example.com/v1")
+                    ),
+                  )
+                _ => fail("options structure mismatch")
+              }
+            }
+            _ => fail("openai-only-provider structure mismatch")
+          }
+        _ => fail("provider structure mismatch")
+      }
+    _ => fail("root structure mismatch")
+  }
+}
+
+///|
+test "apply_provider_to_json - None api_format with both base URLs raises error" {
+  let provider = @provider.Provider::{
+    name: "dual-url-provider",
+    api_key: "sk-dual-key",
+    openai_base_url: Some("https://openai.example.com/v1"),
+    anthropic_base_url: Some("https://anthropic.example.com/v1"),
+    models: [@provider.Model::new(name="test-model")],
+  }
+  let original_json = sample_opencode_json()
+  let result = try? OpenCode::apply_provider_to_json(
+    original_json,
+    provider,
+    None,
+  )
+  match result {
+    Err(_) =>
+      inspect("error raised as expected", content="error raised as expected")
+    Ok(_) =>
+      fail(
+        "should have raised error when both URLs provided without api_format",
+      )
   }
 }
 

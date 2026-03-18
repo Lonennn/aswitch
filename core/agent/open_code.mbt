@@ -28,33 +28,42 @@ fn OpenCode::get_config_dir() -> String {
 }
 
 ///|
-/// Get the base URL for a provider based on the API format
-/// Returns the appropriate base URL or raises ProviderLackUrlError if none available
-fn OpenCode::get_base_url(
+/// Determine both npm package and base URL based on api_format and available base URLs
+/// Returns (npm_package, base_url) tuple or raises ProviderLackUrlError if ambiguous
+fn OpenCode::determine_api_config(
   provider : @provider.Provider,
   api_format : ApiFormat?,
-) -> String raise ProviderLackUrlError {
+) -> (String, String) raise ProviderLackUrlError {
   match api_format {
     Some(OpenAI) =>
-      provider.openai_base_url.unwrap_or_error(
-        ProviderLackUrlError(
-          "openai_base_url is required in your aswitch.json when you choose to use OpenAI compatible API",
+      (
+        AI_SDK_OPENAI,
+        provider.openai_base_url.unwrap_or_error(
+          ProviderLackUrlError(
+            "openai_base_url is required in your aswitch.json when you choose to use OpenAI compatible API",
+          ),
         ),
       )
     Some(Anthropic) =>
-      provider.anthropic_base_url.unwrap_or_error(
-        ProviderLackUrlError(
-          "anthropic_base_url is required in your aswitch.json when you choose to use Anthropic compatible API",
+      (
+        AI_SDK_ANTHROPIC,
+        provider.anthropic_base_url.unwrap_or_error(
+          ProviderLackUrlError(
+            "anthropic_base_url is required in your aswitch.json when you choose to use Anthropic compatible API",
+          ),
         ),
       )
     None =>
-      match provider.anthropic_base_url {
-        Some(url) => url
-        None =>
-          provider.openai_base_url.unwrap_or_error(
-            ProviderLackUrlError(
-              "anthropic_base_url or openai_base_url is required for OpenCode agent",
-            ),
+      match (provider.openai_base_url, provider.anthropic_base_url) {
+        (Some(url), None) => (AI_SDK_OPENAI, url)
+        (None, Some(url)) => (AI_SDK_ANTHROPIC, url)
+        (Some(_), Some(_)) =>
+          raise ProviderLackUrlError(
+            "both openai_base_url and anthropic_base_url are provided, please specify --api-format via command line",
+          )
+        (None, None) =>
+          raise ProviderLackUrlError(
+            "anthropic_base_url or openai_base_url is required for OpenCode agent",
           )
       }
   }
@@ -147,17 +156,13 @@ fn OpenCode::apply_provider_to_json(
     _ => Map::new()
   }
 
-  // Set npm package (using Open AI SDK by default)
-  provider_entry["npm"] = Json::string(
-    match api_format {
-      None => AI_SDK_OPENAI
-      Some(format) =>
-        match format {
-          OpenAI => AI_SDK_OPENAI
-          Anthropic => AI_SDK_ANTHROPIC
-        }
-    },
+  // Determine both npm package and base URL
+  let (npm_package, base_url) = OpenCode::determine_api_config(
+    provider, api_format,
   )
+
+  // Set npm package
+  provider_entry["npm"] = Json::string(npm_package)
 
   // Set display name
   provider_entry["name"] = Json::string(provider.name)
@@ -176,7 +181,6 @@ fn OpenCode::apply_provider_to_json(
   options_map["apiKey"] = Json::string(provider.api_key)
 
   // Set base URL
-  let base_url = OpenCode::get_base_url(provider, api_format)
   options_map["baseURL"] = Json::string(base_url)
   provider_entry["options"] = Json::object(options_map)
 
