@@ -15,10 +15,10 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 
 ---
 
-## Current State (v0.2.0)
+## Current State (v0.3.0)
 
 **Implemented:**
-- Basic CLI structure with commands: `init`, `list`, `switch`, `help`, `version`
+- Basic CLI structure with commands: `init`, `list`, `set`, `help`, `version`
 - Configuration file management (`aswitch.json`)
 - Claude Code agent support (~/.claude/settings.json)
 - OpenCode agent support (~/.config/opencode/opencode.json)
