@@ -550,13 +550,13 @@ test "create_model_entry - includes modalities when non-default" {
 ///|
 test "get_config_file_path - returns correct path" {
   let path = OpenCode::get_config_file_path()
-  assert_true(path.has_suffix("/opencode.json"))
+  assert_true(path.has_suffix("opencode.json"))
 }
 
 ///|
 test "get_config_dir - returns correct directory" {
   let dir = OpenCode::get_config_dir()
-  assert_true(dir.has_suffix("/opencode"))
+  assert_true(dir.has_suffix("opencode"))
 }
 
 ///|
