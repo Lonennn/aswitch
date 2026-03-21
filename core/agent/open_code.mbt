@@ -23,9 +23,7 @@ fn OpenCode::get_config_dir() -> String {
   // Try XDG_CONFIG_HOME first (Unix standard)
   let dir = match @sys.get_env_var("XDG_CONFIG_HOME") {
     Some(config_home) => @path.Path::join(config_home, "opencode")
-    None =>
-      @path.Path::join(@util.get_user_home(), ".config")
-      .join("opencode")
+    None => @path.Path::join(@util.get_user_home(), ".config").join("opencode")
   }
   dir.to_string()
 }
