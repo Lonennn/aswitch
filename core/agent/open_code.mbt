@@ -13,7 +13,7 @@ const AI_SDK_ANTHROPIC = "@ai-sdk/anthropic"
 ///|
 /// Get the OpenCode configuration file path (~/.config/opencode/opencode.json)
 fn OpenCode::get_config_file_path() -> String {
-  OpenCode::get_config_dir() + "/opencode.json"
+  @path.Path::join(OpenCode::get_config_dir(), "opencode.json").to_string()
 }
 
 ///|
@@ -21,10 +21,13 @@ fn OpenCode::get_config_file_path() -> String {
 /// Supports Unix/macOS (XDG_CONFIG_HOME or HOME) and Windows (APPDATA)
 fn OpenCode::get_config_dir() -> String {
   // Try XDG_CONFIG_HOME first (Unix standard)
-  match @sys.get_env_var("XDG_CONFIG_HOME") {
-    Some(config_home) => config_home + "/opencode"
-    None => @util.get_user_home() + "/.config/opencode"
+  let dir = match @sys.get_env_var("XDG_CONFIG_HOME") {
+    Some(config_home) => @path.Path::join(config_home, "opencode")
+    None =>
+      @path.Path::join(@util.get_user_home(), ".config")
+      .join("opencode")
   }
+  dir.to_string()
 }
 
 ///|

@@ -2,6 +2,7 @@ import {
   "moonbitlang/core/list",
   "moonbitlang/core/json",
   "moonbitlang/core/ref",
+  "moonbitlang/x/path",
   "moonbitlang/x/sys",
   "moonbitlang/x/fs",
   "lonen44/aswitch/core/provider",

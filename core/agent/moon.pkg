@@ -3,5 +3,6 @@ import {
   "lonen44/aswitch/core/util",
   "moonbitlang/x/sys",
   "moonbitlang/x/fs",
+  "moonbitlang/x/path",
   "moonbitlang/core/json",
 }

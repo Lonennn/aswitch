@@ -7,7 +7,7 @@ pub struct ClaudeCode {}
 ///|
 /// Get the Claude Code configuration file path (~/.claude/settings.json)
 fn ClaudeCode::get_config_file_path() -> String {
-  ClaudeCode::get_config_dir() + "/settings.json"
+  @path.Path::join(ClaudeCode::get_config_dir(), "settings.json").to_string()
 }
 
 ///|
@@ -18,7 +18,7 @@ fn ClaudeCode::get_config_dir() -> String {
   if home == "." {
     ".claude"
   } else {
-    home + "/.claude"
+    @path.Path::join(home, ".claude").to_string()
   }
 }
 

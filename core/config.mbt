@@ -62,16 +62,16 @@ pub fn get_config_path() -> String {
       if trimmed.is_empty() {
         CONFIG_FILE_NAME
       } else {
-        trimmed.to_string() + "/" + CONFIG_FILE_NAME
+        @path.Path::join(trimmed.to_string(), CONFIG_FILE_NAME).to_string()
       }
     }
     None =>
       // Try HOME (Unix/macOS) or USERPROFILE (Windows)
       match @sys.get_env_var("HOME") {
-        Some(home) => home + "/" + CONFIG_FILE_NAME
+        Some(home) => @path.Path::join(home, CONFIG_FILE_NAME).to_string()
         None =>
           match @sys.get_env_var("USERPROFILE") {
-            Some(home) => home + "/" + CONFIG_FILE_NAME
+            Some(home) => @path.Path::join(home, CONFIG_FILE_NAME).to_string()
             None => CONFIG_FILE_NAME
           }
       }
