@@ -5,3 +5,4 @@ target
 .moonagent/
 
 .claude/settings.local.json
+.worktrees/
