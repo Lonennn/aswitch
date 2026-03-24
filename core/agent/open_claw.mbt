@@ -56,12 +56,8 @@ fn OpenClaw::determine_api_config(
       )
     None =>
       match (provider.openai_base_url, provider.anthropic_base_url) {
-        (Some(url), None) => (AI_API_OPENAI, url)
         (None, Some(url)) => (AI_API_ANTHROPIC, url)
-        (Some(_), Some(_)) =>
-          raise ProviderLackUrlError(
-            "both openai_base_url and anthropic_base_url are provided, please specify --api-format via command line",
-          )
+        (Some(url), _) => (AI_API_OPENAI, url)
         (None, None) =>
           raise ProviderLackUrlError(
             "anthropic_base_url or openai_base_url is required for OpenClaw agent",
