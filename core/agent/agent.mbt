@@ -16,6 +16,7 @@ pub fn create(agent_name : String) -> &Agent? {
   match agent_name.to_lower() {
     "claude" | "claudecode" => Some(ClaudeCode::{  })
     "opencode" | "open-code" => Some(OpenCode::{  })
+    "openclaw" | "open-claw" => Some(OpenClaw::{  })
     _ => None
   }
 }
