@@ -23,6 +23,10 @@ pub struct ClaudeCode {
 }
 pub impl Agent for ClaudeCode
 
+pub struct OpenClaw {
+}
+pub impl Agent for OpenClaw
+
 pub struct OpenCode {
 }
 pub impl Agent for OpenCode
