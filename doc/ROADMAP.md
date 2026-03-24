@@ -22,6 +22,7 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 - Configuration file management (`aswitch.json`)
 - Claude Code agent support (~/.claude/settings.json)
 - OpenCode agent support (~/.config/opencode/opencode.json)
+- OpenClaw agent support (~/.openclaw/openclaw.json)
 - Provider configuration with API keys, base URLs, and extended model configuration (context limits, modalities)
 - Cross-platform path detection (Unix/macOS/Windows)
 - JSON schema validation for configuration
@@ -71,8 +72,8 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 
 **Key Deliverables:**
 - [x] OpenCode agent implementation
+- [x] OpenClaw agent implementation
 - [ ] Zed editor agent implementation
-- [ ] OpenClaw agent implementation
 - [ ] Agent capability detection (auto-discover installed agents)
 - [ ] Generic agent configuration template system
 - [ ] Agent-specific environment variable mapping
@@ -134,8 +135,8 @@ Q1 2026 (Now - Foundation):
 
 Q2 2026 (Next - Agent Expansion):
 ├── OpenCode Agent Support ✅
+├── OpenClaw Agent Support ✅
 ├── Zed Editor Agent Support
-├── OpenClaw Agent Support
 └── Generic Agent Plugin Framework
 
 Q3 2026 (Later - Developer Experience):
@@ -157,7 +158,7 @@ Q4 2026 (Exploration - Advanced):
 
 | Metric | Current | Q1 Target | Q2 Target | Q4 Target |
 |--------|---------|-----------|-----------|-----------|
-| Supported Agents | 2 | 2 | 4+ | 6+ |
+| Supported Agents | 3 | 3 | 4+ | 6+ |
 | Supported Providers | ∞ (manual) | ∞ (CLI) | 5 presets | 10 presets |
 | Setup Time | 10 min | 2 min | 2 min | 1 min |
 | Active Users | - | 100 | 500 | 2000 |
@@ -197,5 +198,5 @@ Q4 2026 (Exploration - Advanced):
 
 ---
 
-*Last updated: 2026-03-18*
-*Roadmap version: 1.1*
+*Last updated: 2026-03-24*
+*Roadmap version: 1.2*
