@@ -26,8 +26,10 @@ pub suberror ProviderLackUrlError {
   ProviderLackUrlError(String)
 }
 
+///|
 impl Show for ProviderLackUrlError with output(self, logger) -> Unit {
   match self {
-    ProviderLackUrlError(msg) => logger.write_string("ProviderLackUrlError: \{msg}")
+    ProviderLackUrlError(msg) =>
+      logger.write_string("ProviderLackUrlError: \{msg}")
   }
 }
