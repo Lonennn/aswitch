@@ -8,6 +8,8 @@ import {
 // Values
 pub fn create(String) -> &Agent?
 
+pub fn supported_agents() -> Array[String]
+
 // Errors
 pub suberror ProviderLackUrlError {
   ProviderLackUrlError(String)

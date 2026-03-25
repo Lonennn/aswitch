@@ -8,6 +8,8 @@ import {
 // Values
 pub fn init_config() -> Int
 
+pub fn list_agents() -> Int
+
 pub fn list_providers() -> Int
 
 pub fn parse_args(Array[String]) -> Command
@@ -22,6 +24,7 @@ pub fn set_provider(String, String, @agent.ApiFormat?) -> Int
 pub enum Command {
   Init
   ListProviders
+  ListAgents
   SetProvider(agent~ : String, provider~ : String, api_format~ : @agent.ApiFormat?)
   Help
   Version

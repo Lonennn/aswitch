@@ -5,6 +5,8 @@ pub enum Command {
   Init
   /// List all providers
   ListProviders
+  /// List supported agents
+  ListAgents
   /// Set active provider (optional api_format: "openai" or "anthropic")
   SetProvider(
     agent~ : String,
@@ -36,7 +38,8 @@ pub fn parse_args(args : Array[String]) -> Command {
       )
       Command::Help
     }
-    ["list" | "ls"] => Command::ListProviders
+    ["providers" | "list" | "ls"] => Command::ListProviders
+    ["agents"] => Command::ListAgents
     ["set" | "switch", agent, provider, .. rest] =>
       if rest.length() == 0 {
         Command::SetProvider(agent~, provider~, api_format=None)

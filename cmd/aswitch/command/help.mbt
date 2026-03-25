@@ -7,7 +7,8 @@ pub fn print_help() -> Int {
   println("")
   println("Commands:")
   println("  init                        Initialize configuration file")
-  println("  list, ls                    List all configured providers")
+  println("  providers                   List all configured providers")
+  println("  agents                      List all supported agents")
   println(
     "  set <agent name> <provider_name>                  Set to a different provider",
   )
@@ -23,6 +24,8 @@ pub fn print_help() -> Int {
   println("")
   println("Examples:")
   println("  aswitch init")
+  println("  aswitch providers")
+  println("  aswitch agents")
   println("  aswitch set claude glm")
   // println("  aswitch add openai sk-xxx https://api.openai.com/v1 gpt-4")
   // println(

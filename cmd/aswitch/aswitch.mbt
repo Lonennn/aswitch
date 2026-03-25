@@ -18,6 +18,7 @@ fn execute_command(command : @command.Command) -> Int {
   match command {
     @command.Command::Init => @command.init_config()
     @command.Command::ListProviders => @command.list_providers()
+    @command.Command::ListAgents => @command.list_agents()
     @command.Command::SetProvider(agent~, provider~, api_format~) =>
       @command.set_provider(agent, provider, api_format)
     @command.Command::Help => @command.print_help()

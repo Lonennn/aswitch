@@ -22,6 +22,11 @@ pub fn create(agent_name : String) -> &Agent? {
 }
 
 ///|
+pub fn supported_agents() -> Array[String] {
+  ["claude-code", "open-code", "openclaw"]
+}
+
+///|
 pub suberror ProviderLackUrlError {
   ProviderLackUrlError(String)
 }
