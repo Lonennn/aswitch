@@ -25,13 +25,15 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 - OpenClaw agent support (~/.openclaw/openclaw.json)
 - Provider configuration with API keys, base URLs, and extended model configuration (context limits, modalities)
 - Cross-platform path detection (Unix/macOS/Windows)
-- JSON schema validation for configuration
+- JSON schema provided for editor IntelliSense and manual validation workflows
 - Switch command supports optional API format parameter (openai/anthropic) for OpenCode agent
 - Improved error handling with descriptive error messages
 
 **Limitations:**
 - No runtime provider management (add/remove commented out)
 - No interactive setup
+- No runtime configuration validation before applying provider changes
+- No backup or dry-run protection for switch operations
 - Partial error handling coverage for edge cases
 
 ---
@@ -40,20 +42,22 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 
 ### Phase 1: Foundation (Q1 2026) - Now
 
-**Theme: Core Stability & Essential Features**
+**Theme: Safe Writes & Core Stability**
 
 | Epic | Hypothesis | Success Metric | Effort |
 |------|------------|----------------|--------|
-| **Provider Management** | We believe that adding runtime provider CRUD operations will reduce manual JSON editing by 80% because users currently need to hand-edit the config file. | % of users using CLI vs manual editing | M (3-4 weeks) |
-| **Configuration Validation** | We believe that validating configuration before applying will reduce configuration errors by 90% because invalid configs currently fail silently. | Error rate reduction | S (1-2 weeks) |
-| **Interactive Setup** | We believe that an interactive `init` command will improve first-time setup completion from 40% to 80% because new users struggle with manual config creation. | Setup completion rate | M (3-4 weeks) |
+| **Runtime Configuration Validation** | We believe that validating configuration before any write or apply operation will reduce configuration errors by 90% because malformed or incomplete configs currently fail late. | Error rate reduction | S (1-2 weeks) |
+| **Safe Modification Workflow** | We believe that backup and dry-run support will reduce destructive mistakes because `set` currently writes directly to agent config files. | Failed switch recovery rate | S (1-2 weeks) |
+| **Provider Management** | We believe that adding runtime provider CRUD operations after validation and backup support will reduce manual JSON editing by 80% without increasing support burden. | % of users using CLI vs manual editing | M (3-4 weeks) |
+| **Interactive Setup** | We believe that an interactive setup flow will improve first-time setup completion from 40% to 80% because new users struggle with manual config creation. | Setup completion rate | M (3-4 weeks) |
 
 **Key Deliverables:**
-- [ ] Uncomment and implement `add`, `remove`, `export` commands
-- [x] Add JSON schema validation for configuration
-- [ ] Interactive wizard for provider setup
+- [ ] Add runtime configuration validation before `set` and future mutating commands
 - [ ] Configuration backup before modifications
 - [ ] Dry-run mode for switch operations
+- [ ] Uncomment and implement `add` and `remove` commands
+- [ ] Expand command and integration tests around mutating workflows
+- [ ] Interactive wizard for provider setup
 
 **Dependencies:** None
 
@@ -129,8 +133,9 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 
 ```
 Q1 2026 (Now - Foundation):
-├── Provider Management (add/remove/edit commands)
-├── Configuration Validation
+├── Runtime Configuration Validation
+├── Backup + Dry-Run Safety Rails
+├── Provider Management (add/remove)
 └── Interactive Setup Wizard
 
 Q2 2026 (Next - Agent Expansion):
@@ -192,11 +197,12 @@ Q4 2026 (Exploration - Advanced):
 | Risk | Impact | Mitigation |
 |------|--------|------------|
 | Agent config format changes | High | Version detection, graceful degradation |
+| Direct config writes corrupt user settings | High | Backup before write, dry-run preview, stronger integration tests |
 | MoonBit ecosystem maturity | Medium | Keep dependencies minimal |
 | Low adoption | Medium | Focus on developer experience, community engagement |
 | Security concerns (API keys) | High | Document security best practices, support secret managers |
 
 ---
 
-*Last updated: 2026-03-24*
-*Roadmap version: 1.2*
+*Last updated: 2026-03-25*
+*Roadmap version: 1.3*
