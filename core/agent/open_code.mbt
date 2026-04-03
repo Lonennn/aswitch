@@ -93,9 +93,9 @@ fn OpenCode::create_model_entry(model : @provider.Model) -> Json {
   let input_is_default = is_default_text_modality(model.input_modality)
   let output_is_default = is_default_text_modality(model.output_modality)
 
-  if not(input_is_default) || not(output_is_default) {
+  if !input_is_default || !output_is_default {
     let modalities_map = Map::new()
-    if not(input_is_default) {
+    if !input_is_default {
       let input_strs = model.input_modality.map(fn(m) {
         match m {
           @provider.Modality::Text => "text"
@@ -107,7 +107,7 @@ fn OpenCode::create_model_entry(model : @provider.Model) -> Json {
         input_strs.map(fn(s) { Json::string(s) }),
       )
     }
-    if not(output_is_default) {
+    if !output_is_default {
       let output_strs = model.output_modality.map(fn(m) {
         match m {
           @provider.Modality::Text => "text"
@@ -221,7 +221,7 @@ fn OpenCode::apply_provider_to_json(
   result_map["provider"] = Json::object(provider_map)
 
   // Add schema if not present
-  if not(result_map.contains("$schema")) {
+  if !result_map.contains("$schema") {
     result_map["$schema"] = Json::string("https://opencode.ai/config.json")
   }
   Json::object(result_map)

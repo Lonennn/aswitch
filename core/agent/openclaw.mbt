@@ -128,7 +128,7 @@ fn OpenClaw::apply_provider_to_json(
   }
 
   // Set mode to merge if not present
-  if not(models_map.contains("mode")) {
+  if !models_map.contains("mode") {
     models_map["mode"] = Json::string("merge")
   }
 
