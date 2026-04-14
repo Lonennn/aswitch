@@ -33,7 +33,7 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 - No runtime provider management (add/remove commented out)
 - No interactive setup
 - No runtime configuration validation before applying provider changes
-- No backup or dry-run protection for switch operations
+- No dry-run protection for switch operations (backup is implemented)
 - Partial error handling coverage for edge cases
 
 ---
@@ -53,7 +53,7 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 
 **Key Deliverables:**
 - [ ] Add runtime configuration validation before `set` and future mutating commands
-- [ ] Configuration backup before modifications
+- [x] Configuration backup before modifications
 - [ ] Dry-run mode for switch operations
 - [ ] Uncomment and implement `add` and `remove` commands
 - [ ] Expand command and integration tests around mutating workflows
@@ -134,7 +134,8 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 ```
 Q1 2026 (Now - Foundation):
 ├── Runtime Configuration Validation
-├── Backup + Dry-Run Safety Rails
+├── Backup Safety Rails ✅
+├── Dry-Run Safety Rails
 ├── Provider Management (add/remove)
 └── Interactive Setup Wizard
 
@@ -204,5 +205,5 @@ Q4 2026 (Exploration - Advanced):
 
 ---
 
-*Last updated: 2026-03-25*
-*Roadmap version: 1.3*
+*Last updated: 2026-04-14*
+*Roadmap version: 1.4*
