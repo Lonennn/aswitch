@@ -2,6 +2,7 @@
 package "lonen44/aswitch/core/provider"
 
 import {
+  "moonbitlang/core/debug",
   "moonbitlang/core/json",
 }
 
@@ -14,7 +15,7 @@ pub(all) enum Modality {
   Text
   Vision
   Audio
-} derive(Eq, Show, ToJson, @json.FromJson)
+} derive(Eq, ToJson, @debug.Debug, @json.FromJson)
 
 pub(all) struct Model {
   name : String
@@ -22,7 +23,7 @@ pub(all) struct Model {
   output_limit : Int?
   input_modality : Array[Modality]
   output_modality : Array[Modality]
-} derive(Eq, Show, ToJson)
+} derive(Eq, ToJson, @debug.Debug)
 pub fn Model::new(name~ : String, context_limit? : Int, output_limit? : Int) -> Self
 
 pub(all) struct Provider {
@@ -31,7 +32,7 @@ pub(all) struct Provider {
   openai_base_url : String?
   anthropic_base_url : String?
   models : Array[Model]
-} derive(Eq, Show, ToJson, @json.FromJson)
+} derive(Eq, ToJson, @debug.Debug, @json.FromJson)
 
 // Type aliases
 

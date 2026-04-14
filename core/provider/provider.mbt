@@ -11,7 +11,7 @@ pub(all) struct Provider {
   anthropic_base_url : String?
   /// Models to use
   models : Array[Model]
-} derive(Show, Eq, ToJson, FromJson)
+} derive(Debug, Eq, ToJson, FromJson)
 
 ///|
 /// Modality enum for model input/output capabilities
@@ -19,4 +19,4 @@ pub(all) enum Modality {
   Text
   Vision
   Audio
-} derive(Show, Eq, ToJson, FromJson)
+} derive(Debug, Eq, ToJson, FromJson)

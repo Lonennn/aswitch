@@ -11,7 +11,7 @@ pub(all) struct Model {
   input_modality : Array[Modality]
   /// Output modalities (default: [Text])
   output_modality : Array[Modality]
-} derive(Show, Eq, ToJson)
+} derive(Debug, Eq, ToJson)
 
 ///|
 /// Create a Model with default modality settings (Text for input and output)

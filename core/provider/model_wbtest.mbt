@@ -7,8 +7,8 @@ test "Model::new - creates model with default modalities" {
   assert_eq(model.name, "test-model")
   assert_eq(model.context_limit, None)
   assert_eq(model.output_limit, None)
-  assert_eq(model.input_modality, [Modality::Text])
-  assert_eq(model.output_modality, [Modality::Text])
+  assert_true(model.input_modality == [Modality::Text])
+  assert_true(model.output_modality == [Modality::Text])
 }
 
 ///|
@@ -17,8 +17,8 @@ test "Model::new - creates model with custom limits" {
   assert_eq(model.name, "gpt-4")
   assert_eq(model.context_limit, Some(8192))
   assert_eq(model.output_limit, Some(4096))
-  assert_eq(model.input_modality, [Modality::Text])
-  assert_eq(model.output_modality, [Modality::Text])
+  assert_true(model.input_modality == [Modality::Text])
+  assert_true(model.output_modality == [Modality::Text])
 }
 
 ///|
@@ -28,8 +28,8 @@ test "FromJson for Model - minimal JSON with only name" {
   assert_eq(model.name, "minimal-model")
   assert_eq(model.context_limit, None)
   assert_eq(model.output_limit, None)
-  assert_eq(model.input_modality, [Modality::Text])
-  assert_eq(model.output_modality, [Modality::Text])
+  assert_true(model.input_modality == [Modality::Text])
+  assert_true(model.output_modality == [Modality::Text])
 }
 
 ///|
@@ -45,8 +45,8 @@ test "FromJson for Model - full JSON with all fields" {
   assert_eq(model.name, "vision-model")
   assert_eq(model.context_limit, Some(128000))
   assert_eq(model.output_limit, Some(8192))
-  assert_eq(model.input_modality, [Modality::Text, Modality::Vision])
-  assert_eq(model.output_modality, [Modality::Text])
+  assert_true(model.input_modality == [Modality::Text, Modality::Vision])
+  assert_true(model.output_modality == [Modality::Text])
 }
 
 ///|
@@ -61,8 +61,8 @@ test "FromJson for Model - null optional fields are handled correctly" {
   let model : Model = @json.from_json(json)
   assert_eq(model.context_limit, None)
   assert_eq(model.output_limit, None)
-  assert_eq(model.input_modality, [Modality::Text])
-  assert_eq(model.output_modality, [Modality::Text])
+  assert_true(model.input_modality == [Modality::Text])
+  assert_true(model.output_modality == [Modality::Text])
 }
 
 ///|

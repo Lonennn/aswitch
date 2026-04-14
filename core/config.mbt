@@ -10,7 +10,7 @@
 pub(all) struct Config {
   /// list of providers
   providers : @list.List[@provider.Provider]
-} derive(Show, Eq, ToJson, FromJson)
+} derive(Debug, Eq, ToJson, FromJson)
 
 ///|
 pub fn Config::new() -> Config {

@@ -3,6 +3,7 @@ package "lonen44/aswitch/core"
 
 import {
   "lonen44/aswitch/core/provider",
+  "moonbitlang/core/debug",
   "moonbitlang/core/json",
   "moonbitlang/core/list",
 }
@@ -21,7 +22,7 @@ pub fn save_config(Config) -> Result[Unit, String]
 // Types and methods
 pub(all) struct Config {
   providers : @list.List[@provider.Provider]
-} derive(Eq, Show, ToJson, @json.FromJson)
+} derive(Eq, ToJson, @debug.Debug, @json.FromJson)
 pub fn Config::get_provider(Self, String) -> @provider.Provider?
 pub fn Config::has_provider(Self, String) -> Bool
 pub fn Config::is_empty(Self) -> Bool
