@@ -255,8 +255,7 @@ pub impl Agent for OpenCode with apply_provider(_self, provider, api_format) -> 
 
   // Write back to file
   let content = updated_json.stringify(indent=2)
-  let write_result = try? @fs.write_string_to_file(config_path, content)
-  guard write_result is Ok(_) else { raise write_result.unwrap_err() }
+  write_config_with_backup(config_path, content)
 }
 
 ///|

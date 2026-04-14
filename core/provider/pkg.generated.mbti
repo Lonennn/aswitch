@@ -14,11 +14,7 @@ pub(all) enum Modality {
   Text
   Vision
   Audio
-}
-pub impl Eq for Modality
-pub impl Show for Modality
-pub impl ToJson for Modality
-pub impl @json.FromJson for Modality
+} derive(Eq, Show, ToJson, @json.FromJson)
 
 pub(all) struct Model {
   name : String
@@ -26,11 +22,8 @@ pub(all) struct Model {
   output_limit : Int?
   input_modality : Array[Modality]
   output_modality : Array[Modality]
-}
+} derive(Eq, Show, ToJson)
 pub fn Model::new(name~ : String, context_limit? : Int, output_limit? : Int) -> Self
-pub impl Eq for Model
-pub impl Show for Model
-pub impl ToJson for Model
 
 pub(all) struct Provider {
   name : String
@@ -38,11 +31,7 @@ pub(all) struct Provider {
   openai_base_url : String?
   anthropic_base_url : String?
   models : Array[Model]
-}
-pub impl Eq for Provider
-pub impl Show for Provider
-pub impl ToJson for Provider
-pub impl @json.FromJson for Provider
+} derive(Eq, Show, ToJson, @json.FromJson)
 
 // Type aliases
 

@@ -120,8 +120,7 @@ pub impl Agent for ClaudeCode with apply_provider(_, provider, _) -> Unit raise 
 
   // Write back to file
   let content = updated_json.stringify(indent=2)
-  let write_result = try? @fs.write_string_to_file(config_path, content)
-  guard write_result is Ok(_) else { raise write_result.unwrap_err() }
+  write_config_with_backup(config_path, content)
 }
 
 ///|
