@@ -100,6 +100,22 @@ fn validate_model(model : @provider.Model) -> Result[Unit, ValidationError] {
 ///|
 /// Validate entire Config structure
 pub fn validate_config(config : Config) -> Result[Unit, ValidationError] {
-  // To implement
+  // Check for duplicate provider names (case-insensitive)
+  let mut seen_names = @list.new()
+  for provider in config.providers.iter() {
+    let lower_name = provider.name.to_lower()
+    if seen_names.contains(lower_name) {
+      return Err(DuplicateProviderName(provider.name))
+    }
+    seen_names = @list.cons(lower_name, seen_names)
+
+    // Validate each provider
+    let result = validate_provider(provider)
+    match result {
+      Ok(_) => ()
+      Err(e) => return Err(e)
+    }
+  }
+
   Ok(())
 }
