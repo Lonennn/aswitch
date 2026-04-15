@@ -27,6 +27,28 @@ pub fn set_provider(
     EXIT_CODE_CONFIG_ERROR
   }
 
+  // Validate configuration
+  let validate_result = @core.validate_config(config)
+  guard validate_result is Ok(_) else {
+    let err_msg = match validate_result.unwrap_err() {
+      @core.ValidationError::EmptyProviderName =>
+        "Provider name cannot be empty"
+      @core.ValidationError::EmptyApiKey => "Provider API key cannot be empty"
+      @core.ValidationError::NoBaseUrls =>
+        "Provider must have at least one base URL configured"
+      @core.ValidationError::InvalidBaseUrl(url) => "Invalid base URL: \{url}"
+      @core.ValidationError::NoModels =>
+        "Provider must have at least one model configured"
+      @core.ValidationError::DuplicateProviderName(name) =>
+        "Duplicate provider name: \{name}"
+      @core.ValidationError::EmptyModelName => "Model name cannot be empty"
+      @core.ValidationError::InvalidContextWindow(value) =>
+        "Invalid context window size: \{value}"
+    }
+    println("Error: Invalid configuration - \{err_msg}")
+    return EXIT_CODE_CONFIG_ERROR
+  }
+
   // Get the provider by name
   let provider_result = config.get_provider(provider_name)
   guard provider_result is Some(provider) else {
