@@ -17,6 +17,10 @@ pub fn load_config() -> Config raise
 
 pub fn save_config(Config) -> Result[Unit, String]
 
+pub fn validate_config(Config) -> Result[Unit, ValidationError]
+
+pub fn validate_provider(@provider.Provider) -> Result[Unit, ValidationError]
+
 // Errors
 
 // Types and methods
@@ -27,6 +31,17 @@ pub fn Config::get_provider(Self, String) -> @provider.Provider?
 pub fn Config::has_provider(Self, String) -> Bool
 pub fn Config::is_empty(Self) -> Bool
 pub fn Config::new() -> Self
+
+pub enum ValidationError {
+  EmptyProviderName
+  EmptyApiKey
+  NoBaseUrls
+  InvalidBaseUrl(String)
+  NoModels
+  DuplicateProviderName(String)
+  EmptyModelName
+  InvalidContextWindow(Int)
+} derive(Eq, @debug.Debug)
 
 // Type aliases
 
