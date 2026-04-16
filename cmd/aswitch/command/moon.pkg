@@ -5,6 +5,9 @@ import {
   "moonbitlang/core/debug",
   "moonbitlang/core/list",
   "moonbitlang/x/fs",
+}
+
+import {
   "moonbitlang/x/path",
   "moonbitlang/x/sys",
-}
+} for "wbtest"
