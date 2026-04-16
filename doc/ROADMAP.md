@@ -52,9 +52,9 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 | **Interactive Setup** | We believe that an interactive setup flow will improve first-time setup completion from 40% to 80% because new users struggle with manual config creation. | Setup completion rate | M (3-4 weeks) |
 
 **Key Deliverables:**
-- [ ] Add runtime configuration validation before `set` and future mutating commands
+- [x] ✅ Add runtime configuration validation before `set` and future mutating commands (Completed 2026-04-17)
 - [x] Configuration backup before modifications
-- [ ] Dry-run mode for switch operations
+- [ ] Dry-run mode for switch operations (Next priority)
 - [ ] Uncomment and implement `add` and `remove` commands
 - [ ] Expand command and integration tests around mutating workflows
 - [ ] Interactive wizard for provider setup
@@ -133,9 +133,9 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 
 ```
 Q1 2026 (Now - Foundation):
-├── Runtime Configuration Validation
+├── Runtime Configuration Validation ✅ (Completed 2026-04-17)
 ├── Backup Safety Rails ✅
-├── Dry-Run Safety Rails
+├── Dry-Run Safety Rails (Next priority)
 ├── Provider Management (add/remove)
 └── Interactive Setup Wizard
 
@@ -205,5 +205,5 @@ Q4 2026 (Exploration - Advanced):
 
 ---
 
-*Last updated: 2026-04-14*
-*Roadmap version: 1.4*
+*Last updated: 2026-04-17*
+*Roadmap version: 1.5*
