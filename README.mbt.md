@@ -52,3 +52,22 @@ Each provider requires:
 | `models` | string[] | yes | List of model names |
 | `openai_base_url` | string | no | OpenAI-compatible API endpoint |
 | `anthropic_base_url` | string | no | Anthropic-compatible API endpoint |
+
+## Configuration Validation
+
+ASwitch automatically validates your `aswitch.json` configuration file before making any changes to your agent settings. This prevents invalid configurations from breaking your AI agents.
+
+### Validation Checks:
+- **Provider validity**: Non-empty name, non-empty API key, at least one base URL configured, base URLs use valid HTTP/HTTPS format
+- **Model validity**: Non-empty name, valid positive context window size
+- **No duplicate providers**: Case-insensitive duplicate provider names are not allowed
+- **At least one model per provider**: Each provider must have at least one model configured
+
+### Error Messages:
+If your configuration is invalid, you will see a clear error message explaining the issue before any changes are made to your agent files, for example:
+```
+Error: Invalid configuration - Duplicate provider name: OpenAI
+```
+
+### Disable Validation (Advanced):
+If you need to load an invalid config for testing, you can disable validation by modifying the source code to pass `validate: false` to `load_config()`.
