@@ -13,7 +13,7 @@ pub const CONFIG_FILE_NAME : String = "aswitch.json"
 
 pub fn get_config_path() -> String
 
-pub fn load_config() -> Config raise
+pub fn load_config(validate? : Bool) -> Config raise
 
 pub fn save_config(Config) -> Result[Unit, String]
 
