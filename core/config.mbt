@@ -80,7 +80,7 @@ pub fn get_config_path() -> String {
 
 ///|
 /// Load configuration from file
-pub fn load_config() -> Config raise Error {
+pub fn load_config(validate? : Bool = true) -> Config raise Error {
   let path = get_config_path()
   if !@fs.path_exists(path) {
     return Config::new()
@@ -95,6 +95,29 @@ pub fn load_config() -> Config raise Error {
   }
   let config_result : Result[Config, _] = try? @json.from_json(json)
   guard config_result is Ok(config) else { raise config_result.unwrap_err() }
+
+  // Validate config if requested (enabled by default)
+  if validate {
+    let validate_result = validate_config(config)
+    guard validate_result is Ok(_) else {
+      let err_msg = match validate_result.unwrap_err() {
+        ValidationError::EmptyProviderName => "Provider name cannot be empty"
+        ValidationError::EmptyApiKey => "Provider API key cannot be empty"
+        ValidationError::NoBaseUrls =>
+          "Provider must have at least one base URL configured"
+        ValidationError::InvalidBaseUrl(url) => "Invalid base URL: \{url}"
+        ValidationError::NoModels =>
+          "Provider must have at least one model configured"
+        ValidationError::DuplicateProviderName(name) =>
+          "Duplicate provider name: \{name}"
+        ValidationError::EmptyModelName => "Model name cannot be empty"
+        ValidationError::InvalidContextWindow(value) =>
+          "Invalid context window size: \{value}"
+      }
+      raise @fs.IOError::IOError("Invalid configuration: \{err_msg}")
+    }
+  }
+
   config
 }
 
