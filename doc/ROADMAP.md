@@ -46,8 +46,8 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 
 | Epic | Hypothesis | Success Metric | Effort |
 |------|------------|----------------|--------|
-| **Runtime Configuration Validation** | We believe that validating configuration before any write or apply operation will reduce configuration errors by 90% because malformed or incomplete configs currently fail late. | Error rate reduction | S (1-2 weeks) |
-| **Safe Modification Workflow** | We believe that backup and dry-run support will reduce destructive mistakes because `set` currently writes directly to agent config files. | Failed switch recovery rate | S (1-2 weeks) |
+| **✅ Runtime Configuration Validation** (Completed 2026-04-17) | We believe that validating configuration before any write or apply operation will reduce configuration errors by 90% because malformed or incomplete configs currently fail late. | Error rate reduction | S (1-2 weeks) |
+| **Safe Modification Workflow** (50% complete - Backup ✅, Dry-run in progress) | We believe that backup and dry-run support will reduce destructive mistakes because `set` currently writes directly to agent config files. | Failed switch recovery rate | S (1-2 weeks) |
 | **Provider Management** | We believe that adding runtime provider CRUD operations after validation and backup support will reduce manual JSON editing by 80% without increasing support burden. | % of users using CLI vs manual editing | M (3-4 weeks) |
 | **Interactive Setup** | We believe that an interactive setup flow will improve first-time setup completion from 40% to 80% because new users struggle with manual config creation. | Setup completion rate | M (3-4 weeks) |
 
