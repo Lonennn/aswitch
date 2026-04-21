@@ -1,3 +1,9 @@
+// This impl Show for Command is strange, but if we impl this in the command.mbt the build system will warn.
+///|
+impl Show for Command with output(self, logger) -> Unit {
+  logger.write_string(self.to_repr().to_string())
+}
+
 ///|
 test "parse_args maps providers and legacy aliases to list providers" {
   assert_true(parse_args(["providers"]) is ListProviders)
@@ -55,6 +61,53 @@ test "set_provider fails with invalid config" {
   @core.save_config(config).unwrap()
 
   // Run set_provider
-  let result = set_provider("claudecode", "openai", None)
+  let result = set_provider("claudecode", "openai", None, false)
   assert_eq(result, EXIT_CODE_CONFIG_ERROR)
+}
+
+///|
+test "parse_args correctly parses dry-run flags" {
+  // Test long form --dry-run
+  match parse_args(["set", "claudecode", "openai", "--dry-run"]) {
+    SetProvider(agent~, provider~, api_format~, dry_run~) => {
+      assert_eq(agent, "claudecode")
+      assert_eq(provider, "openai")
+      assert_true(api_format is None)
+      assert_true(dry_run)
+    }
+    other => fail("Expected SetProvider, got \{other}")
+  }
+
+  // Test short form -n
+  match parse_args(["switch", "open-code", "anthropic", "-n"]) {
+    SetProvider(agent~, provider~, api_format~, dry_run~) => {
+      assert_eq(agent, "open-code")
+      assert_eq(provider, "anthropic")
+      assert_true(api_format is None)
+      assert_true(dry_run)
+    }
+    other => fail("Expected SetProvider, got \{other}")
+  }
+
+  // Test dry-run flag anywhere in args
+  match parse_args(["set", "--dry-run", "openclaw", "openai", "openai"]) {
+    SetProvider(agent~, provider~, api_format~, dry_run~) => {
+      assert_eq(agent, "openclaw")
+      assert_eq(provider, "openai")
+      assert_true(api_format is Some(@agent.OpenAI))
+      assert_true(dry_run)
+    }
+    other => fail("Expected SetProvider, got \{other}")
+  }
+
+  // Test no dry-run flag defaults to false
+  match parse_args(["set", "claudecode", "openai"]) {
+    SetProvider(agent~, provider~, api_format~, dry_run~) => {
+      assert_eq(agent, "claudecode")
+      assert_eq(provider, "openai")
+      assert_true(api_format is None)
+      assert_false(dry_run)
+    }
+    other => fail("Expected SetProvider, got \{other}")
+  }
 }

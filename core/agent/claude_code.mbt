@@ -124,6 +124,24 @@ pub impl Agent for ClaudeCode with apply_provider(_, provider, _) -> Unit raise 
 }
 
 ///|
-pub impl Agent for ClaudeCode with name(_) -> String {
+/// Generate a diff of what changes would be made without writing to disk
+fn ClaudeCode::get_provider_diff(
+  _ : ClaudeCode,
+  provider : @provider.Provider,
+  _ : ApiFormat?,
+) -> ProviderDiff raise Error {
+  let config_path = ClaudeCode::get_config_file_path()
+  generate_provider_diff(config_path, fn(settings) raise {
+    ClaudeCode::apply_provider_to_json(settings, provider)
+  })
+}
+
+///|
+pub impl Agent for ClaudeCode with get_provider_diff(self, provider, api_format) -> ProviderDiff raise Error {
+  ClaudeCode::get_provider_diff(self, provider, api_format)
+}
+
+///|
+pub impl Agent for ClaudeCode with name(_ : ClaudeCode) -> String {
   "Claude Code"
 }

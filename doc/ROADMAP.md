@@ -47,14 +47,14 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 | Epic | Hypothesis | Success Metric | Effort |
 |------|------------|----------------|--------|
 | **✅ Runtime Configuration Validation** (Completed 2026-04-17) | We believe that validating configuration before any write or apply operation will reduce configuration errors by 90% because malformed or incomplete configs currently fail late. | Error rate reduction | S (1-2 weeks) |
-| **Safe Modification Workflow** (50% complete - Backup ✅, Dry-run in progress) | We believe that backup and dry-run support will reduce destructive mistakes because `set` currently writes directly to agent config files. | Failed switch recovery rate | S (1-2 weeks) |
+| **✅ Safe Modification Workflow** (100% complete - Backup ✅, Dry-run ✅, Completed 2026-04-21) | We believe that backup and dry-run support will reduce destructive mistakes because `set` currently writes directly to agent config files. | Failed switch recovery rate | S (1-2 weeks) |
 | **Provider Management** | We believe that adding runtime provider CRUD operations after validation and backup support will reduce manual JSON editing by 80% without increasing support burden. | % of users using CLI vs manual editing | M (3-4 weeks) |
 | **Interactive Setup** | We believe that an interactive setup flow will improve first-time setup completion from 40% to 80% because new users struggle with manual config creation. | Setup completion rate | M (3-4 weeks) |
 
 **Key Deliverables:**
 - [x] ✅ Add runtime configuration validation before `set` and future mutating commands (Completed 2026-04-17)
-- [x] Configuration backup before modifications
-- [ ] Dry-run mode for switch operations (Next priority)
+- [x] ✅ Configuration backup before modifications
+- [x] ✅ Dry-run mode for switch operations (Completed 2026-04-21)
 - [ ] Uncomment and implement `add` and `remove` commands
 - [ ] Expand command and integration tests around mutating workflows
 - [ ] Interactive wizard for provider setup
@@ -135,7 +135,7 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 Q1 2026 (Now - Foundation):
 ├── Runtime Configuration Validation ✅ (Completed 2026-04-17)
 ├── Backup Safety Rails ✅
-├── Dry-Run Safety Rails (Next priority)
+├── Dry-Run Safety Rails ✅ (Completed 2026-04-21)
 ├── Provider Management (add/remove)
 └── Interactive Setup Wizard
 
@@ -205,5 +205,5 @@ Q4 2026 (Exploration - Advanced):
 
 ---
 
-*Last updated: 2026-04-17*
-*Roadmap version: 1.5*
+*Last updated: 2026-04-21*
+*Roadmap version: 1.6*

@@ -252,6 +252,24 @@ pub impl Agent for OpenClaw with apply_provider(_self, provider, api_format) -> 
 }
 
 ///|
-pub impl Agent for OpenClaw with name(_) -> String {
+/// Generate a diff of what changes would be made without writing to disk
+fn OpenClaw::get_provider_diff(
+  _ : OpenClaw,
+  provider : @provider.Provider,
+  api_format : ApiFormat?,
+) -> ProviderDiff raise Error {
+  let config_path = OpenClaw::get_config_file_path()
+  generate_provider_diff(config_path, fn(settings) raise {
+    OpenClaw::apply_provider_to_json(settings, provider, api_format)
+  })
+}
+
+///|
+pub impl Agent for OpenClaw with get_provider_diff(self, provider, api_format) -> ProviderDiff raise Error {
+  OpenClaw::get_provider_diff(self, provider, api_format)
+}
+
+///|
+pub impl Agent for OpenClaw with name(_ : OpenClaw) -> String {
   "OpenClaw"
 }

@@ -259,6 +259,24 @@ pub impl Agent for OpenCode with apply_provider(_self, provider, api_format) -> 
 }
 
 ///|
-pub impl Agent for OpenCode with name(_) -> String {
+/// Generate a diff of what changes would be made without writing to disk
+fn OpenCode::get_provider_diff(
+  _ : OpenCode,
+  provider : @provider.Provider,
+  api_format : ApiFormat?,
+) -> ProviderDiff raise Error {
+  let config_path = OpenCode::get_config_file_path()
+  generate_provider_diff(config_path, fn(settings) raise {
+    OpenCode::apply_provider_to_json(settings, provider, api_format)
+  })
+}
+
+///|
+pub impl Agent for OpenCode with get_provider_diff(self, provider, api_format) -> ProviderDiff raise Error {
+  OpenCode::get_provider_diff(self, provider, api_format)
+}
+
+///|
+pub impl Agent for OpenCode with name(_ : OpenCode) -> String {
   "OpenCode"
 }

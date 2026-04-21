@@ -3,6 +3,7 @@ package "lonen44/aswitch/cmd/aswitch/command"
 
 import {
   "lonen44/aswitch/core/agent",
+  "moonbitlang/core/debug",
 }
 
 // Values
@@ -16,7 +17,7 @@ pub fn parse_args(Array[String]) -> Command
 
 pub fn print_help() -> Int
 
-pub fn set_provider(String, String, @agent.ApiFormat?) -> Int
+pub fn set_provider(String, String, @agent.ApiFormat?, Bool) -> Int
 
 // Errors
 
@@ -25,12 +26,12 @@ pub enum Command {
   Init
   ListProviders
   ListAgents
-  SetProvider(agent~ : String, provider~ : String, api_format~ : @agent.ApiFormat?)
+  SetProvider(agent~ : String, provider~ : String, api_format~ : @agent.ApiFormat?, dry_run~ : Bool)
   Help
   Version
   Unknown(String)
   ErrorParameter(String)
-}
+} derive(@debug.Debug)
 
 // Type aliases
 
