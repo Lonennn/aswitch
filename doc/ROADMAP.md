@@ -18,7 +18,7 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 ## Current State (v0.4.0)
 
 **Implemented:**
-- Basic CLI structure with commands: `init`, `list`, `set`, `help`, `version`
+- Basic CLI structure with commands: `init`, `providers` (`list`/`ls` alias), `agents`, `set`, `help`, `version`
 - Provider add command support: `add` (interactive and argument-based)
 - Provider remove command support: `remove`
 - Configuration file management (`aswitch.json`)
@@ -28,19 +28,21 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 - Provider configuration with API keys, base URLs, and extended model configuration (context limits, modalities)
 - Cross-platform path detection (Unix/macOS/Windows)
 - JSON schema provided for editor IntelliSense and manual validation workflows
-- Switch command supports optional API format parameter (openai/anthropic) for OpenCode agent
+- Switch command supports optional API format parameter (openai/anthropic) for OpenCode and OpenClaw agents
 - Improved error handling with descriptive error messages
 - Add-provider workflow now creates `aswitch.json` backups before save
 - CLI runtime migrated to async and native/llvm targets
 
 **Limitations:**
 - Partial error handling coverage for edge cases
+- No shell completion support yet
+- No package distribution yet (Homebrew/apt/scoop)
 
 ---
 
 ## Roadmap
 
-### Phase 1: Foundation (Q1 2026) - Now
+### Phase 1: Foundation (Q1 2026) - Completed
 
 **Theme: Safe Writes & Core Stability**
 
@@ -63,15 +65,15 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 
 ---
 
-### Phase 2: Agent Expansion (Q2 2026) - Next
+### Phase 2: Agent Expansion (Q2 2026) - Current
 
 **Theme: Broaden Ecosystem Support**
 
 | Epic | Hypothesis | Success Metric | Effort |
 |------|------------|----------------|--------|
-| **OpenCode Support** | We believe that supporting OpenCode will expand our addressable user base by 30% because OpenCode is the second most popular AI coding agent. | Active OpenCode users | M (3-4 weeks) |
+| **✅ OpenCode Support** (Completed 2026-04-21) | We believe that supporting OpenCode will expand our addressable user base by 30% because OpenCode is the second most popular AI coding agent. | Active OpenCode users | M (3-4 weeks) |
 | **Zed Editor Support** | We believe that supporting Zed editor will capture the modern IDE segment because Zed is a popular next-generation editor with built-in AI capabilities. | Active Zed users | S (2 weeks) |
-| **OpenClaw Support** | We believe that supporting OpenClaw will capture the open-source community segment because OpenClaw is gaining traction in OSS projects. | GitHub stars / mentions | S (2 weeks) |
+| **✅ OpenClaw Support** (Completed 2026-04-21) | We believe that supporting OpenClaw will capture the open-source community segment because OpenClaw is gaining traction in OSS projects. | GitHub stars / mentions | S (2 weeks) |
 | **Generic Agent Framework** | We believe that a plugin-style agent framework will enable community contributions because maintainers can't support every new agent. | Community-contributed agents | L (6-8 weeks) |
 
 **Key Deliverables:**
@@ -132,13 +134,13 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 ## Release Timeline
 
 ```
-Q1 2026 (Now - Foundation):
+Q1 2026 (Completed - Foundation):
 ├── Runtime Configuration Validation ✅ (Completed 2026-04-17)
 ├── Backup Safety Rails ✅
 ├── Dry-Run Safety Rails ✅ (Completed 2026-04-21)
 └── Provider Management ✅ (add + remove, completed 2026-04-22)
 
-Q2 2026 (Next - Agent Expansion):
+Q2 2026 (Current - Agent Expansion):
 ├── OpenCode Agent Support ✅
 ├── OpenClaw Agent Support ✅
 ├── Zed Editor Agent Support
@@ -166,8 +168,8 @@ Q4 2026 (Exploration - Advanced):
 | Supported Agents | 3 | 3 | 4+ | 6+ |
 | Supported Providers | ∞ (manual) | ∞ (CLI) | 5 presets | 10 presets |
 | Setup Time | 10 min | 2 min | 2 min | 1 min |
-| Active Users | - | 100 | 500 | 2000 |
-| GitHub Stars | 0 | 50 | 200 | 1000 |
+| Active Users | TBD baseline | 100 | 500 | 2000 |
+| GitHub Stars | TBD baseline | 50 | 200 | 1000 |
 
 ---
 
@@ -186,9 +188,18 @@ Q4 2026 (Exploration - Advanced):
 ## Open Questions
 
 1. Should we support non-OpenAI-compatible API formats natively?
-2. What's the priority order for additional agents (Zed completed, next: Cursor, Copilot, etc.)?
+2. What's the priority order for additional agents after Zed (for example Cursor, Copilot, etc.)?
 3. Should we support agent-specific configuration beyond environment variables?
 4. Is there demand for a Homebrew/apt package distribution?
+
+---
+
+## Immediate Priorities (Next 30-60 Days)
+
+1. Ship Zed editor agent support with integration tests.
+2. Add agent capability detection (auto-discover installed agents).
+3. Deliver package distribution (Homebrew first, then apt/scoop).
+4. Add shell completions for Bash/Zsh/Fish.
 
 ---
 
@@ -205,4 +216,4 @@ Q4 2026 (Exploration - Advanced):
 ---
 
 *Last updated: 2026-04-22*
-*Roadmap version: 1.8*
+*Roadmap version: 1.9*
