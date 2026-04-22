@@ -1,55 +1,84 @@
-# Project Agents.md Guide
+# CLAUDE.md
 
-This is a [MoonBit](https://docs.moonbitlang.com) project.
-
-You can browse and install extra skills here:
-<https://github.com/moonbitlang/skills>
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview
 
-This is a repository for a command line program used to switch the model provider of the AI Agents such as Claude Code, OpenCode, OpenClaw and so on.
+ASwitch is a CLI tool for switching AI agent model providers (Claude Code, OpenCode, OpenClaw, etc.). It manages provider configurations in `aswitch.json` and applies them to agent-specific settings files.
 
-## Project Structure
+## Common Development Commands
 
-- MoonBit packages are organized per directory; each directory contains a
-  `moon.pkg` file listing its dependencies. Each package has its files and
-  blackbox test files (ending in `_test.mbt`) and whitebox test files (ending in
-  `_wbtest.mbt`).
+### Build & Run
+- Build the CLI: `moon build cmd/aswitch`
+- Run the CLI with arguments: `moon run cmd/aswitch -- <command> <args>`
+  - Example: `moon run cmd/aswitch -- list`
+  - Dry-run example: `moon run cmd/aswitch -- set claude-code OpenAI --dry-run`
 
-- In the toplevel directory, there is a `moon.mod.json` file listing module
-  metadata.
+### Testing
+- Run all tests: `moon test`
+- Run tests for a specific package: `moon test <directory>`
+  - Example: `moon test core/agent` or `moon test cmd/aswitch/command`
+- Run tests for a specific file: `moon test <file.mbt>`
+  - Example: `moon test core/agent/claude_code_wbtest.mbt`
+- Update test snapshots: `moon test --update`
+- Generate coverage report: `moon coverage analyze > uncovered.log`
 
-## Coding convention
+### Code Quality & Validation
+- Format all code: `moon fmt`
+- Type check without building: `moon check`
+- Update public interface files (pkg.generated.mbti): `moon info`
 
-- MoonBit code is organized in block style, each block is separated by `///|`,
-  the order of each block is irrelevant. In some refactorings, you can process
-  block by block independently.
+## High-Level Architecture
 
-- Try to keep deprecated blocks in file called `deprecated.mbt` in each
-  directory.
+### Layered Structure
+```
+┌──────────────────────────────────────────────────┐
+│ CLI Layer (cmd/aswitch/)                         │
+│  - Command parsing & dispatch                    │
+│  - User interaction (interactive add, prompts)   │
+│  - Command implementations (add/remove/set etc.) │
+├──────────────────────────────────────────────────┤
+│ Core Layer (core/)                               │
+│  ┌─────────────────────────────────────────────┐ │
+│  │ Agent Module (core/agent/)                  │ │
+│  │  - Agent trait definition                   │ │
+│  │  - Agent implementations:                   │ │
+│  │    * ClaudeCode, OpenCode, OpenClaw         │ │
+│  │  - Handles agent-specific config file I/O   │ │
+│  │  - Dry-run diff generation                  │ │
+│  └─────────────────────────────────────────────┘ │
+│  ┌─────────────────────────────────────────────┐ │
+│  │ Config Module (core/config.mbt)             │ │
+│  │  - Load/save aswitch.json config            │ │
+│  │  - Config path resolution (env var → home)  │ │
+│  └─────────────────────────────────────────────┘ │
+│  ┌─────────────────────────────────────────────┐ │
+│  │ Provider Module (core/provider/)            │ │
+│  │  - Provider and Model data structures       │ │
+│  └─────────────────────────────────────────────┘ │
+│  ┌─────────────────────────────────────────────┐ │
+│  │ Validation Module (core/validation.mbt)     │ │
+│  │  - Config validation logic                  │ │
+│  └─────────────────────────────────────────────┘ │
+└──────────────────────────────────────────────────┘
+```
 
-## Tooling
+### Key Patterns & Conventions
+1. **Agent Trait**: All AI agents implement the `Agent` trait, which defines `name()`, `apply_provider()`, and `get_provider_diff()` methods. New agents can be added by implementing this trait and updating the `create()` factory function.
+2. **Dry-Run Support**: The `get_provider_diff()` method generates a JSON diff of changes without modifying files, enabled via the `--dry-run`/`-n` flag on the `set` command.
+3. **Configuration Safety**: All config changes are validated before being applied to agent files, preventing invalid configurations from breaking AI agents.
+4. **Command Organization**: Each CLI command has its own implementation file in `cmd/aswitch/command/`, with shared logic in `command.mbt`.
 
-- `moon fmt` is used to format your code properly.
+### Configuration Locations
+- `aswitch.json` is loaded in this priority:
+  1. `$ASWITCH_HOME/aswitch.json` (if environment variable is set)
+  2. `$HOME/aswitch.json` (Unix/macOS) or `$USERPROFILE/aswitch.json` (Windows)
+  3. `./aswitch.json` (current directory fallback)
 
-- `moon ide` provides project navigation helpers like `peek-def`, `outline`, and
-  `find-references`. See $moonbit-agent-guide for details.
-
-- `moon info` is used to update the generated interface of the package, each
-  package has a generated interface file `.mbti`, it is a brief formal
-  description of the package. If nothing in `.mbti` changes, this means your
-  change does not bring the visible changes to the external package users, it is
-  typically a safe refactoring.
-
-- In the last step, run `moon info && moon fmt` to update the interface and
-  format the code. Check the diffs of `.mbti` file to see if the changes are
-  expected.
-
-- Run `moon test` to check tests pass. MoonBit supports snapshot testing; when
-  changes affect outputs, run `moon test --update` to refresh snapshots.
-
-- Prefer `assert_eq` or `assert_true(pattern is Pattern(...))` for results that
-  are stable or very unlikely to change. Use snapshot tests to record current
-  behavior. For solid, well-defined results (e.g. scientific computations),
-  prefer assertion tests. You can use `moon coverage analyze > uncovered.log` to
-  see which parts of your code are not covered by tests.
+## MoonBit Project Conventions (from AGENTS.md)
+- Code is organized in blocks separated by `///|`; block order is irrelevant.
+- Each directory is a MoonBit package with a `moon.pkg` file listing dependencies.
+- Tests: 
+  - Black-box tests: `*_test.mbt` (test public APIs)
+  - White-box tests: `*_wbtest.mbt` (test internal implementation)
+- Before submitting changes: Run `moon info && moon fmt` to update interfaces and format code. Check diffs of `pkg.generated.mbti` to verify public API changes are intended.

@@ -1,73 +1,99 @@
 # lonen44/aswitch
 
-Switch AI Agent model config.
+Switch model providers across AI agent CLIs (Claude Code, OpenCode, OpenClaw) from one central config.
+
+## Build and Run
+
+```bash
+# run directly
+moon run cmd/aswitch -- help
+
+# build native binary
+moon build --release
+```
+
+## Supported Agents
+
+- `claude-code` (aliases: `claude`, `claudecode`)
+- `open-code` (aliases: `opencode`, `open-code`)
+- `openclaw` (aliases: `openclaw`, `open-claw`)
+
+Use `aswitch agents` to print the current supported list.
+
+## CLI Commands
+
+```text
+aswitch init
+aswitch providers
+aswitch agents
+aswitch set <agent> <provider> [openai|anthropic] [--dry-run|-n]
+aswitch add
+aswitch add <name> <api_key> <base_url> <model>
+aswitch add --name <name> --api-key <key> --model <model> \
+  [--openai-base-url <url>] [--anthropic-base-url <url>]
+aswitch remove|rm <name>
+aswitch help
+aswitch version
+```
+
+Examples:
+
+```bash
+aswitch init
+aswitch add openai sk-xxx https://api.openai.com/v1 gpt-4.1
+aswitch add --name anthropic --api-key sk-ant-xxx --model claude-sonnet-4-5 \
+  --anthropic-base-url https://api.anthropic.com
+aswitch set claude-code anthropic
+aswitch set open-code openai openai --dry-run
+aswitch remove openai
+```
 
 ## Configuration
 
-ASwitch stores configuration in `aswitch.json`. The location is determined in this order:
+`aswitch` stores providers in `aswitch.json`. Path resolution order:
 
-1. `$ASWITCH_HOME/aswitch.json` - if `ASWITCH_HOME` environment variable is set
-2. `$HOME/aswitch.json` - on Unix/macOS
-3. `$USERPROFILE/aswitch.json` - on Windows
-4. `./aswitch.json` - current directory (fallback)
+1. `$ASWITCH_HOME/aswitch.json` (if `ASWITCH_HOME` is set)
+2. `$HOME/aswitch.json` (Unix/macOS)
+3. `$USERPROFILE/aswitch.json` (Windows)
+4. `./aswitch.json` (fallback)
 
 ### JSON Schema
 
-A [JSON Schema](./core/aswitch.schema.json) is provided for editor autocomplete and validation.
+Schema file: [`asset/aswitch.schema.json`](./asset/aswitch.schema.json)
 
-To enable IntelliSense in your editor, add the `$schema` property to your config file:
+To enable editor IntelliSense, add `$schema` in `aswitch.json`:
 
 ```json
 {
-  "$schema": "./core/aswitch.schema.json",
+  "$schema": "./asset/aswitch.schema.json",
   "providers": [
     {
       "name": "OpenAI",
       "api_key": "sk-...",
       "openai_base_url": "https://api.openai.com/v1",
-      "models": ["gpt-4", "gpt-3.5-turbo"]
+      "models": [{ "name": "gpt-4.1" }]
     }
   ]
 }
 ```
 
-### Editor Support
+See [`aswitch.example.json`](./aswitch.example.json) for a complete example.
 
-- **VS Code**: Automatic IntelliSense when `$schema` is present
-- **JetBrains IDEs**: JSON schema support via Settings → Languages & Frameworks → Schemas
-- **Vim/Neovim**: Use [jsonschema](https://github.com/jeffzip/json-schema.nvim) or similar plugins
-
-### Example Configuration
-
-See [aswitch.example.json](./aswitch.example.json) for a complete example.
-
-### Provider Configuration
-
-Each provider requires:
+### Provider Fields
 
 | Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `name` | string | yes | Display name/alias |
-| `api_key` | string | yes | API key for authentication |
-| `models` | string[] | yes | List of model names |
-| `openai_base_url` | string | no | OpenAI-compatible API endpoint |
-| `anthropic_base_url` | string | no | Anthropic-compatible API endpoint |
+| --- | --- | --- | --- |
+| `name` | string | yes | Provider alias used by `aswitch set` |
+| `api_key` | string | yes | API key |
+| `models` | object[] | yes | Model list, each object requires `name` |
+| `openai_base_url` | string | no | OpenAI-compatible endpoint |
+| `anthropic_base_url` | string | no | Anthropic-compatible endpoint |
 
-## Configuration Validation
+At least one of `openai_base_url` / `anthropic_base_url` is required.
 
-ASwitch automatically validates your `aswitch.json` configuration file before making any changes to your agent settings. This prevents invalid configurations from breaking your AI agents.
+## Validation and Safety
 
-### Validation Checks:
-- **Provider validity**: Non-empty name, non-empty API key, at least one base URL configured, base URLs use valid HTTP/HTTPS format
-- **Model validity**: Non-empty name, valid positive context window size
-- **No duplicate providers**: Case-insensitive duplicate provider names are not allowed
-- **At least one model per provider**: Each provider must have at least one model configured
-
-### Error Messages:
-If your configuration is invalid, you will see a clear error message explaining the issue before any changes are made to your agent files, for example:
-```
-Error: Invalid configuration - Duplicate provider name: OpenAI
-```
-
-### Disable Validation (Advanced):
-If you need to load an invalid config for testing, you can disable validation by modifying the source code to pass `validate: false` to `load_config()`.
+- Config is validated before write/apply.
+- Duplicate provider names are rejected (case-insensitive).
+- `set --dry-run` prints file diffs without writing.
+- Before any file write, backups are rotated as `<file>.bak.1` ... `<file>.bak.5`.
