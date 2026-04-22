@@ -3,6 +3,7 @@ _build/
 target
 .mooncakes/
 .moonagent/
+_aswitch_test/
 
 .claude/settings.local.json
 .worktrees/

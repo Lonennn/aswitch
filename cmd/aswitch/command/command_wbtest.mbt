@@ -1,4 +1,5 @@
 // This impl Show for Command is strange, but if we impl this in the command.mbt the build system will warn.
+
 ///|
 impl Show for Command with output(self, logger) -> Unit {
   logger.write_string(self.to_repr().to_string())
@@ -14,6 +15,65 @@ test "parse_args maps providers and legacy aliases to list providers" {
 ///|
 test "parse_args maps agents to list agents" {
   assert_true(parse_args(["agents"]) is ListAgents)
+}
+
+///|
+test "parse_args maps add to interactive and positional variants" {
+  assert_true(parse_args(["add"]) is AddProviderInteractive)
+  match
+    parse_args([
+      "add", "openai", "sk-xxx", "https://api.openai.com/v1", "gpt-4o",
+    ]) {
+    AddProvider(name~, api_key~, model~, openai_base_url~, anthropic_base_url~) => {
+      assert_eq(name, "openai")
+      assert_eq(api_key, "sk-xxx")
+      assert_eq(model, "gpt-4o")
+      assert_true(openai_base_url is Some("https://api.openai.com/v1"))
+      assert_true(anthropic_base_url is None)
+    }
+    other => fail("Expected AddProvider, got \{other}")
+  }
+}
+
+///|
+test "parse_args maps add option mode for anthropic-only and dual URLs" {
+  match
+    parse_args([
+      "add", "--name", "anthropic", "--api-key", "sk-ant", "--model", "claude-3-7-sonnet",
+      "--anthropic-base-url", "https://api.anthropic.com",
+    ]) {
+    AddProvider(name~, api_key~, model~, openai_base_url~, anthropic_base_url~) => {
+      assert_eq(name, "anthropic")
+      assert_eq(api_key, "sk-ant")
+      assert_eq(model, "claude-3-7-sonnet")
+      assert_true(openai_base_url is None)
+      assert_true(anthropic_base_url is Some("https://api.anthropic.com"))
+    }
+    other => fail("Expected AddProvider, got \{other}")
+  }
+
+  match
+    parse_args([
+      "add", "--name", "both", "--api-key", "sk-both", "--model", "gpt-4.1", "--openai-base-url",
+      "https://api.openai.com/v1", "--anthropic-base-url", "https://api.anthropic.com",
+    ]) {
+    AddProvider(name~, api_key~, model~, openai_base_url~, anthropic_base_url~) => {
+      assert_eq(name, "both")
+      assert_eq(api_key, "sk-both")
+      assert_eq(model, "gpt-4.1")
+      assert_true(openai_base_url is Some("https://api.openai.com/v1"))
+      assert_true(anthropic_base_url is Some("https://api.anthropic.com"))
+    }
+    other => fail("Expected AddProvider, got \{other}")
+  }
+}
+
+///|
+test "parse_args add option mode validates required fields" {
+  match parse_args(["add", "--name", "x", "--api-key", "k", "--model", "m"]) {
+    ErrorParameter(err) => assert_true(err.contains("at least one base URL"))
+    other => fail("Expected ErrorParameter, got \{other}")
+  }
 }
 
 ///|

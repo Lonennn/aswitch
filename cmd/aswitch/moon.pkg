@@ -1,8 +1,10 @@
 import {
+  "moonbitlang/async",
   "lonen44/aswitch/cmd/aswitch/command",
   "moonbitlang/x/sys",
 }
 
 options(
   "is-main": true,
+  targets: { "aswitch.mbt": [ "native", "llvm" ] },
 )

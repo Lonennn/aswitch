@@ -7,6 +7,10 @@ import {
 }
 
 // Values
+pub async fn add_provider(String, String, String, String?, String?) -> Int
+
+pub async fn add_provider_interactive() -> Int
+
 pub fn init_config() -> Int
 
 pub fn list_agents() -> Int
@@ -29,6 +33,8 @@ pub enum Command {
   SetProvider(agent~ : String, provider~ : String, api_format~ : @agent.ApiFormat?, dry_run~ : Bool)
   Help
   Version
+  AddProviderInteractive
+  AddProvider(name~ : String, api_key~ : String, model~ : String, openai_base_url~ : String?, anthropic_base_url~ : String?)
   Unknown(String)
   ErrorParameter(String)
 } derive(@debug.Debug)

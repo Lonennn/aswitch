@@ -1,13 +1,33 @@
 import {
+  "moonbitlang/async/stdio",
   "lonen44/aswitch/core",
   "lonen44/aswitch/core/agent",
   "lonen44/aswitch/core/provider",
   "moonbitlang/core/debug",
+  "moonbitlang/core/json",
   "moonbitlang/core/list",
   "moonbitlang/x/fs",
 }
 
 import {
+  "moonbitlang/async",
+  "moonbitlang/core/json",
   "moonbitlang/x/path",
   "moonbitlang/x/sys",
 } for "wbtest"
+
+options(
+  targets: {
+    "add_provider.mbt": [ "native", "llvm" ],
+    "add_provider_wbtest.mbt": [ "native", "llvm" ],
+    "command.mbt": [ "native", "llvm" ],
+    "command_wbtest.mbt": [ "native", "llvm" ],
+    "exit_code.mbt": [ "native", "llvm" ],
+    "help.mbt": [ "native", "llvm" ],
+    "init_config.mbt": [ "native", "llvm" ],
+    "list_agents.mbt": [ "native", "llvm" ],
+    "list_providers.mbt": [ "native", "llvm" ],
+    "prompt.mbt": [ "native", "llvm" ],
+    "set_provider.mbt": [ "native", "llvm" ],
+  },
+)

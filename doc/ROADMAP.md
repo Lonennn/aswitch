@@ -15,10 +15,11 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 
 ---
 
-## Current State (v0.3.0)
+## Current State (v0.4.0)
 
 **Implemented:**
 - Basic CLI structure with commands: `init`, `list`, `set`, `help`, `version`
+- Provider add command support: `add` (interactive and argument-based)
 - Configuration file management (`aswitch.json`)
 - Claude Code agent support (~/.claude/settings.json)
 - OpenCode agent support (~/.config/opencode/opencode.json)
@@ -28,12 +29,12 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 - JSON schema provided for editor IntelliSense and manual validation workflows
 - Switch command supports optional API format parameter (openai/anthropic) for OpenCode agent
 - Improved error handling with descriptive error messages
+- Add-provider workflow now creates `aswitch.json` backups before save
+- CLI runtime migrated to async and native/llvm targets
 
 **Limitations:**
-- No runtime provider management (add/remove commented out)
-- No interactive setup
-- No runtime configuration validation before applying provider changes
-- No dry-run protection for switch operations (backup is implemented)
+- `remove` command is still pending
+- No full interactive first-run setup wizard yet (only interactive `add`)
 - Partial error handling coverage for edge cases
 
 ---
@@ -48,15 +49,17 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 |------|------------|----------------|--------|
 | **✅ Runtime Configuration Validation** (Completed 2026-04-17) | We believe that validating configuration before any write or apply operation will reduce configuration errors by 90% because malformed or incomplete configs currently fail late. | Error rate reduction | S (1-2 weeks) |
 | **✅ Safe Modification Workflow** (100% complete - Backup ✅, Dry-run ✅, Completed 2026-04-21) | We believe that backup and dry-run support will reduce destructive mistakes because `set` currently writes directly to agent config files. | Failed switch recovery rate | S (1-2 weeks) |
-| **Provider Management** | We believe that adding runtime provider CRUD operations after validation and backup support will reduce manual JSON editing by 80% without increasing support burden. | % of users using CLI vs manual editing | M (3-4 weeks) |
+| **🚧 Provider Management** (Partially complete 2026-04-22: `add` done, `remove` pending) | We believe that adding runtime provider CRUD operations after validation and backup support will reduce manual JSON editing by 80% without increasing support burden. | % of users using CLI vs manual editing | M (3-4 weeks) |
 | **Interactive Setup** | We believe that an interactive setup flow will improve first-time setup completion from 40% to 80% because new users struggle with manual config creation. | Setup completion rate | M (3-4 weeks) |
 
 **Key Deliverables:**
 - [x] ✅ Add runtime configuration validation before `set` and future mutating commands (Completed 2026-04-17)
 - [x] ✅ Configuration backup before modifications
 - [x] ✅ Dry-run mode for switch operations (Completed 2026-04-21)
-- [ ] Uncomment and implement `add` and `remove` commands
-- [ ] Expand command and integration tests around mutating workflows
+- [ ] Implement `remove` command
+- [x] ✅ Implement `add` command (interactive + argument mode, completed 2026-04-22)
+- [x] ✅ Backup `aswitch.json` before add-provider saves (completed 2026-04-22)
+- [x] ✅ Expand command and integration tests around mutating workflows (`add` path, completed 2026-04-22)
 - [ ] Interactive wizard for provider setup
 
 **Dependencies:** None
@@ -136,7 +139,7 @@ Q1 2026 (Now - Foundation):
 ├── Runtime Configuration Validation ✅ (Completed 2026-04-17)
 ├── Backup Safety Rails ✅
 ├── Dry-Run Safety Rails ✅ (Completed 2026-04-21)
-├── Provider Management (add/remove)
+├── Provider Management (add ✅ 2026-04-22, remove pending)
 └── Interactive Setup Wizard
 
 Q2 2026 (Next - Agent Expansion):
@@ -205,5 +208,5 @@ Q4 2026 (Exploration - Advanced):
 
 ---
 
-*Last updated: 2026-04-21*
-*Roadmap version: 1.6*
+*Last updated: 2026-04-22*
+*Roadmap version: 1.7*

@@ -1,6 +1,6 @@
 ///|
 /// Main entry point for the aswitch CLI tool
-fn main {
+async fn main {
   let args = @sys.get_cli_args()
 
   // Skip the program name (first argument)
@@ -10,17 +10,35 @@ fn main {
     [] => []
   }
   let command = @command.parse_args(cmd_args)
-  @sys.exit(execute_command(command))
+  let exit_code = execute_command(command) catch {
+    err => {
+      println("Unhandled error: \{err}")
+      1
+    }
+  }
+  @sys.exit(exit_code)
 }
 
 ///|
-fn execute_command(command : @command.Command) -> Int {
+async fn execute_command(command : @command.Command) -> Int {
   match command {
     @command.Command::Init => @command.init_config()
     @command.Command::ListProviders => @command.list_providers()
     @command.Command::ListAgents => @command.list_agents()
     @command.Command::SetProvider(agent~, provider~, api_format~, dry_run~) =>
       @command.set_provider(agent, provider, api_format, dry_run)
+    @command.Command::AddProviderInteractive =>
+      @command.add_provider_interactive()
+    @command.Command::AddProvider(
+      name~,
+      api_key~,
+      model~,
+      openai_base_url~,
+      anthropic_base_url~
+    ) =>
+      @command.add_provider(
+        name, api_key, model, openai_base_url, anthropic_base_url,
+      )
     @command.Command::Help => @command.print_help()
     @command.Command::Version => print_version()
     @command.Command::Unknown(cmd) => {
