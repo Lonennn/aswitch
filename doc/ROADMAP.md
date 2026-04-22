@@ -20,6 +20,7 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 **Implemented:**
 - Basic CLI structure with commands: `init`, `list`, `set`, `help`, `version`
 - Provider add command support: `add` (interactive and argument-based)
+- Provider remove command support: `remove`
 - Configuration file management (`aswitch.json`)
 - Claude Code agent support (~/.claude/settings.json)
 - OpenCode agent support (~/.config/opencode/opencode.json)
@@ -33,8 +34,6 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 - CLI runtime migrated to async and native/llvm targets
 
 **Limitations:**
-- `remove` command is still pending
-- No full interactive first-run setup wizard yet (only interactive `add`)
 - Partial error handling coverage for edge cases
 
 ---
@@ -49,18 +48,16 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 |------|------------|----------------|--------|
 | **✅ Runtime Configuration Validation** (Completed 2026-04-17) | We believe that validating configuration before any write or apply operation will reduce configuration errors by 90% because malformed or incomplete configs currently fail late. | Error rate reduction | S (1-2 weeks) |
 | **✅ Safe Modification Workflow** (100% complete - Backup ✅, Dry-run ✅, Completed 2026-04-21) | We believe that backup and dry-run support will reduce destructive mistakes because `set` currently writes directly to agent config files. | Failed switch recovery rate | S (1-2 weeks) |
-| **🚧 Provider Management** (Partially complete 2026-04-22: `add` done, `remove` pending) | We believe that adding runtime provider CRUD operations after validation and backup support will reduce manual JSON editing by 80% without increasing support burden. | % of users using CLI vs manual editing | M (3-4 weeks) |
-| **Interactive Setup** | We believe that an interactive setup flow will improve first-time setup completion from 40% to 80% because new users struggle with manual config creation. | Setup completion rate | M (3-4 weeks) |
+| **✅ Provider Management** (Completed 2026-04-22: `add` + `remove`) | We believe that adding runtime provider CRUD operations after validation and backup support will reduce manual JSON editing by 80% without increasing support burden. | % of users using CLI vs manual editing | M (3-4 weeks) |
 
 **Key Deliverables:**
 - [x] ✅ Add runtime configuration validation before `set` and future mutating commands (Completed 2026-04-17)
 - [x] ✅ Configuration backup before modifications
 - [x] ✅ Dry-run mode for switch operations (Completed 2026-04-21)
-- [ ] Implement `remove` command
+- [x] ✅ Implement `remove` command (completed 2026-04-22)
 - [x] ✅ Implement `add` command (interactive + argument mode, completed 2026-04-22)
 - [x] ✅ Backup `aswitch.json` before add-provider saves (completed 2026-04-22)
 - [x] ✅ Expand command and integration tests around mutating workflows (`add` path, completed 2026-04-22)
-- [ ] Interactive wizard for provider setup
 
 **Dependencies:** None
 
@@ -139,8 +136,7 @@ Q1 2026 (Now - Foundation):
 ├── Runtime Configuration Validation ✅ (Completed 2026-04-17)
 ├── Backup Safety Rails ✅
 ├── Dry-Run Safety Rails ✅ (Completed 2026-04-21)
-├── Provider Management (add ✅ 2026-04-22, remove pending)
-└── Interactive Setup Wizard
+└── Provider Management ✅ (add + remove, completed 2026-04-22)
 
 Q2 2026 (Next - Agent Expansion):
 ├── OpenCode Agent Support ✅
@@ -209,4 +205,4 @@ Q4 2026 (Exploration - Advanced):
 ---
 
 *Last updated: 2026-04-22*
-*Roadmap version: 1.7*
+*Roadmap version: 1.8*
