@@ -30,6 +30,17 @@ pub fn Model::new(
 }
 
 ///|
+pub fn Model::deep_copy(self : Model) -> Model {
+  Model::{
+    name: self.name.to_string(),
+    context_limit: self.context_limit,
+    output_limit: self.output_limit,
+    input_modality: self.input_modality.map(fn(modality) { modality }),
+    output_modality: self.output_modality.map(fn(modality) { modality }),
+  }
+}
+
+///|
 impl FromJson for Model with from_json(json, path) {
   match json {
     Json::Object(map) => {

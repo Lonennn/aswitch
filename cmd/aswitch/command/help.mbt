@@ -25,7 +25,7 @@ pub fn print_help() -> Int {
   println(
     "                              Add provider with explicit API format URLs",
   )
-  // println("  remove, rm <name>           Remove a provider")
+  println("  remove, rm <name>           Remove a provider")
   // println("  current                     Show the current active provider")
   // println("  export <agent>              Export config for agent (claude-code)")
   println("  help, -h, --help            Show this help message")
@@ -41,6 +41,7 @@ pub fn print_help() -> Int {
   println(
     "  aswitch add --name anthropic --api-key sk-xxx --model claude-3-7-sonnet --anthropic-base-url https://api.anthropic.com",
   )
+  println("  aswitch remove openai")
   // println("  aswitch export claude-code")
   0
 }

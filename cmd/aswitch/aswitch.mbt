@@ -39,6 +39,7 @@ async fn execute_command(command : @command.Command) -> Int {
       @command.add_provider(
         name, api_key, model, openai_base_url, anthropic_base_url,
       )
+    @command.Command::RemoveProvider(name) => @command.remove_provider(name)
     @command.Command::Help => @command.print_help()
     @command.Command::Version => print_version()
     @command.Command::Unknown(cmd) => {

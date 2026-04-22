@@ -262,13 +262,12 @@ async fn upsert_provider(
     )
   }
   let config_path = @core.get_config_path()
-  let backup_result = backup_config_before_write(config_path)
+  let backup_result = try? @agent.backup_config_before_write(config_path)
   guard backup_result is Ok(_) else {
     return Err("Failed to backup config file: \{backup_result.unwrap_err()}")
   }
-  let save_result = save_providers_preserving_other_fields(
-    config_path,
-    updated_providers,
+  let save_result = @core.save_providers_preserving_other_fields(
+    config_path, updated_providers,
   )
   guard save_result is Ok(_) else { return Err(save_result.unwrap_err()) }
   if existed {
@@ -317,104 +316,5 @@ fn validation_error_to_message(err : @core.ValidationError) -> String {
     @core.ValidationError::EmptyModelName => "Model name cannot be empty"
     @core.ValidationError::InvalidContextWindow(value) =>
       "Invalid context window size: \{value}"
-  }
-}
-
-///|
-const MAX_CONFIG_BACKUPS = 5
-
-///|
-fn config_backup_path(config_path : String, index : Int) -> String {
-  "\{config_path}.bak.\{index}"
-}
-
-///|
-fn copy_file(src : String, dst : String) -> Result[Unit, String] {
-  let read_result = try? @fs.read_file_to_bytes(src)
-  guard read_result is Ok(content) else {
-    return Err("\{read_result.unwrap_err()}")
-  }
-  let write_result = try? @fs.write_bytes_to_file(dst, content)
-  guard write_result is Ok(_) else {
-    return Err("\{write_result.unwrap_err()}")
-  }
-  Ok(())
-}
-
-///|
-fn rotate_backups(
-  config_path : String,
-  index : Int,
-  max_backups : Int,
-) -> Result[Unit, String] {
-  if index > max_backups {
-    return Ok(())
-  }
-  let recurse_result = rotate_backups(config_path, index + 1, max_backups)
-  guard recurse_result is Ok(_) else { return recurse_result }
-  let current_slot = config_backup_path(config_path, index)
-  if !@fs.path_exists(current_slot) {
-    return Ok(())
-  }
-  if index == max_backups {
-    let remove_result = try? @fs.remove_file(current_slot)
-    guard remove_result is Ok(_) else {
-      return Err("\{remove_result.unwrap_err()}")
-    }
-    Ok(())
-  } else {
-    let next_slot = config_backup_path(config_path, index + 1)
-    let copy_result = copy_file(current_slot, next_slot)
-    guard copy_result is Ok(_) else { return copy_result }
-    let remove_result = try? @fs.remove_file(current_slot)
-    guard remove_result is Ok(_) else {
-      return Err("\{remove_result.unwrap_err()}")
-    }
-    Ok(())
-  }
-}
-
-///|
-fn backup_config_before_write(config_path : String) -> Result[Unit, String] {
-  if !@fs.path_exists(config_path) {
-    return Ok(())
-  }
-  let rotate_result = rotate_backups(config_path, 1, MAX_CONFIG_BACKUPS)
-  guard rotate_result is Ok(_) else { return rotate_result }
-  copy_file(config_path, config_backup_path(config_path, 1))
-}
-
-///|
-fn save_providers_preserving_other_fields(
-  config_path : String,
-  providers : @list.List[@provider.Provider],
-) -> Result[Unit, String] {
-  let mut config_json = Json::object({})
-  if @fs.path_exists(config_path) {
-    let read_result = try? @fs.read_file_to_string(config_path)
-    guard read_result is Ok(content) else {
-      return Err("Failed to read existing config file: \{read_result.unwrap_err()}")
-    }
-    let parse_result = try? @json.parse(content)
-    guard parse_result is Ok(parsed) else {
-      return Err("Failed to parse existing config file: \{parse_result.unwrap_err()}")
-    }
-    config_json = parsed
-  }
-
-  match config_json {
-    Json::Object(entries) => {
-      entries["providers"] = providers.to_json()
-      let content = Json::object(entries).stringify(indent=4)
-      let write_result = try? @fs.write_string_to_file(config_path, content)
-      guard write_result is Ok(_) else {
-        return Err("Failed to write config file: \{write_result.unwrap_err()}")
-      }
-      Ok(())
-    }
-    _ =>
-      Err(
-        "Failed to write config file: existing config root must be a JSON object",
-      )
   }
 }

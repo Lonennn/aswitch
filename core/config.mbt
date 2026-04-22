@@ -9,7 +9,7 @@
 /// Main configuration containing all providers and the active provider
 pub(all) struct Config {
   /// list of providers
-  providers : @list.List[@provider.Provider]
+  mut providers : @list.List[@provider.Provider]
 } derive(Debug, Eq, ToJson, FromJson)
 
 ///|
@@ -45,6 +45,14 @@ pub fn Config::get_provider(
       self.providers.find(fn(p) { p.name.to_lower() == name_lower })
     }
   }
+}
+
+///|
+pub fn Config::deep_copy(self : Config) -> Config {
+  let providers = self.providers
+    .to_array()
+    .map(fn(provider) { provider.deep_copy() })
+  Config::{ providers: @list.from_array(providers) }
 }
 
 ///|
@@ -130,5 +138,45 @@ pub fn save_config(config : Config) -> Result[Unit, String] {
   match write_result {
     Ok(_) => Ok(())
     Err(e) => Err("Failed to write config file: \{e}")
+  }
+}
+
+///|
+/// Save providers while preserving other top-level fields in existing aswitch.json.
+pub fn save_providers_preserving_other_fields(
+  config_path : String,
+  providers : @list.List[@provider.Provider],
+) -> Result[Unit, String] {
+  let mut config_json = Json::object({})
+  if @fs.path_exists(config_path) {
+    let read_result = try? @fs.read_file_to_string(config_path)
+    guard read_result is Ok(content) else {
+      return Err(
+        "Failed to read existing config file: \{read_result.unwrap_err()}",
+      )
+    }
+    let parse_result = try? @json.parse(content)
+    guard parse_result is Ok(parsed) else {
+      return Err(
+        "Failed to parse existing config file: \{parse_result.unwrap_err()}",
+      )
+    }
+    config_json = parsed
+  }
+
+  match config_json {
+    Json::Object(entries) => {
+      entries["providers"] = providers.to_json()
+      let content = Json::object(entries).stringify(indent=4)
+      let write_result = try? @fs.write_string_to_file(config_path, content)
+      guard write_result is Ok(_) else {
+        return Err("Failed to write config file: \{write_result.unwrap_err()}")
+      }
+      Ok(())
+    }
+    _ =>
+      Err(
+        "Failed to write config file: existing config root must be a JSON object",
+      )
   }
 }

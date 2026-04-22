@@ -7,6 +7,8 @@ import {
 }
 
 // Values
+pub fn backup_config_before_write(String) -> Unit raise
+
 pub fn create(String) -> &Agent?
 
 pub fn supported_agents() -> Array[String]

@@ -21,6 +21,8 @@ pub fn parse_args(Array[String]) -> Command
 
 pub fn print_help() -> Int
 
+pub async fn remove_provider(String) -> Int
+
 pub fn set_provider(String, String, @agent.ApiFormat?, Bool) -> Int
 
 // Errors
@@ -35,6 +37,7 @@ pub enum Command {
   Version
   AddProviderInteractive
   AddProvider(name~ : String, api_key~ : String, model~ : String, openai_base_url~ : String?, anthropic_base_url~ : String?)
+  RemoveProvider(String)
   Unknown(String)
   ErrorParameter(String)
 } derive(@debug.Debug)

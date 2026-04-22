@@ -28,6 +28,8 @@ options(
     "list_agents.mbt": [ "native", "llvm" ],
     "list_providers.mbt": [ "native", "llvm" ],
     "prompt.mbt": [ "native", "llvm" ],
+    "remove_provider.mbt": [ "native", "llvm" ],
+    "remove_provider_wbtest.mbt": [ "native", "llvm" ],
     "set_provider.mbt": [ "native", "llvm" ],
   },
 )

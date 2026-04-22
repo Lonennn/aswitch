@@ -28,12 +28,12 @@ pub enum Command {
     openai_base_url~ : String?,
     anthropic_base_url~ : String?
   )
+  /// Remove a provider by name
+  RemoveProvider(String)
   /// Unknown command
   Unknown(String)
   /// Some parameters error
   ErrorParameter(String)
-  /// Remove a provider
-  // RemoveProvider(String)
 } derive(Debug)
 
 ///|
@@ -210,6 +210,7 @@ pub fn parse_args(args : Array[String]) -> Command {
     ["providers" | "list" | "ls"] => Command::ListProviders
     ["agents"] => Command::ListAgents
     ["set" | "switch", .. args] => parse_set_command(args.to_array())
+    ["remove" | "rm", name, ..] => Command::RemoveProvider(name)
     ["remove" | "rm"] => {
       println("Error: 'remove' requires provider name")
       Command::Help
@@ -221,7 +222,6 @@ pub fn parse_args(args : Array[String]) -> Command {
     ["help" | "-h" | "--help"] => Command::Help
     ["version" | "-v" | "--version"] => Command::Version
     ["init"] => Command::Init
-    // ["remove" | "rm", name] => Command::RemoveProvider(name)
     // ["add", name, api_key, base_url, model] => {
     //   Command::AddProvider(name, api_key, base_url, model)
     // }

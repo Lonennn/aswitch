@@ -14,6 +14,26 @@ pub(all) struct Provider {
 } derive(Debug, Eq, ToJson, FromJson)
 
 ///|
+pub fn Provider::deep_copy(self : Provider) -> Provider {
+  let openai_base_url = match self.openai_base_url {
+    Some(url) => Some(url.to_string())
+    None => None
+  }
+  let anthropic_base_url = match self.anthropic_base_url {
+    Some(url) => Some(url.to_string())
+    None => None
+  }
+  let models = self.models.map(fn(model) { model.deep_copy() })
+  Provider::{
+    name: self.name.to_string(),
+    api_key: self.api_key.to_string(),
+    openai_base_url,
+    anthropic_base_url,
+    models,
+  }
+}
+
+///|
 /// Modality enum for model input/output capabilities
 pub(all) enum Modality {
   Text

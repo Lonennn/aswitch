@@ -86,3 +86,20 @@ test "validate valid config returns ok" {
   let result = validate_config(config)
   assert_true(result is Ok(_))
 }
+
+///|
+test "config deep_copy returns independent provider list" {
+  let provider = @provider.Provider::{
+    name: "openai",
+    api_key: "sk-xxx",
+    openai_base_url: Some("https://api.openai.com/v1"),
+    anthropic_base_url: None,
+    models: [@provider.Model::new(name="gpt-4o", context_limit=128000)],
+  }
+  let original = Config::{ providers: @list.from_array([provider]) }
+  let copied = original.deep_copy()
+  copied.providers = @list.new()
+
+  assert_eq(original.providers.length(), 1)
+  assert_eq(copied.providers.length(), 0)
+}

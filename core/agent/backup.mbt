@@ -43,7 +43,7 @@ fn rotate_backups(
 }
 
 ///|
-fn backup_config_before_write(config_path : String) -> Unit raise Error {
+pub fn backup_config_before_write(config_path : String) -> Unit raise Error {
   if !@fs.path_exists(config_path) {
     return ()
   }

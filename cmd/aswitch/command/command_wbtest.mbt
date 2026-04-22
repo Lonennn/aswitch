@@ -77,6 +77,19 @@ test "parse_args add option mode validates required fields" {
 }
 
 ///|
+test "parse_args maps remove aliases and ignores extra args" {
+  match parse_args(["remove", "openai"]) {
+    RemoveProvider(name) => assert_eq(name, "openai")
+    other => fail("Expected RemoveProvider, got \{other}")
+  }
+
+  match parse_args(["rm", "anthropic", "ignored", "extra"]) {
+    RemoveProvider(name) => assert_eq(name, "anthropic")
+    other => fail("Expected RemoveProvider, got \{other}")
+  }
+}
+
+///|
 test "set_provider fails with invalid config" {
   // Setup: Create invalid config with duplicate provider names
   let provider1 = @provider.Provider::{

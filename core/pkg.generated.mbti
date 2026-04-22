@@ -17,6 +17,8 @@ pub fn load_config(validate? : Bool) -> Config raise
 
 pub fn save_config(Config) -> Result[Unit, String]
 
+pub fn save_providers_preserving_other_fields(String, @list.List[@provider.Provider]) -> Result[Unit, String]
+
 pub fn validate_config(Config) -> Result[Unit, ValidationError]
 
 pub fn validate_provider(@provider.Provider) -> Result[Unit, ValidationError]
@@ -25,8 +27,9 @@ pub fn validate_provider(@provider.Provider) -> Result[Unit, ValidationError]
 
 // Types and methods
 pub(all) struct Config {
-  providers : @list.List[@provider.Provider]
+  mut providers : @list.List[@provider.Provider]
 } derive(Eq, ToJson, @debug.Debug, @json.FromJson)
+pub fn Config::deep_copy(Self) -> Self
 pub fn Config::get_provider(Self, String) -> @provider.Provider?
 pub fn Config::has_provider(Self, String) -> Bool
 pub fn Config::is_empty(Self) -> Bool
