@@ -1,0 +1,98 @@
+#compdef aswitch
+
+_aswitch_agents() {
+  local -a agents
+  agents=(
+    'claude-code:Claude Code'
+    'claude:Alias for claude-code'
+    'claudecode:Alias for claude-code'
+    'open-code:OpenCode'
+    'opencode:Alias for open-code'
+    'openclaw:OpenClaw'
+    'open-claw:Alias for openclaw'
+  )
+  _describe -t agents 'agent' agents
+}
+
+_aswitch_providers() {
+  local -a providers lines
+  local line
+
+  lines=("${(@f)$(_call_program providers aswitch providers 2>/dev/null)}")
+  providers=()
+
+  for line in "${lines[@]}"; do
+    line="${line## ##}"
+    [[ -z "$line" ]] && continue
+    [[ "$line" == 'Configured providers:' ]] && continue
+    [[ "$line" == 'No providers configured' ]] && continue
+    [[ "$line" == Total:* ]] && continue
+    providers+=("$line")
+  done
+
+  if (( ${#providers[@]} > 0 )); then
+    _describe -t providers 'provider' providers
+  else
+    _message 'provider name'
+  fi
+}
+
+_aswitch_add_opts() {
+  _arguments -s \
+    '--name[Provider name]:name:' \
+    '--api-key[Provider API key]:api key:' \
+    '--model[Provider model name]:model:' \
+    '--openai-base-url[OpenAI-compatible base URL]:url:' \
+    '--anthropic-base-url[Anthropic-compatible base URL]:url:' \
+    '1:name:' \
+    '2:api key:' \
+    '3:base URL:_urls' \
+    '4:model:'
+}
+
+_aswitch() {
+  local context state line
+  local -a commands
+
+  _arguments -C -s \
+    '1:command:->command' \
+    '*::arg:->args'
+
+  case $state in
+    command)
+      commands=(
+        'init:Initialize configuration file'
+        'providers:List configured providers'
+        'agents:List supported agents'
+        'set:Set active provider for an agent'
+        'add:Add or update provider'
+        'remove:Remove provider'
+        'rm:Alias for remove'
+        'help:Show help'
+        'version:Show version'
+      )
+      _describe -t commands 'aswitch command' commands
+      ;;
+    args)
+      case $words[2] in
+        set|switch)
+          _arguments -s \
+            '1:agent:_aswitch_agents' \
+            '2:provider:_aswitch_providers' \
+            '3:api format:(openai anthropic)' \
+            '(-n --dry-run)'{-n,--dry-run}'[Print diff without writing config]'
+          ;;
+        remove|rm)
+          _arguments '1:provider:_aswitch_providers'
+          ;;
+        add)
+          _aswitch_add_opts
+          ;;
+        *)
+          ;;
+      esac
+      ;;
+  esac
+}
+
+_aswitch "$@"
