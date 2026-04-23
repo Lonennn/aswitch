@@ -11,6 +11,10 @@ pub fn backup_config_before_write(String) -> Unit raise
 
 pub fn create(String) -> &Agent?
 
+pub fn get_agent_config_path(String) -> String?
+
+pub fn is_agent_installed(String) -> Bool
+
 pub fn supported_agents() -> Array[String]
 
 // Errors
@@ -26,14 +30,17 @@ pub(all) enum ApiFormat {
 
 pub struct ClaudeCode {
 }
+pub fn ClaudeCode::get_config_file_path() -> String
 pub impl Agent for ClaudeCode
 
 pub struct OpenClaw {
 }
+pub fn OpenClaw::get_config_file_path() -> String
 pub impl Agent for OpenClaw
 
 pub struct OpenCode {
 }
+pub fn OpenCode::get_config_file_path() -> String
 pub impl Agent for OpenCode
 
 pub struct ProviderDiff {

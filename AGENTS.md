@@ -15,11 +15,17 @@ ASwitch is a CLI tool for switching AI agent model providers (Claude Code, OpenC
   - Dry-run example: `moon run cmd/aswitch -- set claude-code OpenAI --dry-run`
 
 ### Testing
+
+#### Critical Safety Rule: Environment Isolation
+When working with ASwitch during development or testing:
+- **Never run write operations against the default system user environment** to avoid accidental modification of real user configuration files for installed AI agents.
+- Always use isolated, temporary test environments for all operations that read or write configuration data. Changing the `HOME` environment variable maybe helpful.
+- Prefer dry-run mode for all write operations when validating functionality to avoid unnecessary file system modifications.
+- Always clean up temporary test resources after testing is complete.
+
 - Run all tests: `moon test`
 - Run tests for a specific package: `moon test <directory>`
-  - Example: `moon test core/agent` or `moon test cmd/aswitch/command`
 - Run tests for a specific file: `moon test <file.mbt>`
-  - Example: `moon test core/agent/claude_code_wbtest.mbt`
 - Update test snapshots: `moon test --update`
 - Generate coverage report: `moon coverage analyze > uncovered.log`
 
@@ -46,6 +52,7 @@ ASwitch is a CLI tool for switching AI agent model providers (Claude Code, OpenC
 │  │    * ClaudeCode, OpenCode, OpenClaw         │ │
 │  │  - Handles agent-specific config file I/O   │ │
 │  │  - Dry-run diff generation                  │ │
+│  │  - Agent detection utilities                │ │
 │  └─────────────────────────────────────────────┘ │
 │  ┌─────────────────────────────────────────────┐ │
 │  │ Config Module (core/config.mbt)             │ │

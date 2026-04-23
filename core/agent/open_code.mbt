@@ -12,7 +12,7 @@ const AI_SDK_ANTHROPIC = "@ai-sdk/anthropic"
 
 ///|
 /// Get the OpenCode configuration file path (~/.config/opencode/opencode.json)
-fn OpenCode::get_config_file_path() -> String {
+pub fn OpenCode::get_config_file_path() -> String {
   @path.Path::join(OpenCode::get_config_dir(), "opencode.json").to_string()
 }
 

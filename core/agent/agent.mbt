@@ -49,18 +49,84 @@ fn generate_provider_diff(
 }
 
 ///|
+/// Agent metadata structure containing all information about supported agents
+priv struct AgentMeta {
+  canonical_name : String
+  aliases : Array[String]
+  get_config_path : () -> String
+  create_instance : () -> &Agent
+}
+
+///|
+/// Single source of truth for all supported agents
+let agent_meta : Array[AgentMeta] = [
+  AgentMeta::{
+    canonical_name: "claude-code",
+    aliases: ["claude", "claudecode"],
+    get_config_path: () => ClaudeCode::get_config_file_path(),
+    create_instance: () => ClaudeCode::{  },
+  },
+  AgentMeta::{
+    canonical_name: "open-code",
+    aliases: ["opencode"],
+    get_config_path: () => OpenCode::get_config_file_path(),
+    create_instance: () => OpenCode::{  },
+  },
+  AgentMeta::{
+    canonical_name: "openclaw",
+    aliases: ["open-claw"],
+    get_config_path: () => OpenClaw::get_config_file_path(),
+    create_instance: () => OpenClaw::{  },
+  },
+]
+
+///|
+/// Helper to find agent metadata by name (supports aliases)
+fn find_agent_meta(agent_name : String) -> AgentMeta? {
+  let name_lower = agent_name.to_lower()
+  for meta in agent_meta {
+    if meta.canonical_name == name_lower || meta.aliases.contains(name_lower) {
+      return Some(meta)
+    }
+  }
+  None
+}
+
+///|
 pub fn create(agent_name : String) -> &Agent? {
-  match agent_name.to_lower() {
-    "claude" | "claudecode" => Some(ClaudeCode::{  })
-    "opencode" | "open-code" => Some(OpenCode::{  })
-    "openclaw" | "open-claw" => Some(OpenClaw::{  })
-    _ => None
+  match find_agent_meta(agent_name) {
+    Some(meta) => Some((meta.create_instance)())
+    None => None
   }
 }
 
 ///|
 pub fn supported_agents() -> Array[String] {
-  ["claude-code", "open-code", "openclaw"]
+  let result = []
+  for meta in agent_meta {
+    result.push(meta.canonical_name)
+  }
+  result
+}
+
+///|
+/// Get the configuration file path for a given agent
+/// Returns None if the agent is not supported
+pub fn get_agent_config_path(agent_name : String) -> String? {
+  match find_agent_meta(agent_name) {
+    Some(meta) => Some((meta.get_config_path)())
+    None => None
+  }
+}
+
+///|
+/// Check if an agent is installed (config file exists at standard path)
+/// Returns false if the agent is not supported or config file does not exist
+pub fn is_agent_installed(agent_name : String) -> Bool {
+  match get_agent_config_path(agent_name) {
+    Some(path) => @fs.path_exists(path)
+    None => false
+  }
 }
 
 ///|

@@ -6,7 +6,7 @@ pub struct ClaudeCode {}
 
 ///|
 /// Get the Claude Code configuration file path (~/.claude/settings.json)
-fn ClaudeCode::get_config_file_path() -> String {
+pub fn ClaudeCode::get_config_file_path() -> String {
   @path.Path::join(ClaudeCode::get_config_dir(), "settings.json").to_string()
 }
 

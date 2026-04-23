@@ -73,14 +73,11 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 |------|------------|----------------|--------|
 | **✅ OpenCode Support** (Completed 2026-04-21) | We believe that supporting OpenCode will expand our addressable user base by 30% because OpenCode is the second most popular AI coding agent. | Active OpenCode users | M (3-4 weeks) |
 | **✅ OpenClaw Support** (Completed 2026-04-21) | We believe that supporting OpenClaw will capture the open-source community segment because OpenClaw is gaining traction in OSS projects. | GitHub stars / mentions | S (2 weeks) |
-| **Generic Agent Framework** | We believe that a plugin-style agent framework will enable community contributions because maintainers can't support every new agent. | Community-contributed agents | L (6-8 weeks) |
 
 **Key Deliverables:**
 - [x] OpenCode agent implementation
 - [x] OpenClaw agent implementation
 - [ ] Agent capability detection (auto-discover installed agents)
-- [ ] Generic agent configuration template system
-- [ ] Agent-specific environment variable mapping
 
 **Dependencies:** Phase 1 (stable core)
 
@@ -117,6 +114,7 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 | **Provider Switching API** | We believe that a programmatic API will enable CI/CD integration because teams want to switch providers in automated workflows. | API usage | L (6-8 weeks) |
 | **Configuration Versioning** | We believe that config history will reduce rollback time from 30 minutes to 1 minute because users currently manually undo changes. | Rollback usage | M (3-4 weeks) |
 | **Team Workspaces** | We believe that shared team configurations will improve enterprise adoption because current configs are individual-only. | Enterprise sign-ups | L (6-8 weeks) |
+| **Generic Agent Plugin Framework** | We believe that a plugin-style agent framework will enable community contributions because maintainers can't support every new agent. | Community-contributed agents | L (6-8 weeks) |
 
 **Key Deliverables:**
 - [ ] Library API for programmatic usage
@@ -124,6 +122,9 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 - [ ] Team workspace support
 - [ ] Audit logging for provider switches
 - [ ] Integration with secret managers (1Password, Bitwarden)
+- [ ] Generic agent configuration template system
+- [ ] Agent-specific environment variable mapping
+- [ ] Plugin sandboxing and distribution mechanism
 
 **Dependencies:** Phase 3 (mature product)
 
@@ -141,7 +142,7 @@ Q1 2026 (Completed - Foundation):
 Q2 2026 (Current - Agent Expansion):
 ├── OpenCode Agent Support ✅
 ├── OpenClaw Agent Support ✅
-└── Generic Agent Plugin Framework
+└── Agent capability detection
 
 Q3 2026 (Later - Developer Experience):
 ├── Shell Completions
@@ -153,7 +154,8 @@ Q4 2026 (Exploration - Advanced):
 ├── Programmatic API
 ├── Configuration Versioning
 ├── Team Workspaces
-└── Secret Manager Integration
+├── Secret Manager Integration
+└── Generic Agent Plugin Framework
 ```
 
 ---
@@ -211,5 +213,5 @@ Q4 2026 (Exploration - Advanced):
 
 ---
 
-*Last updated: 2026-04-22*
+*Last updated: 2026-04-23*
 *Roadmap version: 2.0*

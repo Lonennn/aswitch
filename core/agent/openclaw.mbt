@@ -12,7 +12,7 @@ const AI_API_ANTHROPIC = "anthropic-messages"
 
 ///|
 /// Get the OpenClaw configuration file path (~/.openclaw/openclaw.json)
-fn OpenClaw::get_config_file_path() -> String {
+pub fn OpenClaw::get_config_file_path() -> String {
   @path.Path::join(OpenClaw::get_config_dir(), "openclaw.json").to_string()
 }
 
