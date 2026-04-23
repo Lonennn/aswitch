@@ -1,6 +1,5 @@
 ///|
 /// Execution commands for aswitch CLI
-
 const SCHEMA_URL = "https://raw.githubusercontent.com/Lonennn/aswitch/master/asset/aswitch.schema.json"
 
 ///|
@@ -8,7 +7,7 @@ const SCHEMA_URL = "https://raw.githubusercontent.com/Lonennn/aswitch/master/ass
 pub fn init_config() -> Int {
   let path = @core.get_config_path()
   if !@fs.path_exists(path) {
-    let config_json: Json = {
+    let config_json : Json = {
       "$schema": Json::string(SCHEMA_URL),
       "providers": Json::array([]),
     }

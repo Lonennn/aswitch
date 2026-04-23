@@ -73,8 +73,7 @@ pub fn get_config_path() -> String {
         @path.Path::join(trimmed.to_string(), CONFIG_FILE_NAME).to_string()
       }
     }
-    None =>
-      @util.get_user_home()
+    None => @util.get_user_home()
   }
 }
 
