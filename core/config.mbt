@@ -74,15 +74,7 @@ pub fn get_config_path() -> String {
       }
     }
     None =>
-      // Try HOME (Unix/macOS) or USERPROFILE (Windows)
-      match @sys.get_env_var("HOME") {
-        Some(home) => @path.Path::join(home, CONFIG_FILE_NAME).to_string()
-        None =>
-          match @sys.get_env_var("USERPROFILE") {
-            Some(home) => @path.Path::join(home, CONFIG_FILE_NAME).to_string()
-            None => CONFIG_FILE_NAME
-          }
-      }
+      @util.get_user_home()
   }
 }
 
