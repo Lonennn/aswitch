@@ -15,8 +15,8 @@ moon build --release
 ## Supported Agents
 
 - `claude-code` (aliases: `claude`, `claudecode`)
-- `open-code` (aliases: `opencode`, `open-code`)
-- `openclaw` (aliases: `openclaw`, `open-claw`)
+- `opencode` (aliases: `open-code`)
+- `openclaw` (aliases: `open-claw`)
 
 Use `aswitch agents` to print the current supported list.
 
@@ -97,3 +97,7 @@ At least one of `openai_base_url` / `anthropic_base_url` is required.
 - Duplicate provider names are rejected (case-insensitive).
 - `set --dry-run` prints file diffs without writing.
 - Before any file write, backups are rotated as `<file>.bak.1` ... `<file>.bak.5`.
+
+## Shell Completion
+
+See the complete [Shell Completion Installation Guide](./docs/shell-completions.md) for instructions on installing completions for Zsh, PowerShell, and other supported shells.
