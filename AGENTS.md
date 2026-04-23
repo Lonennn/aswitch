@@ -87,3 +87,7 @@ When working with ASwitch during development or testing:
   - Black-box tests: `*_test.mbt` (test public APIs)
   - White-box tests: `*_wbtest.mbt` (test internal implementation)
 - Before submitting changes: Run `moon info && moon fmt` to update interfaces and format code. Check diffs of `pkg.generated.mbti` to verify public API changes are intended.
+
+### Git Commit
+
+- Do not write Angular JS style commit message.
