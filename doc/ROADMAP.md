@@ -32,6 +32,7 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 - Improved error handling with descriptive error messages
 - Add-provider workflow now creates `aswitch.json` backups before save
 - CLI runtime migrated to async and native/llvm targets
+- Agent capability detection (auto-discovers installed agents, groups them in `agents` command output)
 
 **Limitations:**
 - Partial error handling coverage for edge cases
@@ -65,7 +66,7 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 
 ---
 
-### Phase 2: Agent Expansion (Q2 2026) - Current
+### Phase 2: Agent Expansion (Q2 2026) - Completed
 
 **Theme: Broaden Ecosystem Support**
 
@@ -73,17 +74,18 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 |------|------------|----------------|--------|
 | **✅ OpenCode Support** (Completed 2026-04-21) | We believe that supporting OpenCode will expand our addressable user base by 30% because OpenCode is the second most popular AI coding agent. | Active OpenCode users | M (3-4 weeks) |
 | **✅ OpenClaw Support** (Completed 2026-04-21) | We believe that supporting OpenClaw will capture the open-source community segment because OpenClaw is gaining traction in OSS projects. | GitHub stars / mentions | S (2 weeks) |
+| **✅ Agent Capability Detection** (Completed 2026-04-24) | We believe that auto-detecting installed agents improves user experience by eliminating the need for users to remember which agents they have set up. | User satisfaction / support queries | S (1 week) |
 
 **Key Deliverables:**
 - [x] OpenCode agent implementation
 - [x] OpenClaw agent implementation
-- [ ] Agent capability detection (auto-discover installed agents)
+- [x] Agent capability detection (auto-discover installed agents, groups output by installation status)
 
 **Dependencies:** Phase 1 (stable core)
 
 ---
 
-### Phase 3: Developer Experience (Q3 2026) - Later
+### Phase 3: Developer Experience (Q3 2026) - Current
 
 **Theme: Polish & Power User Features**
 
@@ -139,12 +141,12 @@ Q1 2026 (Completed - Foundation):
 ├── Dry-Run Safety Rails ✅ (Completed 2026-04-21)
 └── Provider Management ✅ (add + remove, completed 2026-04-22)
 
-Q2 2026 (Current - Agent Expansion):
+Q2 2026 (Completed - Agent Expansion):
 ├── OpenCode Agent Support ✅
 ├── OpenClaw Agent Support ✅
-└── Agent capability detection
+└── Agent capability detection ✅ (Completed 2026-04-24)
 
-Q3 2026 (Later - Developer Experience):
+Q3 2026 (Current - Developer Experience):
 ├── Shell Completions
 ├── Provider Presets
 ├── Multi-Agent Sync
@@ -195,9 +197,9 @@ Q4 2026 (Exploration - Advanced):
 
 ## Immediate Priorities (Next 30-60 Days)
 
-1. Add agent capability detection (auto-discover installed agents).
-2. Deliver package distribution (Homebrew first, then apt/scoop).
-3. Add shell completions for Bash/Zsh/Fish.
+1. Deliver package distribution (Homebrew first, then apt/scoop).
+2. Add shell completions for Bash/Zsh/Fish.
+3. Add built-in provider presets for common model providers (OpenAI, Anthropic, Moonshot, DeepSeek, etc.).
 
 ---
 
@@ -213,5 +215,5 @@ Q4 2026 (Exploration - Advanced):
 
 ---
 
-*Last updated: 2026-04-23*
-*Roadmap version: 2.0*
+*Last updated: 2026-04-24*
+*Roadmap version: 2.1*
