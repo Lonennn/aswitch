@@ -1,6 +1,4 @@
-# CLAUDE.md
-
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+# aswitch
 
 ## Project Overview
 
@@ -19,7 +17,7 @@ ASwitch is a CLI tool for switching AI agent model providers (Claude Code, OpenC
 #### Critical Safety Rule: Environment Isolation
 When working with ASwitch during development or testing:
 - **Never run write operations against the default system user environment** to avoid accidental modification of real user configuration files for installed AI agents.
-- Always use isolated, temporary test environments for all operations that read or write configuration data. Changing the `HOME` environment variable maybe helpful.
+- Always use isolated, temporary test environments for all operations that read or write configuration data. Changing the `ASWITCH_HOME` environment variable maybe helpful.
 - Prefer dry-run mode for all write operations when validating functionality to avoid unnecessary file system modifications.
 - Always clean up temporary test resources after testing is complete.
 
