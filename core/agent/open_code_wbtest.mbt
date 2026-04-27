@@ -50,6 +50,88 @@ fn expected_other_settings() -> Json {
 }
 
 ///|
+fn cleanup_open_code_temp_dir(temp_dir : String) -> Unit {
+  if !@fs.path_exists(temp_dir) {
+    return ()
+  }
+  let entries_result = try? @fs.read_dir(temp_dir)
+  guard entries_result is Ok(entries) else {
+    let _ = try? @fs.remove_dir(temp_dir)
+    return ()
+  }
+  for entry in entries {
+    let child_path = @path.Path(temp_dir).join(entry).to_string()
+    let remove_file_result = try? @fs.remove_file(child_path)
+    if remove_file_result is Err(_) {
+      cleanup_open_code_temp_dir(child_path)
+    }
+  }
+  let _ = try? @fs.remove_dir(temp_dir)
+}
+
+///|
+test "get_temporary_override preserves existing opencode settings" {
+  let original_home = @sys.get_env_var("HOME")
+  let original_xdg = @sys.get_env_var("XDG_CONFIG_HOME")
+  let temp_home = "_aswitch_test_opencode_temp_override"
+  cleanup_open_code_temp_dir(temp_home)
+  try! @fs.create_dir(temp_home)
+  @sys.set_env_var("HOME", temp_home)
+  @sys.unset_env_var("XDG_CONFIG_HOME")
+
+  let config_dir = @path.Path(temp_home).join(".config").to_string()
+  try! @fs.create_dir(config_dir)
+  let opencode_dir = @path.Path(config_dir).join("opencode").to_string()
+  try! @fs.create_dir(opencode_dir)
+  let config_path = @path.Path(opencode_dir).join("opencode.json").to_string()
+  try! @fs.write_string_to_file(
+    config_path,
+    sample_opencode_json().stringify(indent=2),
+  )
+
+  let provider = @provider.Provider::{
+    name: "temp-provider",
+    api_key: "sk-temp-key",
+    openai_base_url: Some("https://temp.example.com/v1"),
+    anthropic_base_url: None,
+    models: [@provider.Model::new(name="temp-model")],
+  }
+  let temporary_override = OpenCode::get_temporary_override(
+    OpenCode::{  },
+    provider,
+    Some(OpenAI),
+  )
+  let content = temporary_override.env_vars[0].value
+  let json_result = try? @json.parse(content)
+  guard json_result is Ok(json) else {
+    fail("temporary override should contain valid JSON")
+  }
+  match json {
+    {
+      "provider": {
+        "existing-provider": _,
+        "another-provider": _,
+        "temp-provider": _,
+        ..
+      },
+      "other-settings": other_settings,
+      ..
+    } => assert_eq(other_settings, expected_other_settings())
+    _ => fail("temporary override should preserve existing settings")
+  }
+
+  cleanup_open_code_temp_dir(temp_home)
+  match original_home {
+    Some(home) => @sys.set_env_var("HOME", home)
+    None => @sys.unset_env_var("HOME")
+  }
+  match original_xdg {
+    Some(xdg) => @sys.set_env_var("XDG_CONFIG_HOME", xdg)
+    None => @sys.unset_env_var("XDG_CONFIG_HOME")
+  }
+}
+
+///|
 test "apply_provider_to_json - adds new provider and preserves all other properties" {
   // Create a provider with 2 models
   let provider = @provider.Provider::{

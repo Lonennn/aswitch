@@ -84,6 +84,20 @@ pub fn validate_provider(
 }
 
 ///|
+pub fn validation_error_message(err : ValidationError) -> String {
+  match err {
+    EmptyProviderName => "Provider name cannot be empty"
+    EmptyApiKey => "Provider API key cannot be empty"
+    NoBaseUrls => "Provider must have at least one base URL configured"
+    InvalidBaseUrl(url) => "Invalid base URL: \{url}"
+    NoModels => "Provider must have at least one model configured"
+    DuplicateProviderName(name) => "Duplicate provider name: \{name}"
+    EmptyModelName => "Model name cannot be empty"
+    InvalidContextWindow(value) => "Invalid context window size: \{value}"
+  }
+}
+
+///|
 /// Validate a single Model configuration
 fn validate_model(model : @provider.Model) -> Result[Unit, ValidationError] {
   if model.name.trim().is_empty() {

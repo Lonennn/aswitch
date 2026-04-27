@@ -7,6 +7,7 @@ import {
   "moonbitlang/core/json",
   "moonbitlang/core/list",
   "moonbitlang/x/fs",
+  "moonbitlang/x/path",
 }
 
 import {
@@ -31,5 +32,6 @@ options(
     "remove_provider.mbt": [ "native", "llvm" ],
     "remove_provider_wbtest.mbt": [ "native", "llvm" ],
     "set_provider.mbt": [ "native", "llvm" ],
+    "temporary_provider.mbt": [ "native", "llvm" ],
   },
 )

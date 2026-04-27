@@ -25,6 +25,10 @@ pub async fn remove_provider(String) -> Int
 
 pub fn set_provider(String, String, @agent.ApiFormat?, Bool) -> Int
 
+pub fn temporary_command(String, String, @agent.ApiFormat?) -> Int
+
+pub fn temporary_exec(String, String, @agent.ApiFormat?, Array[String], Bool) -> Int
+
 // Errors
 
 // Types and methods
@@ -33,6 +37,8 @@ pub enum Command {
   ListProviders
   ListAgents
   SetProvider(agent~ : String, provider~ : String, api_format~ : @agent.ApiFormat?, dry_run~ : Bool)
+  TemporaryCommand(agent~ : String, provider~ : String, api_format~ : @agent.ApiFormat?)
+  TemporaryExec(agent~ : String, provider~ : String, api_format~ : @agent.ApiFormat?, command~ : Array[String], print_command~ : Bool)
   Help
   Version
   AddProviderInteractive

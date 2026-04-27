@@ -142,6 +142,72 @@ pub impl Agent for ClaudeCode with get_provider_diff(self, provider, api_format)
 }
 
 ///|
+fn ClaudeCode::get_temporary_override(
+  _ : ClaudeCode,
+  provider : @provider.Provider,
+  _ : ApiFormat?,
+) -> TemporaryOverride raise Error {
+  let updated_json = ClaudeCode::apply_provider_to_json(
+    Json::object(Map::new()),
+    provider,
+  )
+  let env_json = match updated_json {
+    { "env": env_obj, .. } => env_obj
+    _ => Json::object(Map::new())
+  }
+  let env_map : Map[String, Json] = match env_json {
+    Json::Object(entries) => entries
+    _ => Map::new()
+  }
+  let get_string = fn(key : String) -> String raise {
+    match env_map.get(key) {
+      Some(Json::String(value)) => value
+      _ =>
+        raise ProviderLackUrlError(
+          "missing temporary override value for \{key}",
+        )
+    }
+  }
+  let env_vars = [
+    EnvVar::{
+      key: "ANTHROPIC_AUTH_TOKEN",
+      value: get_string("ANTHROPIC_AUTH_TOKEN"),
+    },
+    EnvVar::{
+      key: "ANTHROPIC_BASE_URL",
+      value: get_string("ANTHROPIC_BASE_URL"),
+    },
+    EnvVar::{
+      key: "ANTHROPIC_DEFAULT_OPUS_MODEL",
+      value: get_string("ANTHROPIC_DEFAULT_OPUS_MODEL"),
+    },
+    EnvVar::{
+      key: "ANTHROPIC_DEFAULT_SONNET_MODEL",
+      value: get_string("ANTHROPIC_DEFAULT_SONNET_MODEL"),
+    },
+    EnvVar::{
+      key: "ANTHROPIC_DEFAULT_HAIKU_MODEL",
+      value: get_string("ANTHROPIC_DEFAULT_HAIKU_MODEL"),
+    },
+  ]
+  TemporaryOverride::{
+    executable: "claude",
+    args: [],
+    env_vars,
+    temp_files: [],
+  }
+}
+
+///|
+pub impl Agent for ClaudeCode with get_temporary_override(
+  self,
+  provider,
+  api_format,
+) -> TemporaryOverride raise Error {
+  ClaudeCode::get_temporary_override(self, provider, api_format)
+}
+
+///|
 pub impl Agent for ClaudeCode with name(_ : ClaudeCode) -> String {
   "Claude Code"
 }

@@ -10,52 +10,15 @@ pub fn set_provider(
   api_format : @agent.ApiFormat?,
   dry_run : Bool,
 ) -> Int {
-  // Validate agent name
-  let agent_result = @agent.create(agent_name)
-  guard agent_result is Some(agent) else {
-    println("Error: Unknown agent '\{agent_name}'")
-    EXIT_CODE_UNKNOWN_AGENT
-  }
-
-  // Load configuration
   let config_path = @core.get_config_path()
   println("Loading configuration from: \{config_path}")
-  let load_config_result = try? @core.load_config()
-  guard load_config_result is Ok(config) else {
-    println(
-      "Error: Failed to load config file, \{load_config_result.unwrap_err()}",
-    )
-    EXIT_CODE_CONFIG_ERROR
-  }
 
-  // Validate configuration
-  let validate_result = @core.validate_config(config)
-  guard validate_result is Ok(_) else {
-    let err_msg = match validate_result.unwrap_err() {
-      @core.ValidationError::EmptyProviderName =>
-        "Provider name cannot be empty"
-      @core.ValidationError::EmptyApiKey => "Provider API key cannot be empty"
-      @core.ValidationError::NoBaseUrls =>
-        "Provider must have at least one base URL configured"
-      @core.ValidationError::InvalidBaseUrl(url) => "Invalid base URL: \{url}"
-      @core.ValidationError::NoModels =>
-        "Provider must have at least one model configured"
-      @core.ValidationError::DuplicateProviderName(name) =>
-        "Duplicate provider name: \{name}"
-      @core.ValidationError::EmptyModelName => "Model name cannot be empty"
-      @core.ValidationError::InvalidContextWindow(value) =>
-        "Invalid context window size: \{value}"
-    }
-    println("Error: Invalid configuration - \{err_msg}")
-    return EXIT_CODE_CONFIG_ERROR
+  let selection_result = resolve_temporary_selection(agent_name, provider_name)
+  guard selection_result is Ok(selection) else {
+    return selection_result.unwrap_err()
   }
-
-  // Get the provider by name
-  let provider_result = config.get_provider(provider_name)
-  guard provider_result is Some(provider) else {
-    println("Error: Unknown provider '\{provider_name}'")
-    EXIT_CODE_UNKNOWN_PROVIDER
-  }
+  let agent = selection.agent
+  let provider = selection.provider
 
   // Apply the provider to the agent (with optional api_format)
   if dry_run {

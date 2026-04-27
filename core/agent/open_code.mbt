@@ -259,6 +259,26 @@ pub impl Agent for OpenCode with apply_provider(_self, provider, api_format) -> 
 }
 
 ///|
+fn OpenCode::get_temporary_override(
+  _ : OpenCode,
+  provider : @provider.Provider,
+  api_format : ApiFormat?,
+) -> TemporaryOverride raise Error {
+  let config_path = OpenCode::get_config_file_path()
+  let settings_json = load_agent_settings_json(config_path)
+  let updated_json = OpenCode::apply_provider_to_json(
+    settings_json, provider, api_format,
+  )
+  let content = updated_json.stringify(indent=2)
+  TemporaryOverride::{
+    executable: "opencode",
+    args: [],
+    env_vars: [EnvVar::{ key: "OPENCODE_CONFIG_CONTENT", value: content }],
+    temp_files: [],
+  }
+}
+
+///|
 /// Generate a diff of what changes would be made without writing to disk
 fn OpenCode::get_provider_diff(
   _ : OpenCode,
@@ -274,6 +294,15 @@ fn OpenCode::get_provider_diff(
 ///|
 pub impl Agent for OpenCode with get_provider_diff(self, provider, api_format) -> ProviderDiff raise Error {
   OpenCode::get_provider_diff(self, provider, api_format)
+}
+
+///|
+pub impl Agent for OpenCode with get_temporary_override(
+  self,
+  provider,
+  api_format,
+) -> TemporaryOverride raise Error {
+  OpenCode::get_temporary_override(self, provider, api_format)
 }
 
 ///|

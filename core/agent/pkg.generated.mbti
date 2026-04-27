@@ -15,6 +15,10 @@ pub fn get_agent_config_path(String) -> String?
 
 pub fn is_agent_installed(String) -> Bool
 
+pub fn prepare_temporary_override(TemporaryOverride) -> Unit raise
+
+pub fn render_posix_shell_command(TemporaryOverride, extra_args? : Array[String]) -> String
+
 pub fn supported_agents() -> Array[String]
 
 // Errors
@@ -33,6 +37,11 @@ pub struct ClaudeCode {
 pub fn ClaudeCode::get_config_file_path() -> String
 pub impl Agent for ClaudeCode
 
+pub struct EnvVar {
+  key : String
+  value : String
+}
+
 pub struct OpenClaw {
 }
 pub fn OpenClaw::get_config_file_path() -> String
@@ -48,6 +57,18 @@ pub struct ProviderDiff {
   diff_output : String
 }
 
+pub struct TempFile {
+  path : String
+  content : String
+}
+
+pub struct TemporaryOverride {
+  executable : String
+  args : Array[String]
+  env_vars : Array[EnvVar]
+  temp_files : Array[TempFile]
+}
+
 // Type aliases
 
 // Traits
@@ -55,5 +76,6 @@ pub(open) trait Agent {
   name(Self) -> String
   apply_provider(Self, @provider.Provider, ApiFormat?) -> Unit raise
   get_provider_diff(Self, @provider.Provider, ApiFormat?) -> ProviderDiff raise
+  get_temporary_override(Self, @provider.Provider, ApiFormat?) -> TemporaryOverride raise
 }
 

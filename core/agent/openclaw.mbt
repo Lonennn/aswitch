@@ -29,6 +29,37 @@ fn OpenClaw::get_config_dir() -> String {
 }
 
 ///|
+fn OpenClaw::get_temporary_override_dir() -> String {
+  let base_dir = match @sys.get_env_var("ASWITCH_HOME") {
+    Some(custom_home) => {
+      let trimmed = custom_home.trim()
+      if trimmed.is_empty() {
+        "."
+      } else {
+        trimmed.to_string()
+      }
+    }
+    None => @util.get_user_home()
+  }
+  @path.Path(base_dir).join(".aswitch-temp").to_string()
+}
+
+///|
+fn OpenClaw::get_temporary_override_path(
+  provider : @provider.Provider,
+  api_format : ApiFormat?,
+) -> String {
+  let format_name = match api_format {
+    Some(OpenAI) => "openai"
+    Some(Anthropic) => "anthropic"
+    None => "auto"
+  }
+  @path.Path(OpenClaw::get_temporary_override_dir())
+  .join("openclaw-\{provider.name.to_lower()}-\{format_name}.json")
+  .to_string()
+}
+
+///|
 /// Determine both API type and base URL based on api_format and available base URLs
 /// Returns (api_type, base_url) tuple or raises ProviderLackUrlError if ambiguous
 fn OpenClaw::determine_api_config(
@@ -267,6 +298,37 @@ fn OpenClaw::get_provider_diff(
 ///|
 pub impl Agent for OpenClaw with get_provider_diff(self, provider, api_format) -> ProviderDiff raise Error {
   OpenClaw::get_provider_diff(self, provider, api_format)
+}
+
+///|
+fn OpenClaw::get_temporary_override(
+  _ : OpenClaw,
+  provider : @provider.Provider,
+  api_format : ApiFormat?,
+) -> TemporaryOverride raise Error {
+  let config_path = OpenClaw::get_config_file_path()
+  let settings_json = load_agent_settings_json(config_path)
+  let updated_json = OpenClaw::apply_provider_to_json(
+    settings_json, provider, api_format,
+  )
+  let temp_path = OpenClaw::get_temporary_override_path(provider, api_format)
+  TemporaryOverride::{
+    executable: "openclaw",
+    args: [],
+    env_vars: [EnvVar::{ key: "OPENCLAW_CONFIG_PATH", value: temp_path }],
+    temp_files: [
+      TempFile::{ path: temp_path, content: updated_json.stringify(indent=2) },
+    ],
+  }
+}
+
+///|
+pub impl Agent for OpenClaw with get_temporary_override(
+  self,
+  provider,
+  api_format,
+) -> TemporaryOverride raise Error {
+  OpenClaw::get_temporary_override(self, provider, api_format)
 }
 
 ///|

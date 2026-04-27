@@ -184,3 +184,206 @@ test "parse_args correctly parses dry-run flags" {
     other => fail("Expected SetProvider, got \{other}")
   }
 }
+
+///|
+fn cleanup_command_temp_dir(temp_dir : String) -> Unit {
+  if !@fs.path_exists(temp_dir) {
+    return ()
+  }
+  let entries_result = try? @fs.read_dir(temp_dir)
+  guard entries_result is Ok(entries) else {
+    let _ = try? @fs.remove_dir(temp_dir)
+    return ()
+  }
+  for entry in entries {
+    let child_path = @path.Path(temp_dir).join(entry).to_string()
+    let remove_file_result = try? @fs.remove_file(child_path)
+    if remove_file_result is Err(_) {
+      cleanup_command_temp_dir(child_path)
+    }
+  }
+  let _ = try? @fs.remove_dir(temp_dir)
+}
+
+///|
+fn command_with_temp_aswitch_home(
+  temp_dir : String,
+  body : () -> Unit raise Error,
+) -> Unit raise Error {
+  let original_home = @sys.get_env_var("ASWITCH_HOME")
+  cleanup_command_temp_dir(temp_dir)
+  try! @fs.create_dir(temp_dir)
+  @sys.set_env_var("ASWITCH_HOME", temp_dir)
+  defer {
+    cleanup_command_temp_dir(temp_dir)
+    match original_home {
+      Some(home) => @sys.set_env_var("ASWITCH_HOME", home)
+      None => @sys.unset_env_var("ASWITCH_HOME")
+    }
+  }
+  body()
+}
+
+///|
+fn command_with_temp_xdg_config_home(
+  temp_dir : String,
+  body : () -> Unit raise Error,
+) -> Unit raise Error {
+  let original_home = @sys.get_env_var("HOME")
+  let original_xdg = @sys.get_env_var("XDG_CONFIG_HOME")
+  cleanup_command_temp_dir(temp_dir)
+  try! @fs.create_dir(temp_dir)
+  @sys.set_env_var("HOME", temp_dir)
+  @sys.set_env_var("XDG_CONFIG_HOME", temp_dir)
+  defer {
+    cleanup_command_temp_dir(temp_dir)
+    match original_home {
+      Some(home) => @sys.set_env_var("HOME", home)
+      None => @sys.unset_env_var("HOME")
+    }
+    match original_xdg {
+      Some(xdg) => @sys.set_env_var("XDG_CONFIG_HOME", xdg)
+      None => @sys.unset_env_var("XDG_CONFIG_HOME")
+    }
+  }
+  body()
+}
+
+///|
+fn write_test_config(providers : Array[@provider.Provider]) -> Unit {
+  let config = @core.Config::{ providers: @list.from_array(providers) }
+  @core.save_config(config).unwrap()
+}
+
+///|
+test "parse_args maps temporary command and exec variants" {
+  match
+    parse_args(["command", "claude-code", "seed", "--api-format", "anthropic"]) {
+    TemporaryCommand(agent~, provider~, api_format~) => {
+      assert_eq(agent, "claude-code")
+      assert_eq(provider, "seed")
+      assert_true(api_format is Some(@agent.Anthropic))
+    }
+    other => fail("Expected TemporaryCommand, got \{other}")
+  }
+
+  match
+    parse_args([
+      "exec", "open-code", "seed", "--api-format", "openai", "--print-command", "--",
+      "opencode", "run",
+    ]) {
+    TemporaryExec(agent~, provider~, api_format~, command~, print_command~) => {
+      assert_eq(agent, "open-code")
+      assert_eq(provider, "seed")
+      assert_true(api_format is Some(@agent.OpenAI))
+      assert_eq(command, ["opencode", "run"])
+      assert_true(print_command)
+    }
+    other => fail("Expected TemporaryExec, got \{other}")
+  }
+
+  match parse_args(["exec", "claude-code", "seed"]) {
+    TemporaryExec(agent~, provider~, api_format~, command~, print_command~) => {
+      assert_eq(agent, "claude-code")
+      assert_eq(provider, "seed")
+      assert_true(api_format is None)
+      assert_eq(command, [])
+      assert_false(print_command)
+    }
+    other => fail("Expected TemporaryExec, got \{other}")
+  }
+}
+
+///|
+async test "render_temporary_command renders claude override from isolated config" {
+  command_with_temp_aswitch_home("_aswitch_test_temp_command_claude", fn() raise {
+    write_test_config([
+      @provider.Provider::{
+        name: "seed",
+        api_key: "sk-test-'quoted'",
+        openai_base_url: None,
+        anthropic_base_url: Some("https://seed.example.com/anthropic"),
+        models: [
+          @provider.Model::new(name="seed-opus"),
+          @provider.Model::new(name="seed-sonnet"),
+          @provider.Model::new(name="seed-haiku"),
+        ],
+      },
+    ])
+
+    let rendered = render_temporary_command("claude", "seed", None).unwrap()
+    inspect(
+      rendered.command,
+      content=(
+        #|ANTHROPIC_AUTH_TOKEN='sk-test-'"'"'quoted'' ANTHROPIC_BASE_URL='https://seed.example.com/anthropic' ANTHROPIC_DEFAULT_OPUS_MODEL='seed-opus' ANTHROPIC_DEFAULT_SONNET_MODEL='seed-sonnet' ANTHROPIC_DEFAULT_HAIKU_MODEL='seed-haiku' claude
+      ),
+    )
+  })
+}
+
+///|
+async test "render_temporary_command renders opencode override with config content" {
+  command_with_temp_aswitch_home("_aswitch_test_temp_command_opencode", fn() raise {
+    command_with_temp_xdg_config_home(
+      "_aswitch_test_temp_xdg_command_opencode",
+      fn() raise {
+        write_test_config([
+          @provider.Provider::{
+            name: "seed",
+            api_key: "sk-opencode",
+            openai_base_url: Some("https://seed.example.com/openai"),
+            anthropic_base_url: Some("https://seed.example.com/anthropic"),
+            models: [@provider.Model::new(name="seed-model")],
+          },
+        ])
+
+        let rendered = render_temporary_command(
+          "open-code",
+          "seed",
+          Some(@agent.OpenAI),
+        ).unwrap()
+        inspect(
+          rendered.command,
+          content=(
+            #|OPENCODE_CONFIG_CONTENT='{
+            #|  "provider": {
+            #|    "seed": {
+            #|      "npm": "@ai-sdk/openai-compatible",
+            #|      "name": "seed",
+            #|      "options": {
+            #|        "apiKey": "sk-opencode",
+            #|        "baseURL": "https://seed.example.com/openai"
+            #|      },
+            #|      "models": {
+            #|        "seed-model": {
+            #|          "name": "seed-model"
+            #|        }
+            #|      }
+            #|    }
+            #|  },
+            #|  "$schema": "https://opencode.ai/config.json"
+            #|}' opencode
+          ),
+        )
+      },
+    )
+  })
+}
+
+///|
+test "temporary_command rejects openclaw render-only workflow" {
+  command_with_temp_aswitch_home("_aswitch_test_temp_command_openclaw", fn() raise {
+    write_test_config([
+      @provider.Provider::{
+        name: "seed",
+        api_key: "sk-openclaw",
+        openai_base_url: Some("https://seed.example.com/openai"),
+        anthropic_base_url: None,
+        models: [@provider.Model::new(name="seed-model")],
+      },
+    ])
+
+    let status = temporary_command("openclaw", "seed", Some(@agent.OpenAI))
+    assert_eq(status, EXIT_CODE_CONFIG_ERROR)
+  })
+}

@@ -23,6 +23,8 @@ pub fn validate_config(Config) -> Result[Unit, ValidationError]
 
 pub fn validate_provider(@provider.Provider) -> Result[Unit, ValidationError]
 
+pub fn validation_error_message(ValidationError) -> String
+
 // Errors
 
 // Types and methods

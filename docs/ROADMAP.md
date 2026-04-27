@@ -93,15 +93,19 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 |------|------------|----------------|--------|
 | **Shell Integration** | We believe that shell completions and aliases will reduce command execution time by 50% because users currently type full commands. | Command completion usage | S (1-2 weeks) |
 | **Provider Presets** | We believe that built-in provider templates will reduce onboarding time from 10 minutes to 2 minutes because users currently lookup provider URLs. | Time to first switch | S (1-2 weeks) |
+| **✅ Temporary Provider Override** (Completed 2026-04-24) | We believe that non-persistent provider overrides will unlock one-off tasks, CI jobs, and per-command experimentation because `set` currently rewrites agent config files even when the user only needs a temporary switch. | % of switches done without file writes | M (2-3 weeks) |
 | **Multi-Agent Sync** | We believe that syncing provider across multiple agents will save power users 5 minutes per switch because they currently manually update each agent. | Multi-agent users | M (3-4 weeks) |
 | **Import/Export** | We believe that config portability will improve team adoption because teams currently share configs manually. | Team usage metrics | S (2 weeks) |
 
 **Key Deliverables:**
 - [ ] Bash/Zsh/Fish completions
 - [ ] Built-in presets for OpenAI, Anthropic, Moonshot, DeepSeek, etc.
+- [x] Temporary provider override workflow for one command or one shell session (`command` / `exec`, completed 2026-04-24)
 - [ ] `sync` command to apply provider to multiple agents
 - [ ] `import`/`export` commands for configuration portability
 - [ ] Environment-specific profiles (dev/staging/prod)
+
+Detailed requirements: [temporary-provider-override.md](/Users/zego/coding/project/aswitch/docs/temporary-provider-override.md)
 
 **Dependencies:** Phase 2 (multiple agents)
 
@@ -149,6 +153,7 @@ Q2 2026 (Completed - Agent Expansion):
 Q3 2026 (Current - Developer Experience):
 ├── Shell Completions
 ├── Provider Presets
+├── Temporary Provider Override ✅ (Completed 2026-04-24)
 ├── Multi-Agent Sync
 └── Import/Export
 
@@ -190,7 +195,7 @@ Q4 2026 (Exploration - Advanced):
 
 1. Should we support non-OpenAI-compatible API formats natively?
 2. What's the priority order for additional agents (for example Cursor, Copilot, etc.)?
-3. Should we support agent-specific configuration beyond environment variables?
+3. Which agents can be reliably driven by environment variables alone, and which still require file-based writes for full support?
 4. Is there demand for a Homebrew/apt package distribution?
 
 ---
@@ -199,7 +204,8 @@ Q4 2026 (Exploration - Advanced):
 
 1. Deliver package distribution (Homebrew first, then apt/scoop).
 2. Add shell completions for Bash/Zsh/Fish.
-3. Add built-in provider presets for common model providers (OpenAI, Anthropic, Moonshot, DeepSeek, etc.).
+3. Design and implement temporary provider override (`command` / `exec`) without touching agent config files.
+4. Add built-in provider presets for common model providers (OpenAI, Anthropic, Moonshot, DeepSeek, etc.).
 
 ---
 
@@ -216,4 +222,4 @@ Q4 2026 (Exploration - Advanced):
 ---
 
 *Last updated: 2026-04-24*
-*Roadmap version: 2.1*
+*Roadmap version: 2.2*
