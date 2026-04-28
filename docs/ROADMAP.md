@@ -91,14 +91,16 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 
 | Epic | Hypothesis | Success Metric | Effort |
 |------|------------|----------------|--------|
-| **Shell Integration** | We believe that shell completions and aliases will reduce command execution time by 50% because users currently type full commands. | Command completion usage | S (1-2 weeks) |
+| **✅ Shell Integration** (Zsh & PowerShell completed 2026-04-28) | We believe that shell completions and aliases will reduce command execution time by 50% because users currently type full commands. | Command completion usage | S (1-2 weeks) |
 | **Provider Presets** | We believe that built-in provider templates will reduce onboarding time from 10 minutes to 2 minutes because users currently lookup provider URLs. | Time to first switch | S (1-2 weeks) |
 | **✅ Temporary Provider Override** (Completed 2026-04-24) | We believe that non-persistent provider overrides will unlock one-off tasks, CI jobs, and per-command experimentation because `set` currently rewrites agent config files even when the user only needs a temporary switch. | % of switches done without file writes | M (2-3 weeks) |
 | **Multi-Agent Sync** | We believe that syncing provider across multiple agents will save power users 5 minutes per switch because they currently manually update each agent. | Multi-agent users | M (3-4 weeks) |
 | **Import/Export** | We believe that config portability will improve team adoption because teams currently share configs manually. | Team usage metrics | S (2 weeks) |
 
 **Key Deliverables:**
-- [ ] Bash/Zsh/Fish completions
+- [x] Zsh completions (completed 2026-04-28)
+- [x] PowerShell completions (completed 2026-04-28)
+- [ ] Bash/Fish completions
 - [ ] Built-in presets for OpenAI, Anthropic, Moonshot, DeepSeek, etc.
 - [x] Temporary provider override workflow for one command or one shell session (`command` / `exec`, completed 2026-04-24)
 - [ ] `sync` command to apply provider to multiple agents
@@ -151,7 +153,7 @@ Q2 2026 (Completed - Agent Expansion):
 └── Agent capability detection ✅ (Completed 2026-04-24)
 
 Q3 2026 (Current - Developer Experience):
-├── Shell Completions
+├── Shell Completions (Zsh ✅, PowerShell ✅, Bash/Fish pending)
 ├── Provider Presets
 ├── Temporary Provider Override ✅ (Completed 2026-04-24)
 ├── Multi-Agent Sync
@@ -203,9 +205,8 @@ Q4 2026 (Exploration - Advanced):
 ## Immediate Priorities (Next 30-60 Days)
 
 1. Deliver package distribution (Homebrew first, then apt/scoop).
-2. Add shell completions for Bash/Zsh/Fish.
-3. Design and implement temporary provider override (`command` / `exec`) without touching agent config files.
-4. Add built-in provider presets for common model providers (OpenAI, Anthropic, Moonshot, DeepSeek, etc.).
+2. Add shell completions for Bash/Fish (Zsh & PowerShell already complete).
+3. Add built-in provider presets for common model providers (OpenAI, Anthropic, Moonshot, DeepSeek, etc.).
 
 ---
 
@@ -221,5 +222,5 @@ Q4 2026 (Exploration - Advanced):
 
 ---
 
-*Last updated: 2026-04-24*
-*Roadmap version: 2.2*
+*Last updated: 2026-04-28*
+*Roadmap version: 2.3*
