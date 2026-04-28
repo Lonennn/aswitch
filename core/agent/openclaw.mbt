@@ -30,18 +30,7 @@ fn OpenClaw::get_config_dir() -> String {
 
 ///|
 fn OpenClaw::get_temporary_override_dir() -> String {
-  let base_dir = match @sys.get_env_var("ASWITCH_HOME") {
-    Some(custom_home) => {
-      let trimmed = custom_home.trim()
-      if trimmed.is_empty() {
-        "."
-      } else {
-        trimmed.to_string()
-      }
-    }
-    None => @util.get_user_home()
-  }
-  @path.Path(base_dir).join(".aswitch-temp").to_string()
+  @path.Path(@util.get_aswitch_home()).join(".aswitch-temp").to_string()
 }
 
 ///|

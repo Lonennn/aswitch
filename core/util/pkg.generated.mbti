@@ -4,6 +4,8 @@ package "lonen44/aswitch/core/util"
 // Values
 pub fn generate_json_diff(String, String) -> String
 
+pub fn get_aswitch_home() -> String
+
 pub fn get_user_home() -> String
 
 // Errors

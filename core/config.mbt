@@ -63,16 +63,7 @@ pub const CONFIG_FILE_NAME : String = "aswitch.json"
 /// Get the default configuration file path
 /// Uses ASWITCH_HOME env var if set, otherwise uses home directory via HOME/USERPROFILE env vars
 pub fn get_config_path() -> String {
-  // Check for custom config directory via environment variable
-  guard @sys.get_env_var("ASWITCH_HOME") is Some(custom_home) else {
-    return @path.Path::join(@util.get_user_home(), CONFIG_FILE_NAME).to_string()
-  }
-  let trimmed = custom_home.trim()
-  if trimmed.is_empty() {
-    CONFIG_FILE_NAME
-  } else {
-    @path.Path::join(trimmed.to_string(), CONFIG_FILE_NAME).to_string()
-  }
+  @path.Path::join(@util.get_aswitch_home(), CONFIG_FILE_NAME).to_string()
 }
 
 ///|
