@@ -5,40 +5,31 @@ test "supported_agents returns canonical agent names" {
 
 ///|
 test "get_agent_config_path returns correct path for supported agents" {
+  // Build expected path parts using the core library
+  let claude_part = @path.Path::join(".claude", "settings.json").to_string()
+  let opencode_part = @path.Path::join("opencode", "opencode.json").to_string()
+  let openclaw_part = @path.Path::join(".openclaw", "openclaw.json").to_string()
+
   assert_true(
-    get_agent_config_path("claude-code")
-    .unwrap()
-    .contains(".claude/settings.json"),
+    get_agent_config_path("claude-code").unwrap().contains(claude_part),
   )
+  assert_true(get_agent_config_path("claude").unwrap().contains(claude_part))
   assert_true(
-    get_agent_config_path("claude").unwrap().contains(".claude/settings.json"),
-  )
-  assert_true(
-    get_agent_config_path("claudecode")
-    .unwrap()
-    .contains(".claude/settings.json"),
+    get_agent_config_path("claudecode").unwrap().contains(claude_part),
   )
 
   assert_true(
-    get_agent_config_path("open-code")
-    .unwrap()
-    .contains("opencode/opencode.json"),
+    get_agent_config_path("open-code").unwrap().contains(opencode_part),
   )
   assert_true(
-    get_agent_config_path("opencode")
-    .unwrap()
-    .contains("opencode/opencode.json"),
+    get_agent_config_path("opencode").unwrap().contains(opencode_part),
   )
 
   assert_true(
-    get_agent_config_path("openclaw")
-    .unwrap()
-    .contains(".openclaw/openclaw.json"),
+    get_agent_config_path("openclaw").unwrap().contains(openclaw_part),
   )
   assert_true(
-    get_agent_config_path("open-claw")
-    .unwrap()
-    .contains(".openclaw/openclaw.json"),
+    get_agent_config_path("open-claw").unwrap().contains(openclaw_part),
   )
 }
 
