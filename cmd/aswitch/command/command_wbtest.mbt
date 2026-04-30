@@ -256,6 +256,113 @@ fn write_test_config(providers : Array[@provider.Provider]) -> Unit {
 }
 
 ///|
+test "init_config creates config with schema when file is missing" {
+  command_with_temp_aswitch_home("_aswitch_test_init_create", fn() raise {
+    let result = init_config()
+    assert_eq(result, EXIT_CODE_SUCCESS)
+
+    let config_path = @core.get_config_path()
+    assert_true(@fs.path_exists(config_path))
+
+    let content = try! @fs.read_file_to_string(config_path)
+    let json = try! @json.parse(content)
+    match json {
+      Json::Object(entries) => {
+        assert_true(entries["$schema"] is Json::String(_))
+        assert_true(entries["providers"] is Json::Array([]))
+      }
+      _ => fail("Expected config JSON object")
+    }
+  })
+}
+
+///|
+test "init_config patches missing schema on existing config" {
+  command_with_temp_aswitch_home("_aswitch_test_init_patch_schema", fn() raise {
+    let config_path = @core.get_config_path()
+    let content = "{\n" +
+      "    \"notes\": \"keep me\",\n" +
+      "    \"providers\": []\n" +
+      "}\n"
+    try! @fs.write_string_to_file(config_path, content)
+
+    let result = init_config()
+    assert_eq(result, EXIT_CODE_SUCCESS)
+
+    let updated_content = try! @fs.read_file_to_string(config_path)
+    let updated_json = try! @json.parse(updated_content)
+    match updated_json {
+      Json::Object(entries) => {
+        assert_true(entries["notes"] is Json::String("keep me"))
+        assert_true(
+          entries["$schema"]
+          is Json::String(
+            "https://raw.githubusercontent.com/Lonennn/aswitch/master/asset/aswitch.schema.json"
+          ),
+        )
+      }
+      _ => fail("Expected config JSON object")
+    }
+  })
+}
+
+///|
+test "init_config preserves existing schema value" {
+  command_with_temp_aswitch_home("_aswitch_test_init_preserve_schema", fn() raise {
+    let config_path = @core.get_config_path()
+    let content = "{\n" +
+      "    \"$schema\": \"https://custom.example.com/schema.json\",\n" +
+      "    \"providers\": []\n" +
+      "}\n"
+    try! @fs.write_string_to_file(config_path, content)
+
+    let result = init_config()
+    assert_eq(result, EXIT_CODE_SUCCESS)
+
+    let updated_content = try! @fs.read_file_to_string(config_path)
+    let updated_json = try! @json.parse(updated_content)
+    match updated_json {
+      Json::Object(entries) =>
+        assert_true(
+          entries["$schema"]
+          is Json::String("https://custom.example.com/schema.json"),
+        )
+      _ => fail("Expected config JSON object")
+    }
+  })
+}
+
+///|
+test "init_config returns error for invalid json config" {
+  command_with_temp_aswitch_home("_aswitch_test_init_invalid_json", fn() raise {
+    let config_path = @core.get_config_path()
+    let content = "{ invalid json"
+    try! @fs.write_string_to_file(config_path, content)
+
+    let result = init_config()
+    assert_eq(result, EXIT_CODE_CONFIG_ERROR)
+
+    let current_content = try! @fs.read_file_to_string(config_path)
+    assert_eq(current_content, content)
+  })
+}
+
+///|
+test "init_config returns error for non-object config root" {
+  command_with_temp_aswitch_home("_aswitch_test_init_non_object", fn() raise {
+    let config_path = @core.get_config_path()
+    let content = "[]\n"
+    try! @fs.write_string_to_file(config_path, content)
+
+    let result = init_config()
+    assert_eq(result, EXIT_CODE_CONFIG_ERROR)
+
+    let current_content = try! @fs.read_file_to_string(config_path)
+    assert_eq(current_content, content)
+  })
+}
+
+///|
 test "parse_args maps temporary command and exec variants" {
   match
     parse_args(["command", "claude-code", "seed", "--api-format", "anthropic"]) {

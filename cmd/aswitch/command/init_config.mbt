@@ -24,11 +24,56 @@ pub fn init_config() -> Int {
       }
     }
   } else {
-    println("Configuration file already exists at: \{path}")
-    println(
-      "To start with a fresh config, delete the file and run `aswitch init` again.",
-    )
-    println("To add providers to the existing config, use `aswitch add`.")
-    EXIT_CODE_SUCCESS
+    let read_result = try? @fs.read_file_to_string(path)
+    match read_result {
+      Ok(content) => {
+        let parse_result = try? @json.parse(content)
+        match parse_result {
+          Ok(Json::Object(entries)) =>
+            if entries.contains("$schema") {
+              println("Configuration file already exists at: \{path}")
+              println("Schema field already exists; no changes made.")
+              println(
+                "To add providers to the existing config, use `aswitch add`.",
+              )
+              EXIT_CODE_SUCCESS
+            } else {
+              entries["$schema"] = Json::string(SCHEMA_URL)
+              let updated_content = Json::object(entries).stringify(indent=4)
+              let write_result = try? @fs.write_string_to_file(
+                path, updated_content,
+              )
+              match write_result {
+                Ok(_) => {
+                  println("Configuration file already exists at: \{path}")
+                  println("Added missing $schema field to existing config.")
+                  println(
+                    "To add providers to the existing config, use `aswitch add`.",
+                  )
+                  EXIT_CODE_SUCCESS
+                }
+                Err(e) => {
+                  println("Error patching config schema field: \{e}")
+                  EXIT_CODE_CONFIG_ERROR
+                }
+              }
+            }
+          Ok(_) => {
+            println(
+              "Error patching config schema field: config root must be a JSON object",
+            )
+            EXIT_CODE_CONFIG_ERROR
+          }
+          Err(e) => {
+            println("Error patching config schema field: \{e}")
+            EXIT_CODE_CONFIG_ERROR
+          }
+        }
+      }
+      Err(e) => {
+        println("Error patching config schema field: \{e}")
+        EXIT_CODE_CONFIG_ERROR
+      }
+    }
   }
 }
