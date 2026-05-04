@@ -15,7 +15,7 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 
 ---
 
-## Current State (v0.4.0)
+## Current State (v0.5.0)
 
 **Implemented:**
 - Basic CLI structure with commands: `init`, `providers` (`list`/`ls` alias), `agents`, `set`, `help`, `version`

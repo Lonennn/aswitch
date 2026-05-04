@@ -69,6 +69,6 @@ async fn execute_command(command : @command.Command) -> Int {
 ///|
 /// Print version information
 pub fn print_version() -> Int {
-  println("aswitch v0.4.0")
+  println("aswitch v0.5.0")
   0
 }
