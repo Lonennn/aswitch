@@ -60,7 +60,7 @@ fn OpenCode::determine_api_config(
         (None, Some(url)) => (AI_SDK_ANTHROPIC, url)
         (Some(_), Some(_)) =>
           raise ProviderLackUrlError(
-            "both openai_base_url and anthropic_base_url are provided, please specify --api-format via command line",
+            "both openai_base_url and anthropic_base_url are provided, please specify api-format via command line",
           )
         (None, None) =>
           raise ProviderLackUrlError(
