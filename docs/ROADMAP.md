@@ -38,6 +38,7 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 - Partial error handling coverage for edge cases
 - No shell completion support yet
 - No package distribution yet (Homebrew/apt/scoop)
+- API keys stored in cleartext in `aswitch.json` — no integration with secret managers or OS keychains yet
 
 ---
 
@@ -103,6 +104,7 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 - [ ] Bash/Fish completions
 - [ ] Built-in presets for OpenAI, Anthropic, Moonshot, DeepSeek, etc.
 - [x] Temporary provider override workflow for one command or one shell session (`command` / `exec`, completed 2026-04-24)
+- [x] Safe command display: the `command` subcommand renders the temporary shell command to stdout for inspection without execution, preventing API key exposure in shell history; `exec` prefixes a leading space to avoid shell history recording
 - [ ] `sync` command to apply provider to multiple agents
 - [ ] `import`/`export` commands for configuration portability
 - [ ] Environment-specific profiles (dev/staging/prod)
@@ -218,7 +220,7 @@ Q4 2026 (Exploration - Advanced):
 | Direct config writes corrupt user settings | High | Backup before write, dry-run preview, stronger integration tests |
 | MoonBit ecosystem maturity | Medium | Keep dependencies minimal |
 | Low adoption | Medium | Focus on developer experience, community engagement |
-| Security concerns (API keys) | High | Document security best practices, support secret managers |
+| Security concerns (API keys stored in cleartext) | High | Document security best practices, integrate with secret managers and OS keychains |
 
 ---
 
