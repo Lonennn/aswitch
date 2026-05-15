@@ -18,7 +18,7 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 ## Current State (v0.5.0)
 
 **Implemented:**
-- Basic CLI structure with commands: `init`, `providers` (`list`/`ls` alias), `agents`, `set`, `help`, `version`
+- Basic CLI structure with commands: `init`, `providers` (`list`/`ls` alias), `agents`, `set`, `exec` (`run` alias), `help`, `version`
 - Provider add command support: `add` (interactive and argument-based)
 - Provider remove command support: `remove`
 - Configuration file management (`aswitch.json`)
@@ -104,7 +104,8 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 - [ ] Bash/Fish completions
 - [ ] Built-in presets for OpenAI, Anthropic, Moonshot, DeepSeek, etc.
 - [x] Temporary provider override workflow for one command or one shell session (`command` / `exec`, completed 2026-04-24)
-- [x] Safe command display: the `command` subcommand renders the temporary shell command to stdout for inspection without execution, preventing API key exposure in shell history; `exec` prefixes a leading space to avoid shell history recording
+- [x] Safe command display: the `command` subcommand renders the temporary shell command to stdout for inspection without execution, preventing API key exposure in shell history; `exec` (`run` alias) prefixes a leading space to avoid shell history recording
+- [ ] Remember last used provider: `exec` and `command` commands recall the previously used provider so that subsequent invocations do not require a provider argument
 - [ ] `sync` command to apply provider to multiple agents
 - [ ] `import`/`export` commands for configuration portability
 - [ ] Environment-specific profiles (dev/staging/prod)
