@@ -335,7 +335,7 @@ pub fn parse_args(args : Array[String]) -> Command {
     ["providers" | "list" | "ls"] => Command::ListProviders
     ["agents"] => Command::ListAgents
     ["command", .. rest] => parse_temporary_command(rest.to_owned())
-    ["exec", .. rest] => parse_temporary_exec(rest.to_owned())
+    ["exec" | "run", .. rest] => parse_temporary_exec(rest.to_owned())
     ["set" | "switch", .. args] => parse_set_command(args.to_owned())
     ["remove" | "rm", name, ..] => Command::RemoveProvider(name)
     ["remove" | "rm"] => {

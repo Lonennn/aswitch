@@ -399,6 +399,18 @@ test "parse_args maps temporary command and exec variants" {
     }
     other => fail("Expected TemporaryExec, got \{other}")
   }
+
+  // Verify `run` alias works identically to `exec`
+  match parse_args(["run", "claude-code", "seed", "--", "claude"]) {
+    TemporaryExec(agent~, provider~, api_format~, command~, print_command~) => {
+      assert_true(agent == "claude-code")
+      assert_true(provider == "seed")
+      assert_true(api_format is None)
+      assert_true(command == ["claude"])
+      assert_false(print_command)
+    }
+    other => fail("Expected TemporaryExec, got \{other}")
+  }
 }
 
 ///|

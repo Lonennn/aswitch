@@ -17,7 +17,7 @@ pub fn print_help() -> Int {
   )
   println("                              Supported for env-based agents only")
   println(
-    "  exec <agent> <provider> [--api-format <fmt>] [--print-command] [-- <command...>]",
+    "  run <agent> <provider> [--api-format <fmt>] [--print-command] [-- <command...>]",
   )
   println(
     "                              Run a command with a temporary provider override",
@@ -47,8 +47,9 @@ pub fn print_help() -> Int {
   println("  aswitch agents")
   println("  aswitch set claude glm")
   println("  aswitch command claude-code seed")
-  println("  aswitch exec open-code seed -- opencode run")
-  println("  aswitch exec open-code seed --print-command -- opencode run")
+  println("  aswitch run open-code seed -- opencode run")
+  println("  aswitch run open-code seed --print-command -- opencode run")
+  println("  aswitch run claude-code seed -- claude")
   println("  aswitch add")
   println("  aswitch add openai sk-xxx https://api.openai.com/v1 gpt-4")
   println(
