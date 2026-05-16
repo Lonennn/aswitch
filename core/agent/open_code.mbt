@@ -73,7 +73,7 @@ fn OpenCode::determine_api_config(
 ///|
 /// Create a model entry from a Model object, excluding null fields
 fn OpenCode::create_model_entry(model : @provider.Model) -> Json {
-  let entries = Map::new()
+  let entries = Map([])
   entries["name"] = Json::string(model.name)
 
   // Only add optional fields if they are set
@@ -94,7 +94,7 @@ fn OpenCode::create_model_entry(model : @provider.Model) -> Json {
   let output_is_default = is_default_text_modality(model.output_modality)
 
   if !input_is_default || !output_is_default {
-    let modalities_map = Map::new()
+    let modalities_map = Map([])
     if !input_is_default {
       let input_strs = model.input_modality.map(fn(m) {
         match m {
@@ -137,13 +137,13 @@ fn OpenCode::apply_provider_to_json(
   // Get or create the provider object
   let provider_json = match settings_json {
     { "provider": provider_obj, .. } => provider_obj
-    _ => Json::object(Map::new())
+    _ => Json::object(Map([]))
   }
 
   // Convert provider to Map for modification
   let provider_map : Map[String, Json] = match provider_json {
     Json::Object(m) => m
-    _ => Map::new()
+    _ => Map([])
   }
 
   // Get or create the specific provider entry
@@ -152,9 +152,9 @@ fn OpenCode::apply_provider_to_json(
     Some(entry) =>
       match entry {
         Json::Object(m) => m
-        _ => Map::new()
+        _ => Map([])
       }
-    _ => Map::new()
+    _ => Map([])
   }
 
   // Determine both npm package and base URL
@@ -173,9 +173,9 @@ fn OpenCode::apply_provider_to_json(
     Some(options) =>
       match options {
         Json::Object(m) => m
-        _ => Map::new()
+        _ => Map([])
       }
-    _ => Map::new()
+    _ => Map([])
   }
 
   // Set API key
@@ -198,9 +198,9 @@ fn OpenCode::apply_provider_to_json(
     Some(models) =>
       match models {
         Json::Object(m) => m
-        _ => Map::new()
+        _ => Map([])
       }
-    _ => Map::new()
+    _ => Map([])
   }
 
   // Add each model from the provider
@@ -216,7 +216,7 @@ fn OpenCode::apply_provider_to_json(
   // Build the result JSON, preserving other properties
   let result_map : Map[String, Json] = match settings_json {
     Json::Object(m) => m
-    _ => Map::new()
+    _ => Map([])
   }
   result_map["provider"] = Json::object(provider_map)
 
@@ -245,7 +245,7 @@ pub impl Agent for OpenCode with apply_provider(_self, provider, api_format) -> 
     guard json_result is Ok(json) else { raise json_result.unwrap_err() }
     json
   } else {
-    Json::object(Map::new())
+    Json::object(Map([]))
   }
 
   // Apply provider settings in memory

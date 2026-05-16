@@ -89,7 +89,7 @@ fn OpenClaw::determine_api_config(
 ///|
 /// Create a model entry from a Model object for OpenClaw configuration
 fn OpenClaw::create_model_entry(model : @provider.Model) -> Json {
-  let entries = Map::new()
+  let entries = Map([])
   entries["id"] = Json::string(model.name)
   entries["name"] = Json::string(model.name)
   entries["reasoning"] = Json::boolean(false)
@@ -117,7 +117,7 @@ fn OpenClaw::create_model_entry(model : @provider.Model) -> Json {
   entries["input"] = Json::array(input_strs.map(fn(s) { Json::string(s) }))
 
   // Set cost structure (all zeros as default)
-  let cost_map = Map::new()
+  let cost_map = Map([])
   cost_map["input"] = Json::number(0.0)
   cost_map["output"] = Json::number(0.0)
   cost_map["cacheRead"] = Json::number(0.0)
@@ -139,12 +139,12 @@ fn OpenClaw::apply_provider_to_json(
   // Get or create models object
   let models_json = match settings_json {
     { "models": models_obj, .. } => models_obj
-    _ => Json::object(Map::new())
+    _ => Json::object(Map([]))
   }
 
   let models_map : Map[String, Json] = match models_json {
     Json::Object(m) => m
-    _ => Map::new()
+    _ => Map([])
   }
 
   // Set mode to merge if not present
@@ -155,12 +155,12 @@ fn OpenClaw::apply_provider_to_json(
   // Get or create providers object
   let providers_json = match models_map.get("providers") {
     Some(providers_obj) => providers_obj
-    _ => Json::object(Map::new())
+    _ => Json::object(Map([]))
   }
 
   let providers_map : Map[String, Json] = match providers_json {
     Json::Object(m) => m
-    _ => Map::new()
+    _ => Map([])
   }
 
   // Determine API config
@@ -169,7 +169,7 @@ fn OpenClaw::apply_provider_to_json(
   )
 
   // Create provider entry
-  let provider_entry = Map::new()
+  let provider_entry = Map([])
   provider_entry["baseUrl"] = Json::string(base_url)
   provider_entry["apiKey"] = Json::string(provider.api_key)
   provider_entry["api"] = Json::string(api_type)
@@ -187,32 +187,32 @@ fn OpenClaw::apply_provider_to_json(
   // Update agents.defaults.model.primary to use first model
   let agents_json = match settings_json {
     { "agents": agents_obj, .. } => agents_obj
-    _ => Json::object(Map::new())
+    _ => Json::object(Map([]))
   }
 
   let agents_map : Map[String, Json] = match agents_json {
     Json::Object(m) => m
-    _ => Map::new()
+    _ => Map([])
   }
 
   let defaults_json = match agents_map.get("defaults") {
     Some(defaults_obj) => defaults_obj
-    _ => Json::object(Map::new())
+    _ => Json::object(Map([]))
   }
 
   let defaults_map : Map[String, Json] = match defaults_json {
     Json::Object(m) => m
-    _ => Map::new()
+    _ => Map([])
   }
 
   let model_json = match defaults_map.get("model") {
     Some(model_obj) => model_obj
-    _ => Json::object(Map::new())
+    _ => Json::object(Map([]))
   }
 
   let model_map : Map[String, Json] = match model_json {
     Json::Object(m) => m
-    _ => Map::new()
+    _ => Map([])
   }
 
   // Set primary model to first model from provider
@@ -231,7 +231,7 @@ fn OpenClaw::apply_provider_to_json(
   // Build final result
   let result_map : Map[String, Json] = match settings_json {
     Json::Object(m) => m
-    _ => Map::new()
+    _ => Map([])
   }
 
   result_map["models"] = Json::object(models_map)
@@ -258,7 +258,7 @@ pub impl Agent for OpenClaw with apply_provider(_self, provider, api_format) -> 
     guard json_result is Ok(json) else { raise json_result.unwrap_err() }
     json
   } else {
-    Json::object(Map::new())
+    Json::object(Map([]))
   }
 
   // Apply provider settings in memory

@@ -6,7 +6,7 @@ async fn main {
   // Skip the program name (first argument)
   let cmd_args : Array[String] = match args {
     [_] => []
-    [_, .. rest] => rest.to_array()
+    [_, .. rest] => rest.to_owned()
     [] => []
   }
   let command = @command.parse_args(cmd_args)

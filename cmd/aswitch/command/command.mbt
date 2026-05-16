@@ -331,12 +331,12 @@ fn parse_temporary_exec(args : Array[String]) -> Command {
 pub fn parse_args(args : Array[String]) -> Command {
   match args {
     [] => Command::Help
-    ["add", .. rest] => parse_add_command(rest.to_array())
+    ["add", .. rest] => parse_add_command(rest.to_owned())
     ["providers" | "list" | "ls"] => Command::ListProviders
     ["agents"] => Command::ListAgents
-    ["command", .. rest] => parse_temporary_command(rest.to_array())
-    ["exec", .. rest] => parse_temporary_exec(rest.to_array())
-    ["set" | "switch", .. args] => parse_set_command(args.to_array())
+    ["command", .. rest] => parse_temporary_command(rest.to_owned())
+    ["exec", .. rest] => parse_temporary_exec(rest.to_owned())
+    ["set" | "switch", .. args] => parse_set_command(args.to_owned())
     ["remove" | "rm", name, ..] => Command::RemoveProvider(name)
     ["remove" | "rm"] => {
       println("Error: 'remove' requires provider name")

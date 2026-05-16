@@ -33,13 +33,13 @@ fn ClaudeCode::apply_provider_to_json(
   // Get or create the env object
   let env_json = match settings_json {
     { "env": env_obj, .. } => env_obj
-    _ => Json::object(Map::new())
+    _ => Json::object(Map([]))
   }
 
   // Convert env to Map for modification
   let env_map : Map[String, Json] = match env_json {
     Json::Object(m) => m
-    _ => Map::new()
+    _ => Map([])
   }
 
   // Set API key
@@ -87,7 +87,7 @@ fn ClaudeCode::apply_provider_to_json(
   // Build the result JSON, preserving other properties
   let result_map : Map[String, Json] = match settings_json {
     Json::Object(m) => m
-    _ => Map::new()
+    _ => Map([])
   }
   result_map["env"] = Json::object(env_map)
   Json::object(result_map)
@@ -112,7 +112,7 @@ pub impl Agent for ClaudeCode with apply_provider(_, provider, _) -> Unit raise 
     guard json_result is Ok(json) else { raise json_result.unwrap_err() }
     json
   } else {
-    Json::object(Map::new())
+    Json::object(Map([]))
   }
 
   // Apply provider settings in memory
@@ -148,16 +148,16 @@ fn ClaudeCode::get_temporary_override(
   _ : ApiFormat?,
 ) -> TemporaryOverride raise Error {
   let updated_json = ClaudeCode::apply_provider_to_json(
-    Json::object(Map::new()),
+    Json::object(Map([])),
     provider,
   )
   let env_json = match updated_json {
     { "env": env_obj, .. } => env_obj
-    _ => Json::object(Map::new())
+    _ => Json::object(Map([]))
   }
   let env_map : Map[String, Json] = match env_json {
     Json::Object(entries) => entries
-    _ => Map::new()
+    _ => Map([])
   }
   let get_string = fn(key : String) -> String raise {
     match env_map.get(key) {

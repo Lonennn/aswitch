@@ -63,7 +63,7 @@ fn generate_provider_diff(
 ///|
 fn load_agent_settings_json(config_path : String) -> Json raise Error {
   if !@fs.path_exists(config_path) {
-    return Json::object(Map::new())
+    return Json::object(Map([]))
   }
   let read_result = try? @fs.read_file_to_string(config_path)
   guard read_result is Ok(content) else { raise read_result.unwrap_err() }

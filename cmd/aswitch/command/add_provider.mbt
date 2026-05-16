@@ -164,7 +164,7 @@ async fn prompt_required(
   match read_line() {
     None => None
     Some(line) => {
-      let value = line.trim().to_string()
+      let value = line.trim().to_owned()
       if value.is_empty() {
         write_line("This field is required. Please enter a non-empty value.")
         prompt_required(prompt, read_line, write_line)
@@ -185,7 +185,7 @@ async fn prompt_optional(
   match read_line() {
     None => None
     Some(line) => {
-      let value = line.trim().to_string()
+      let value = line.trim().to_owned()
       if value.is_empty() {
         Some(None)
       } else {

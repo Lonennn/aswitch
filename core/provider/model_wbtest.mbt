@@ -4,9 +4,9 @@
 ///|
 test "Model::new - creates model with default modalities" {
   let model = Model::new(name="test-model")
-  assert_eq(model.name, "test-model")
-  assert_eq(model.context_limit, None)
-  assert_eq(model.output_limit, None)
+  assert_true(model.name == "test-model")
+  assert_true(model.context_limit == None)
+  assert_true(model.output_limit == None)
   assert_true(model.input_modality == [Modality::Text])
   assert_true(model.output_modality == [Modality::Text])
 }
@@ -14,9 +14,9 @@ test "Model::new - creates model with default modalities" {
 ///|
 test "Model::new - creates model with custom limits" {
   let model = Model::new(name="gpt-4", context_limit=8192, output_limit=4096)
-  assert_eq(model.name, "gpt-4")
-  assert_eq(model.context_limit, Some(8192))
-  assert_eq(model.output_limit, Some(4096))
+  assert_true(model.name == "gpt-4")
+  assert_true(model.context_limit == Some(8192))
+  assert_true(model.output_limit == Some(4096))
   assert_true(model.input_modality == [Modality::Text])
   assert_true(model.output_modality == [Modality::Text])
 }
@@ -25,9 +25,9 @@ test "Model::new - creates model with custom limits" {
 test "FromJson for Model - minimal JSON with only name" {
   let json : Json = { "name": "minimal-model" }
   let model : Model = @json.from_json(json)
-  assert_eq(model.name, "minimal-model")
-  assert_eq(model.context_limit, None)
-  assert_eq(model.output_limit, None)
+  assert_true(model.name == "minimal-model")
+  assert_true(model.context_limit == None)
+  assert_true(model.output_limit == None)
   assert_true(model.input_modality == [Modality::Text])
   assert_true(model.output_modality == [Modality::Text])
 }
@@ -42,9 +42,9 @@ test "FromJson for Model - full JSON with all fields" {
     "output_modality": ["Text"],
   }
   let model : Model = @json.from_json(json)
-  assert_eq(model.name, "vision-model")
-  assert_eq(model.context_limit, Some(128000))
-  assert_eq(model.output_limit, Some(8192))
+  assert_true(model.name == "vision-model")
+  assert_true(model.context_limit == Some(128000))
+  assert_true(model.output_limit == Some(8192))
   assert_true(model.input_modality == [Modality::Text, Modality::Vision])
   assert_true(model.output_modality == [Modality::Text])
 }
@@ -59,8 +59,8 @@ test "FromJson for Model - null optional fields are handled correctly" {
     "output_modality": null,
   }
   let model : Model = @json.from_json(json)
-  assert_eq(model.context_limit, None)
-  assert_eq(model.output_limit, None)
+  assert_true(model.context_limit == None)
+  assert_true(model.output_limit == None)
   assert_true(model.input_modality == [Modality::Text])
   assert_true(model.output_modality == [Modality::Text])
 }

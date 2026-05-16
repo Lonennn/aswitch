@@ -116,7 +116,7 @@ test "get_temporary_override preserves existing opencode settings" {
       },
       "other-settings": other_settings,
       ..
-    } => assert_eq(other_settings, expected_other_settings())
+    } => assert_true(other_settings == expected_other_settings())
     _ => fail("temporary override should preserve existing settings")
   }
 
@@ -160,7 +160,7 @@ test "apply_provider_to_json - adds new provider and preserves all other propert
       ..
     } => {
       // Check schema is preserved
-      inspect(
+      debug_inspect(
         schema,
         content=(
           #|String("https://opencode.ai/config.json")
@@ -184,13 +184,13 @@ test "apply_provider_to_json - adds new provider and preserves all other propert
               "models": models_obj,
               ..
             } => {
-              inspect(
+              debug_inspect(
                 npm_val,
                 content=(
                   #|String("@ai-sdk/anthropic")
                 ),
               )
-              inspect(
+              debug_inspect(
                 name_val,
                 content=(
                   #|String("new-provider")
@@ -200,13 +200,13 @@ test "apply_provider_to_json - adds new provider and preserves all other propert
               // Check options
               match options_obj {
                 { "baseURL": base_url_val, "apiKey": api_key_val, .. } => {
-                  inspect(
+                  debug_inspect(
                     base_url_val,
                     content=(
                       #|String("https://new-provider.example.com/api/v1")
                     ),
                   )
-                  inspect(
+                  debug_inspect(
                     api_key_val,
                     content=(
                       #|String("sk-new-provider-api-key")
@@ -222,16 +222,13 @@ test "apply_provider_to_json - adds new provider and preserves all other propert
                   // Verify model-alpha exists with correct structure
                   match model_alpha {
                     { "name": model_name_val, .. } =>
-                      inspect(
+                      debug_inspect(
                         model_name_val,
                         content=(
                           #|String("model-alpha")
                         ),
                       )
-                    _ =>
-                      fail(
-                        "model-alpha structure mismatch, actual: \{model_alpha}",
-                      )
+                    _ => fail("model-alpha structure mismatch")
                   }
                 _ => fail("models structure mismatch")
               }
@@ -242,7 +239,7 @@ test "apply_provider_to_json - adds new provider and preserves all other propert
       }
 
       // Verify other-settings are preserved using assert_eq
-      assert_eq(other_settings_obj, expected_other_settings())
+      assert_true(other_settings_obj == expected_other_settings())
     }
     _ => fail("root structure mismatch")
   }
@@ -278,13 +275,13 @@ test "apply_provider_to_json - updates existing provider" {
               "models": models_obj,
               ..
             } => {
-              inspect(
+              debug_inspect(
                 npm_val,
                 content=(
                   #|String("@ai-sdk/anthropic")
                 ),
               )
-              inspect(
+              debug_inspect(
                 name_val,
                 content=(
                   #|String("existing-provider")
@@ -292,13 +289,13 @@ test "apply_provider_to_json - updates existing provider" {
               )
               match options_obj {
                 { "baseURL": base_url_val, "apiKey": api_key_val, .. } => {
-                  inspect(
+                  debug_inspect(
                     base_url_val,
                     content=(
                       #|String("https://updated.example.com/api")
                     ),
                   )
-                  inspect(
+                  debug_inspect(
                     api_key_val,
                     content=(
                       #|String("sk-updated-api-key")
@@ -368,7 +365,7 @@ test "apply_provider_to_json - raises error when models is empty" {
 
 ///|
 test "apply_provider_to_json - works with empty JSON (creates new structure)" {
-  let empty_json : Json = Json::object(Map::new())
+  let empty_json : Json = Json::object(Map([]))
   let provider = @provider.Provider::{
     name: "test-provider",
     api_key: "new-key",
@@ -385,7 +382,7 @@ test "apply_provider_to_json - works with empty JSON (creates new structure)" {
   // Verify the structure is created properly
   match updated_json {
     { "$schema": schema, "provider": provider_obj, .. } => {
-      inspect(
+      debug_inspect(
         schema,
         content=(
           #|String("https://opencode.ai/config.json")
@@ -425,7 +422,7 @@ test "apply_provider_to_json - OpenAI API format" {
         { "openai-provider": openai_provider, .. } =>
           match openai_provider {
             { "npm": npm_val, "options": options_obj, "models": models_obj, .. } => {
-              inspect(
+              debug_inspect(
                 npm_val,
                 content=(
                   #|String("@ai-sdk/openai-compatible")
@@ -433,7 +430,7 @@ test "apply_provider_to_json - OpenAI API format" {
               )
               match options_obj {
                 { "baseURL": base_url_val, .. } =>
-                  inspect(
+                  debug_inspect(
                     base_url_val,
                     content=(
                       #|String("https://api.openai.com/v1")
@@ -476,7 +473,7 @@ test "apply_provider_to_json - None api_format uses Anthropic SDK when only anth
         { "default-provider": default_provider, .. } =>
           match default_provider {
             { "npm": npm_val, "options": options_obj, .. } => {
-              inspect(
+              debug_inspect(
                 npm_val,
                 content=(
                   #|String("@ai-sdk/anthropic")
@@ -484,7 +481,7 @@ test "apply_provider_to_json - None api_format uses Anthropic SDK when only anth
               )
               match options_obj {
                 { "baseURL": base_url_val, .. } =>
-                  inspect(
+                  debug_inspect(
                     base_url_val,
                     content=(
                       #|String("https://anthropic.example.com/v1")
@@ -524,7 +521,7 @@ test "apply_provider_to_json - None api_format uses openai_base_url when anthrop
             { "options": options_obj, .. } =>
               match options_obj {
                 { "baseURL": base_url_val, .. } =>
-                  inspect(
+                  debug_inspect(
                     base_url_val,
                     content=(
                       #|String("https://fallback.example.com/v1")
@@ -546,7 +543,7 @@ test "create_model_entry - creates correct model structure" {
   let model_entry = OpenCode::create_model_entry(model)
   match model_entry {
     { "name": name_val, .. } =>
-      inspect(
+      debug_inspect(
         name_val,
         content=(
           #|String("test-model-123")
@@ -573,19 +570,19 @@ test "create_model_entry - includes context_limit and output_limit when set" {
       "output_limit": output_val,
       ..
     } => {
-      inspect(
+      debug_inspect(
         name_val,
         content=(
           #|String("test-model")
         ),
       )
-      inspect(
+      debug_inspect(
         context_val,
         content=(
           #|Number(100000)
         ),
       )
-      inspect(
+      debug_inspect(
         output_val,
         content=(
           #|Number(4000)
@@ -608,7 +605,7 @@ test "create_model_entry - includes modalities when non-default" {
   let model_entry = OpenCode::create_model_entry(model)
   match model_entry {
     { "name": name_val, "modalities": modalities_obj, .. } => {
-      inspect(
+      debug_inspect(
         name_val,
         content=(
           #|String("vision-model")
@@ -616,7 +613,7 @@ test "create_model_entry - includes modalities when non-default" {
       )
       match modalities_obj {
         { "input": input_arr, .. } =>
-          inspect(
+          debug_inspect(
             input_arr,
             content=(
               #|Array([String("text"), String("vision")])
@@ -661,13 +658,13 @@ test "apply_provider_to_json - preserves schema if already present" {
   )
   match updated_json {
     { "$schema": schema_val, "other": other_val, .. } => {
-      inspect(
+      debug_inspect(
         schema_val,
         content=(
           #|String("https://custom.example.com/schema.json")
         ),
       )
-      inspect(
+      debug_inspect(
         other_val,
         content=(
           #|String("value")
@@ -699,7 +696,7 @@ test "apply_provider_to_json - None api_format uses OpenAI SDK when only openai_
         { "openai-only-provider": openai_provider, .. } =>
           match openai_provider {
             { "npm": npm_val, "options": options_obj, .. } => {
-              inspect(
+              debug_inspect(
                 npm_val,
                 content=(
                   #|String("@ai-sdk/openai-compatible")
@@ -707,7 +704,7 @@ test "apply_provider_to_json - None api_format uses OpenAI SDK when only openai_
               )
               match options_obj {
                 { "baseURL": base_url_val, .. } =>
-                  inspect(
+                  debug_inspect(
                     base_url_val,
                     content=(
                       #|String("https://openai.example.com/v1")
@@ -773,7 +770,7 @@ test "apply_provider_to_json - picks correct base URL when both are provided" {
       },
       ..
     } =>
-      inspect(
+      debug_inspect(
         url_val,
         content=(
           #|String("https://anthropic.example.com/v1")
@@ -796,7 +793,7 @@ test "apply_provider_to_json - picks correct base URL when both are provided" {
       },
       ..
     } =>
-      inspect(
+      debug_inspect(
         url_val,
         content=(
           #|String("https://openai.example.com/v1")
@@ -818,13 +815,13 @@ test "create_model_entry - supports multiple output modalities" {
   let model_entry = OpenCode::create_model_entry(model)
   match model_entry {
     { "modalities": { "input": input_arr, "output": output_arr, .. }, .. } => {
-      inspect(
+      debug_inspect(
         input_arr,
         content=(
           #|Array([String("text"), String("vision")])
         ),
       )
-      inspect(
+      debug_inspect(
         output_arr,
         content=(
           #|Array([String("text"), String("audio")])
@@ -857,16 +854,16 @@ test "apply_provider_to_json - preserves unknown top-level fields" {
   )
   match updated_json {
     { "custom-setting": custom_val, "feature-flags": flags_val, .. } => {
-      inspect(
+      debug_inspect(
         custom_val,
         content=(
           #|String("custom-value")
         ),
       )
-      inspect(
+      debug_inspect(
         flags_val,
         content=(
-          #|Object({"beta": True, "experimental": False})
+          #|Object({ "beta": True, "experimental": False })
         ),
       )
     }

@@ -56,8 +56,8 @@ test "backup_config_before_write creates first backup" {
 
   let backup1 = backup_file_path(config_path, 1)
   assert_true(@fs.path_exists(backup1))
-  assert_eq(read_text(backup1), "v1")
-  assert_eq(read_text(config_path), "v1")
+  assert_true(read_text(backup1) == "v1")
+  assert_true(read_text(config_path) == "v1")
   assert_true(!@fs.path_exists(backup_file_path(config_path, 2)))
 
   cleanup_dir(dir)
@@ -76,11 +76,11 @@ test "backup_config_before_write keeps only latest five backups" {
     write_text(config_path, "v\{i}")
   }
 
-  assert_eq(read_text(backup_file_path(config_path, 1)), "v6")
-  assert_eq(read_text(backup_file_path(config_path, 2)), "v5")
-  assert_eq(read_text(backup_file_path(config_path, 3)), "v4")
-  assert_eq(read_text(backup_file_path(config_path, 4)), "v3")
-  assert_eq(read_text(backup_file_path(config_path, 5)), "v2")
+  assert_true(read_text(backup_file_path(config_path, 1)) == "v6")
+  assert_true(read_text(backup_file_path(config_path, 2)) == "v5")
+  assert_true(read_text(backup_file_path(config_path, 3)) == "v4")
+  assert_true(read_text(backup_file_path(config_path, 4)) == "v3")
+  assert_true(read_text(backup_file_path(config_path, 5)) == "v2")
   assert_true(!@fs.path_exists(backup_file_path(config_path, 6)))
 
   cleanup_dir(dir)

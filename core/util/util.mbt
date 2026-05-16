@@ -22,7 +22,7 @@ pub fn get_aswitch_home() -> String {
       if trimmed.is_empty() {
         "."
       } else {
-        trimmed.to_string()
+        trimmed.to_owned()
       }
     }
     None => get_user_home()
@@ -35,12 +35,9 @@ pub fn get_aswitch_home() -> String {
 pub fn generate_json_diff(original : String, updated : String) -> String {
   let original_lines = original
     .split("\n")
-    .map(fn(s) { s.to_string() })
+    .map(fn(s) { s.to_owned() })
     .to_array()
-  let updated_lines = updated
-    .split("\n")
-    .map(fn(s) { s.to_string() })
-    .to_array()
+  let updated_lines = updated.split("\n").map(fn(s) { s.to_owned() }).to_array()
 
   let output = []
   let mut i = 0

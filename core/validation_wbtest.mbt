@@ -100,6 +100,6 @@ test "config deep_copy returns independent provider list" {
   let copied = original.deep_copy()
   copied.providers = @list.new()
 
-  assert_eq(original.providers.length(), 1)
-  assert_eq(copied.providers.length(), 0)
+  assert_true(original.providers.length() == 1)
+  assert_true(copied.providers.length() == 0)
 }

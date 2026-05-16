@@ -25,9 +25,9 @@ test "parse_args maps add to interactive and positional variants" {
       "add", "openai", "sk-xxx", "https://api.openai.com/v1", "gpt-4o",
     ]) {
     AddProvider(name~, api_key~, model~, openai_base_url~, anthropic_base_url~) => {
-      assert_eq(name, "openai")
-      assert_eq(api_key, "sk-xxx")
-      assert_eq(model, "gpt-4o")
+      assert_true(name == "openai")
+      assert_true(api_key == "sk-xxx")
+      assert_true(model == "gpt-4o")
       assert_true(openai_base_url is Some("https://api.openai.com/v1"))
       assert_true(anthropic_base_url is None)
     }
@@ -43,9 +43,9 @@ test "parse_args maps add option mode for anthropic-only and dual URLs" {
       "--anthropic-base-url", "https://api.anthropic.com",
     ]) {
     AddProvider(name~, api_key~, model~, openai_base_url~, anthropic_base_url~) => {
-      assert_eq(name, "anthropic")
-      assert_eq(api_key, "sk-ant")
-      assert_eq(model, "claude-3-7-sonnet")
+      assert_true(name == "anthropic")
+      assert_true(api_key == "sk-ant")
+      assert_true(model == "claude-3-7-sonnet")
       assert_true(openai_base_url is None)
       assert_true(anthropic_base_url is Some("https://api.anthropic.com"))
     }
@@ -58,9 +58,9 @@ test "parse_args maps add option mode for anthropic-only and dual URLs" {
       "https://api.openai.com/v1", "--anthropic-base-url", "https://api.anthropic.com",
     ]) {
     AddProvider(name~, api_key~, model~, openai_base_url~, anthropic_base_url~) => {
-      assert_eq(name, "both")
-      assert_eq(api_key, "sk-both")
-      assert_eq(model, "gpt-4.1")
+      assert_true(name == "both")
+      assert_true(api_key == "sk-both")
+      assert_true(model == "gpt-4.1")
       assert_true(openai_base_url is Some("https://api.openai.com/v1"))
       assert_true(anthropic_base_url is Some("https://api.anthropic.com"))
     }
@@ -79,12 +79,12 @@ test "parse_args add option mode validates required fields" {
 ///|
 test "parse_args maps remove aliases and ignores extra args" {
   match parse_args(["remove", "openai"]) {
-    RemoveProvider(name) => assert_eq(name, "openai")
+    RemoveProvider(name) => assert_true(name == "openai")
     other => fail("Expected RemoveProvider, got \{other}")
   }
 
   match parse_args(["rm", "anthropic", "ignored", "extra"]) {
-    RemoveProvider(name) => assert_eq(name, "anthropic")
+    RemoveProvider(name) => assert_true(name == "anthropic")
     other => fail("Expected RemoveProvider, got \{other}")
   }
 }
@@ -135,7 +135,7 @@ test "set_provider fails with invalid config" {
 
   // Run set_provider
   let result = set_provider("claudecode", "openai", None, false)
-  assert_eq(result, EXIT_CODE_CONFIG_ERROR)
+  assert_true(result == EXIT_CODE_CONFIG_ERROR)
 }
 
 ///|
@@ -143,8 +143,8 @@ test "parse_args correctly parses dry-run flags" {
   // Test long form --dry-run
   match parse_args(["set", "claudecode", "openai", "--dry-run"]) {
     SetProvider(agent~, provider~, api_format~, dry_run~) => {
-      assert_eq(agent, "claudecode")
-      assert_eq(provider, "openai")
+      assert_true(agent == "claudecode")
+      assert_true(provider == "openai")
       assert_true(api_format is None)
       assert_true(dry_run)
     }
@@ -154,8 +154,8 @@ test "parse_args correctly parses dry-run flags" {
   // Test short form -n
   match parse_args(["switch", "open-code", "anthropic", "-n"]) {
     SetProvider(agent~, provider~, api_format~, dry_run~) => {
-      assert_eq(agent, "open-code")
-      assert_eq(provider, "anthropic")
+      assert_true(agent == "open-code")
+      assert_true(provider == "anthropic")
       assert_true(api_format is None)
       assert_true(dry_run)
     }
@@ -165,8 +165,8 @@ test "parse_args correctly parses dry-run flags" {
   // Test dry-run flag anywhere in args
   match parse_args(["set", "--dry-run", "openclaw", "openai", "openai"]) {
     SetProvider(agent~, provider~, api_format~, dry_run~) => {
-      assert_eq(agent, "openclaw")
-      assert_eq(provider, "openai")
+      assert_true(agent == "openclaw")
+      assert_true(provider == "openai")
       assert_true(api_format is Some(@agent.OpenAI))
       assert_true(dry_run)
     }
@@ -176,8 +176,8 @@ test "parse_args correctly parses dry-run flags" {
   // Test no dry-run flag defaults to false
   match parse_args(["set", "claudecode", "openai"]) {
     SetProvider(agent~, provider~, api_format~, dry_run~) => {
-      assert_eq(agent, "claudecode")
-      assert_eq(provider, "openai")
+      assert_true(agent == "claudecode")
+      assert_true(provider == "openai")
       assert_true(api_format is None)
       assert_false(dry_run)
     }
@@ -259,7 +259,7 @@ fn write_test_config(providers : Array[@provider.Provider]) -> Unit {
 test "init_config creates config with schema when file is missing" {
   command_with_temp_aswitch_home("_aswitch_test_init_create", fn() raise {
     let result = init_config()
-    assert_eq(result, EXIT_CODE_SUCCESS)
+    assert_true(result == EXIT_CODE_SUCCESS)
 
     let config_path = @core.get_config_path()
     assert_true(@fs.path_exists(config_path))
@@ -287,7 +287,7 @@ test "init_config patches missing schema on existing config" {
     try! @fs.write_string_to_file(config_path, content)
 
     let result = init_config()
-    assert_eq(result, EXIT_CODE_SUCCESS)
+    assert_true(result == EXIT_CODE_SUCCESS)
 
     let updated_content = try! @fs.read_file_to_string(config_path)
     let updated_json = try! @json.parse(updated_content)
@@ -317,7 +317,7 @@ test "init_config preserves existing schema value" {
     try! @fs.write_string_to_file(config_path, content)
 
     let result = init_config()
-    assert_eq(result, EXIT_CODE_SUCCESS)
+    assert_true(result == EXIT_CODE_SUCCESS)
 
     let updated_content = try! @fs.read_file_to_string(config_path)
     let updated_json = try! @json.parse(updated_content)
@@ -340,10 +340,10 @@ test "init_config returns error for invalid json config" {
     try! @fs.write_string_to_file(config_path, content)
 
     let result = init_config()
-    assert_eq(result, EXIT_CODE_CONFIG_ERROR)
+    assert_true(result == EXIT_CODE_CONFIG_ERROR)
 
     let current_content = try! @fs.read_file_to_string(config_path)
-    assert_eq(current_content, content)
+    assert_true(current_content == content)
   })
 }
 
@@ -355,10 +355,10 @@ test "init_config returns error for non-object config root" {
     try! @fs.write_string_to_file(config_path, content)
 
     let result = init_config()
-    assert_eq(result, EXIT_CODE_CONFIG_ERROR)
+    assert_true(result == EXIT_CODE_CONFIG_ERROR)
 
     let current_content = try! @fs.read_file_to_string(config_path)
-    assert_eq(current_content, content)
+    assert_true(current_content == content)
   })
 }
 
@@ -367,8 +367,8 @@ test "parse_args maps temporary command and exec variants" {
   match
     parse_args(["command", "claude-code", "seed", "--api-format", "anthropic"]) {
     TemporaryCommand(agent~, provider~, api_format~) => {
-      assert_eq(agent, "claude-code")
-      assert_eq(provider, "seed")
+      assert_true(agent == "claude-code")
+      assert_true(provider == "seed")
       assert_true(api_format is Some(@agent.Anthropic))
     }
     other => fail("Expected TemporaryCommand, got \{other}")
@@ -380,10 +380,10 @@ test "parse_args maps temporary command and exec variants" {
       "opencode", "run",
     ]) {
     TemporaryExec(agent~, provider~, api_format~, command~, print_command~) => {
-      assert_eq(agent, "open-code")
-      assert_eq(provider, "seed")
+      assert_true(agent == "open-code")
+      assert_true(provider == "seed")
       assert_true(api_format is Some(@agent.OpenAI))
-      assert_eq(command, ["opencode", "run"])
+      assert_true(command == ["opencode", "run"])
       assert_true(print_command)
     }
     other => fail("Expected TemporaryExec, got \{other}")
@@ -391,10 +391,10 @@ test "parse_args maps temporary command and exec variants" {
 
   match parse_args(["exec", "claude-code", "seed"]) {
     TemporaryExec(agent~, provider~, api_format~, command~, print_command~) => {
-      assert_eq(agent, "claude-code")
-      assert_eq(provider, "seed")
+      assert_true(agent == "claude-code")
+      assert_true(provider == "seed")
       assert_true(api_format is None)
-      assert_eq(command, [])
+      assert_true(command == [])
       assert_false(print_command)
     }
     other => fail("Expected TemporaryExec, got \{other}")
@@ -491,6 +491,6 @@ test "temporary_command rejects openclaw render-only workflow" {
     ])
 
     let status = temporary_command("openclaw", "seed", Some(@agent.OpenAI))
-    assert_eq(status, EXIT_CODE_CONFIG_ERROR)
+    assert_true(status == EXIT_CODE_CONFIG_ERROR)
   })
 }

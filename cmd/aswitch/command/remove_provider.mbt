@@ -24,7 +24,7 @@ async fn run_remove_provider(
   read_line : async () -> String?,
   write_line : (String) -> Unit,
 ) -> (Int, String) {
-  let provider_name = name.trim().to_string()
+  let provider_name = name.trim().to_owned()
   if provider_name.is_empty() {
     return (EXIT_CODE_CONFIG_ERROR, "Error: provider name cannot be empty")
   }

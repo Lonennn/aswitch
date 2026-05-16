@@ -1,6 +1,6 @@
 ///|
 test "supported_agents returns canonical agent names" {
-  assert_eq(supported_agents(), ["claude-code", "open-code", "openclaw"])
+  assert_true(supported_agents() == ["claude-code", "open-code", "openclaw"])
 }
 
 ///|
@@ -35,9 +35,9 @@ test "get_agent_config_path returns correct path for supported agents" {
 
 ///|
 test "get_agent_config_path returns None for unsupported agents" {
-  assert_eq(get_agent_config_path("invalid"), None)
-  assert_eq(get_agent_config_path("cursor"), None)
-  assert_eq(get_agent_config_path(""), None)
+  assert_true(get_agent_config_path("invalid") == None)
+  assert_true(get_agent_config_path("cursor") == None)
+  assert_true(get_agent_config_path("") == None)
 }
 
 ///|

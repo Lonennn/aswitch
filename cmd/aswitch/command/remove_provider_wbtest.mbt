@@ -25,7 +25,7 @@ async test "run_remove_provider removes provider after confirmation" {
       mock_reader(["y"]),
       mock_writer(logs),
     )
-    assert_eq(result, (EXIT_CODE_SUCCESS, "Removed provider 'openai'"))
+    assert_true(result == (EXIT_CODE_SUCCESS, "Removed provider 'openai'"))
     assert_true(
       logs.any(fn(line) { line == "Remove provider 'openai'? (y/N):" }),
     )
@@ -53,7 +53,7 @@ async test "run_remove_provider supports case-insensitive provider lookup" {
       mock_reader(["y"]),
       mock_writer([]),
     )
-    assert_eq(result, (EXIT_CODE_SUCCESS, "Removed provider 'OpenAI'"))
+    assert_true(result == (EXIT_CODE_SUCCESS, "Removed provider 'OpenAI'"))
 
     let updated = @core.load_config()
     assert_true(updated.providers.is_empty())
@@ -70,8 +70,8 @@ async test "run_remove_provider returns unknown provider exit code" {
       mock_reader(["y"]),
       mock_writer([]),
     )
-    assert_eq(
-      result,
+    assert_true(
+      result ==
       (EXIT_CODE_UNKNOWN_PROVIDER, "Error: Unknown provider 'not-found'"),
     )
   })
@@ -94,7 +94,7 @@ async test "run_remove_provider can cancel operation" {
       mock_reader(["n"]),
       mock_writer([]),
     )
-    assert_eq(result, (EXIT_CODE_CONFIG_ERROR, "Operation canceled"))
+    assert_true(result == (EXIT_CODE_CONFIG_ERROR, "Operation canceled"))
 
     let updated = @core.load_config()
     assert_true(updated.get_provider("openai") is Some(_))
@@ -126,7 +126,7 @@ async test "run_remove_provider creates backup and preserves non-provider fields
       mock_reader(["y"]),
       mock_writer([]),
     )
-    assert_eq(result, (EXIT_CODE_SUCCESS, "Removed provider 'openai'"))
+    assert_true(result == (EXIT_CODE_SUCCESS, "Removed provider 'openai'"))
 
     let backup_path = "\{config_path}.bak.1"
     assert_true(@fs.path_exists(backup_path))
@@ -149,7 +149,7 @@ async test "run_remove_provider creates backup and preserves non-provider fields
     let backup_content = try! @fs.read_file_to_string(backup_path)
     let backup_json = try! @json.parse(backup_content)
     let backup_config : @core.Config = try! @json.from_json(backup_json)
-    assert_eq(backup_config.providers.length(), 1)
+    assert_true(backup_config.providers.length() == 1)
     assert_true(backup_config.get_provider("openai") is Some(_))
   })
 }

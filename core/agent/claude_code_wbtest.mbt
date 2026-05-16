@@ -128,31 +128,31 @@ test "apply_provider_to_json - updates env and preserves all other properties" {
           ..
         } => {
           // Verify updated values
-          inspect(
+          debug_inspect(
             auth_token,
             content=(
               #|String("new-api-key-12345")
             ),
           )
-          inspect(
+          debug_inspect(
             base_url,
             content=(
               #|String("https://new-provider.example.com/api/v1")
             ),
           )
-          inspect(
+          debug_inspect(
             opus_model,
             content=(
               #|String("new-opus")
             ),
           )
-          inspect(
+          debug_inspect(
             sonnet_model,
             content=(
               #|String("new-sonnet")
             ),
           )
-          inspect(
+          debug_inspect(
             haiku_model,
             content=(
               #|String("new-haiku")
@@ -160,19 +160,19 @@ test "apply_provider_to_json - updates env and preserves all other properties" {
           )
 
           // Verify preserved env values
-          inspect(
+          debug_inspect(
             timeout,
             content=(
               #|String("3000000")
             ),
           )
-          inspect(
+          debug_inspect(
             disable_traffic,
             content=(
               #|String("1")
             ),
           )
-          inspect(
+          debug_inspect(
             experimental,
             content=(
               #|String("1")
@@ -183,13 +183,13 @@ test "apply_provider_to_json - updates env and preserves all other properties" {
       }
 
       // Verify hooks are preserved using assert_eq
-      assert_eq(hooks_obj, expected_hooks())
+      assert_true(hooks_obj == expected_hooks())
 
       // Verify enabledPlugins are preserved using assert_eq
-      assert_eq(plugins_obj, expected_plugins())
+      assert_true(plugins_obj == expected_plugins())
 
       // Verify model is preserved using assert_eq
-      assert_eq(model_val, Json::string("opus"))
+      assert_true(model_val == Json::string("opus"))
     }
     _ => fail("root structure mismatch")
   }
@@ -227,32 +227,32 @@ test "apply_provider_to_json - with 2 models uses last model for sonnet and haik
           "ANTHROPIC_DEFAULT_HAIKU_MODEL": haiku_model,
           ..
         } => {
-          inspect(
+          debug_inspect(
             auth_token,
             content=(
               #|String("two-model-key")
             ),
           )
-          inspect(
+          debug_inspect(
             base_url,
             content=(
               #|String("https://two-model.example.com/api")
             ),
           )
-          inspect(
+          debug_inspect(
             opus_model,
             content=(
               #|String("model-a")
             ),
           )
           // With 2 models: sonnet = models[1], haiku = models[last] = models[1]
-          inspect(
+          debug_inspect(
             sonnet_model,
             content=(
               #|String("model-b")
             ),
           )
-          inspect(
+          debug_inspect(
             haiku_model,
             content=(
               #|String("model-b")
@@ -260,9 +260,9 @@ test "apply_provider_to_json - with 2 models uses last model for sonnet and haik
           )
 
           // Verify other properties are preserved using assert_eq
-          assert_eq(hooks_obj, expected_hooks())
-          assert_eq(plugins_obj, expected_plugins())
-          assert_eq(model_val, Json::string("opus"))
+          assert_true(hooks_obj == expected_hooks())
+          assert_true(plugins_obj == expected_plugins())
+          assert_true(model_val == Json::string("opus"))
         }
         _ => fail("env structure mismatch")
       }
@@ -298,19 +298,19 @@ test "apply_provider_to_json - with 1 model uses same model for all" {
           ..
         } => {
           // With 1 model: all use models[0]
-          inspect(
+          debug_inspect(
             opus_model,
             content=(
               #|String("only-model")
             ),
           )
-          inspect(
+          debug_inspect(
             sonnet_model,
             content=(
               #|String("only-model")
             ),
           )
-          inspect(
+          debug_inspect(
             haiku_model,
             content=(
               #|String("only-model")
@@ -318,9 +318,9 @@ test "apply_provider_to_json - with 1 model uses same model for all" {
           )
 
           // Verify other properties are preserved using assert_eq
-          assert_eq(hooks_obj, expected_hooks())
-          assert_eq(plugins_obj, expected_plugins())
-          assert_eq(model_val, Json::string("opus"))
+          assert_true(hooks_obj == expected_hooks())
+          assert_true(plugins_obj == expected_plugins())
+          assert_true(model_val == Json::string("opus"))
         }
         _ => fail("env structure mismatch")
       }
@@ -398,31 +398,31 @@ test "apply_provider_to_json - works with minimal settings (no hooks/plugins)" {
           "ANTHROPIC_DEFAULT_HAIKU_MODEL": haiku_model,
           ..
         } => {
-          inspect(
+          debug_inspect(
             auth_token,
             content=(
               #|String("new-key")
             ),
           )
-          inspect(
+          debug_inspect(
             base_url,
             content=(
               #|String("https://new.example.com/api")
             ),
           )
-          inspect(
+          debug_inspect(
             opus_model,
             content=(
               #|String("opus-model")
             ),
           )
-          inspect(
+          debug_inspect(
             sonnet_model,
             content=(
               #|String("sonnet-model")
             ),
           )
-          inspect(
+          debug_inspect(
             haiku_model,
             content=(
               #|String("haiku-model")
@@ -432,7 +432,7 @@ test "apply_provider_to_json - works with minimal settings (no hooks/plugins)" {
         _ => fail("env structure mismatch")
       }
       // model should be preserved using assert_eq
-      assert_eq(model_val, Json::string("sonnet"))
+      assert_true(model_val == Json::string("sonnet"))
     }
     _ => fail("root structure mismatch")
   }

@@ -111,10 +111,11 @@ test "get_temporary_override preserves existing openclaw settings" {
       "ui": ui,
       ..
     } => {
-      assert_eq(agents, {
-        "defaults": { "model": { "primary": "temp-provider/temp-model" } },
-      })
-      assert_eq(ui, { "theme": "light" })
+      assert_true(
+        agents ==
+        { "defaults": { "model": { "primary": "temp-provider/temp-model" } } },
+      )
+      assert_true(ui == { "theme": "light" })
     }
     _ => fail("temporary override should preserve existing OpenClaw settings")
   }

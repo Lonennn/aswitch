@@ -99,12 +99,12 @@ async test "run_add_provider_interactive adds provider with multiple models" {
 
     let config = @core.load_config()
     let provider = config.get_provider("openai").unwrap()
-    assert_eq(provider.api_key, "sk-test")
+    assert_true(provider.api_key == "sk-test")
     assert_true(provider.openai_base_url is Some("https://api.openai.com/v1"))
     assert_true(provider.anthropic_base_url is None)
-    assert_eq(provider.models.length(), 2)
-    assert_eq(provider.models[0].name, "gpt-4o")
-    assert_eq(provider.models[1].name, "gpt-4.1")
+    assert_true(provider.models.length() == 2)
+    assert_true(provider.models[0].name == "gpt-4o")
+    assert_true(provider.models[1].name == "gpt-4.1")
   })
 }
 
@@ -156,8 +156,8 @@ async test "upsert_provider asks confirmation before overwrite and can cancel" {
 
     let config = @core.load_config()
     let provider = config.get_provider("openai").unwrap()
-    assert_eq(provider.api_key, "sk-old")
-    assert_eq(provider.models[0].name, "gpt-4o")
+    assert_true(provider.api_key == "sk-old")
+    assert_true(provider.models[0].name == "gpt-4o")
   })
 }
 
@@ -186,13 +186,13 @@ async test "upsert_provider overwrites provider when confirmed" {
 
     let config = @core.load_config()
     let provider = config.get_provider("openai").unwrap()
-    assert_eq(provider.api_key, "sk-new")
+    assert_true(provider.api_key == "sk-new")
     assert_true(
       provider.anthropic_base_url is Some("https://api.anthropic.com"),
     )
-    assert_eq(provider.models.length(), 2)
-    assert_eq(provider.models[0].name, "gpt-4.1")
-    assert_eq(provider.models[1].name, "gpt-4.1-mini")
+    assert_true(provider.models.length() == 2)
+    assert_true(provider.models[0].name == "gpt-4.1")
+    assert_true(provider.models[1].name == "gpt-4.1-mini")
   })
 }
 
@@ -229,10 +229,10 @@ async test "upsert_provider creates backup before saving updated config" {
     let backup_json = try! @json.parse(backup_content)
     let backup_config : @core.Config = try! @json.from_json(backup_json)
     let backup_provider = backup_config.get_provider("openai").unwrap()
-    assert_eq(backup_provider.api_key, "sk-old")
+    assert_true(backup_provider.api_key == "sk-old")
 
     let current_config = @core.load_config()
     let current_provider = current_config.get_provider("openai").unwrap()
-    assert_eq(current_provider.api_key, "sk-new")
+    assert_true(current_provider.api_key == "sk-new")
   })
 }
