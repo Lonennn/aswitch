@@ -7,4 +7,5 @@ _aswitch_test/
 
 .claude/settings.local.json
 .claude/skills/moonbit-agent-guide
+.claude/commands
 .worktrees/
