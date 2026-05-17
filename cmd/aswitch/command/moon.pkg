@@ -5,9 +5,11 @@ import {
   "lonen44/aswitch/core/provider",
   "moonbitlang/core/debug",
   "moonbitlang/core/json",
+  "moonbitlang/core/buffer",
+  "moonbitlang/core/encoding/utf8",
   "moonbitlang/core/list",
   "moonbitlang/x/fs",
-  "moonbitlang/x/path",
+  "moonbitlang/x/sys",
 }
 
 import {
@@ -18,6 +20,7 @@ import {
 } for "wbtest"
 
 options(
+  "native-stub": [ "launcher.c" ],
   targets: {
     "add_provider.mbt": [ "native", "llvm" ],
     "add_provider_wbtest.mbt": [ "native", "llvm" ],
@@ -26,6 +29,7 @@ options(
     "exit_code.mbt": [ "native", "llvm" ],
     "help.mbt": [ "native", "llvm" ],
     "init_config.mbt": [ "native", "llvm" ],
+    "launcher.c": [ "native" ],
     "list_agents.mbt": [ "native", "llvm" ],
     "list_providers.mbt": [ "native", "llvm" ],
     "prompt.mbt": [ "native", "llvm" ],

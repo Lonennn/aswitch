@@ -9,4 +9,5 @@ _aswitch_test/
 .claude/skills/moonbit-agent-guide
 .claude/skills/moonbit-c-binding
 .claude/commands
+.moon-include
 .worktrees/

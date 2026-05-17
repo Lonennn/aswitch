@@ -52,17 +52,6 @@ fn command_supports_render_only(agent : &@agent.Agent) -> Bool {
 }
 
 ///|
-fn cleanup_temporary_override(
-  temporary_override : @agent.TemporaryOverride,
-) -> Unit {
-  for temp_file in temporary_override.temp_files {
-    let _ = try? @fs.remove_file(temp_file.path)
-    let parent_dir = @path.Path(temp_file.path).dirname().to_string()
-    let _ = try? @fs.remove_dir(parent_dir)
-  }
-}
-
-///|
 fn render_temporary_command(
   agent_name : String,
   provider_name : String,
@@ -136,43 +125,48 @@ pub fn temporary_command(
 }
 
 ///|
-#borrow(command)
-extern "c" fn run_shell_command(command : Bytes) -> Int = "system"
+#borrow(executable, args)
+extern "c" fn launch_command_ffi(
+  executable : Bytes,
+  args : FixedArray[Bytes],
+) -> Int = "aswitch_launch_command"
 
 ///|
 fn string_to_utf8_bytes(str : String, append_nul : Bool) -> Bytes {
-  let res : Array[Byte] = []
-  let len = str.length()
-  let mut i = 0
-  while i < len {
-    let mut c = str.code_unit_at(i).to_int()
-    if 0xD800 <= c && c <= 0xDBFF {
-      c -= 0xD800
-      i = i + 1
-      let l = str.code_unit_at(i).to_int() - 0xDC00
-      c = (c << 10) + l + 0x10000
-    }
-    if c < 0x80 {
-      res.push(c.to_byte())
-    } else if c < 0x800 {
-      res.push((0xc0 + (c >> 6)).to_byte())
-      res.push((0x80 + (c & 0x3f)).to_byte())
-    } else if c < 0x10000 {
-      res.push((0xe0 + (c >> 12)).to_byte())
-      res.push((0x80 + ((c >> 6) & 0x3f)).to_byte())
-      res.push((0x80 + (c & 0x3f)).to_byte())
-    } else {
-      res.push((0xf0 + (c >> 18)).to_byte())
-      res.push((0x80 + ((c >> 12) & 0x3f)).to_byte())
-      res.push((0x80 + ((c >> 6) & 0x3f)).to_byte())
-      res.push((0x80 + (c & 0x3f)).to_byte())
-    }
-    i += 1
+  let bytes = @utf8.encode(str)
+  if !append_nul {
+    return bytes
   }
-  if append_nul {
-    res.push((0).to_byte())
+  let buf = @buffer.new(size_hint=bytes.length() + 1)
+  buf.write_bytes(bytes)
+  buf.write_byte((0).to_byte())
+  buf.to_bytes()
+}
+
+///|
+fn apply_env_vars(env_vars : Array[@agent.EnvVar]) -> Unit {
+  for env_var in env_vars {
+    @sys.set_env_var(env_var.key, env_var.value)
   }
-  Bytes::from_array(res)
+}
+
+///|
+fn build_args(
+  override_args : Array[String],
+  extra_args : Array[String],
+) -> FixedArray[Bytes] {
+  let total = override_args.length() + extra_args.length()
+  let result = FixedArray::make(total, Bytes::new(0))
+  for i in 0..<override_args.length() {
+    result[i] = string_to_utf8_bytes(override_args[i], true)
+  }
+  for i in 0..<extra_args.length() {
+    result[override_args.length() + i] = string_to_utf8_bytes(
+      extra_args[i],
+      true,
+    )
+  }
+  result
 }
 
 ///|
@@ -203,14 +197,26 @@ pub fn temporary_exec(
     selection.agent.name(),
   )
   guard prepare_result is Ok(_) else { return prepare_result.unwrap_err() }
-  defer cleanup_temporary_override(rendered_command.temporary_override)
 
   if print_command {
     println(rendered_command.command)
   }
-  // A leading space helps shells configured with ignorespace avoid saving
-  // this secret-bearing command line into interactive history.
-  let shell_command = " \{rendered_command.command}"
-  let status = run_shell_command(string_to_utf8_bytes(shell_command, true))
-  status
+
+  // execvp does not accept a custom environment — it inherits the current
+  // process's environment. Set the agent's env vars now so the launched
+  // process sees them.
+  let temp_override = rendered_command.temporary_override
+  apply_env_vars(temp_override.env_vars)
+
+  // Launch the command by replacing the current process.
+  // On success this never returns; the TUI agent takes over the terminal.
+  let executable = string_to_utf8_bytes(temp_override.executable, true)
+  let args = build_args(temp_override.args, command)
+  let status = launch_command_ffi(executable, args)
+
+  // Only reached if the exec failed (executable not found, etc.).
+  println(
+    "Error: Failed to launch '\{temp_override.executable}' (exit code: \{status})",
+  )
+  EXIT_CODE_CONFIG_ERROR
 }

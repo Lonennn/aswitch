@@ -7,4 +7,11 @@ import {
 options(
   "is-main": true,
   targets: { "aswitch.mbt": [ "native", "llvm" ] },
+  "pre-build": [
+    {
+      "command": "mkdir -p .moon-include && cp -r ~/.moon/include/* .moon-include/",
+      "input": [ ],
+      "output": "../../.moon-include/moonbit.h",
+    },
+  ],
 )
