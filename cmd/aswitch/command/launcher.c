@@ -1,4 +1,5 @@
 #include <moonbit.h>
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 #if defined(_WIN32)
@@ -34,6 +35,7 @@ int aswitch_launch_command(moonbit_bytes_t executable, void **args) {
 #endif
 
   // Only reached if execvp/_execvp fails.
+  const int saved_errno = errno;
   free(argv);
-  return -1;
+  return -saved_errno;
 }

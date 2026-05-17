@@ -214,9 +214,16 @@ pub fn temporary_exec(
   let args = build_args(temp_override.args, command)
   let status = launch_command_ffi(executable, args)
 
-  // Only reached if the exec failed (executable not found, etc.).
-  println(
-    "Error: Failed to launch '\{temp_override.executable}' (exit code: \{status})",
-  )
+  // Only reached if the exec failed.
+  let error_reason = match status {
+    -2 => "No such file or directory"
+    -7 => "Argument list too long"
+    -8 => "Exec format error"
+    -12 => "Not enough memory"
+    -13 => "Permission denied"
+    -22 => "Invalid argument"
+    _ => "launch failed (exit code: \{status})"
+  }
+  println("Error: '\{temp_override.executable}' - \{error_reason}")
   EXIT_CODE_CONFIG_ERROR
 }
