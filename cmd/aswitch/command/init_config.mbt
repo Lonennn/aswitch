@@ -7,6 +7,15 @@ const SCHEMA_URL = "https://raw.githubusercontent.com/Lonennn/aswitch/master/ass
 pub fn init_config() -> Int {
   let path = @core.get_config_path()
   if !@fs.path_exists(path) {
+    let parent = @path.Path(path).dirname()
+
+    @util.create_dirs(parent) catch {
+      e => {
+        println("Failed to create directory \{parent}: \{e}")
+        return EXIT_CODE_FAILED_TO_CREATE_DIR
+      }
+    }
+
     let config_json : Json = {
       "$schema": Json::string(SCHEMA_URL),
       "providers": Json::array([]),

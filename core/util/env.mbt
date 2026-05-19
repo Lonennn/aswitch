@@ -13,6 +13,13 @@ pub fn get_user_home() -> String {
 }
 
 ///|
+/// Get the default base directory for aswitch files
+fn get_default_aswitch_home() -> @path.Path {
+  let user_home = get_user_home()
+  @path.Path::join(user_home, ".aswitch")
+}
+
+///|
 /// Get the base directory for aswitch files
 /// Tries ASWITCH_HOME env var first, then uses user home directory
 pub fn get_aswitch_home() -> String {
@@ -25,6 +32,6 @@ pub fn get_aswitch_home() -> String {
         trimmed.to_owned()
       }
     }
-    None => get_user_home()
+    None => get_default_aswitch_home().to_string()
   }
 }

@@ -1,7 +1,14 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "lonen44/aswitch/core/util"
 
+import {
+  "moonbitlang/x/fs",
+  "moonbitlang/x/path",
+}
+
 // Values
+pub fn create_dirs(@path.Path) -> Unit raise @fs.IOError
+
 pub fn generate_json_diff(String, String) -> String
 
 pub fn get_aswitch_home() -> String

@@ -9,3 +9,7 @@ const EXIT_CODE_UNKNOWN_AGENT = 2
 
 ///|
 const EXIT_CODE_UNKNOWN_PROVIDER = 3
+
+///|
+/// Failed to create a directory
+const EXIT_CODE_FAILED_TO_CREATE_DIR = 4
