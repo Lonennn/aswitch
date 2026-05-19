@@ -11,7 +11,7 @@ options(
     {
       "input": [ "../../moon.mod.json" ],
       "output": "version.mbt",
-      "command": "moon run scripts/generate_version_file.mbtx"
+      "command": "moon run scripts/generate_version_file.mbtx",
     },
     {
       "command": "mkdir -p .moon-include && cp -r ~/.moon/include/* .moon-include/",
