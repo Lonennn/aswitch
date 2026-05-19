@@ -9,6 +9,11 @@ options(
   targets: { "aswitch.mbt": [ "native", "llvm" ] },
   "pre-build": [
     {
+      "input": [ "../../moon.mod.json" ],
+      "output": "version.mbt",
+      "command": "moon run scripts/generate_version_file.mbtx"
+    },
+    {
       "command": "mkdir -p .moon-include && cp -r ~/.moon/include/* .moon-include/",
       "input": [ ],
       "output": "../../.moon-include/moonbit.h",

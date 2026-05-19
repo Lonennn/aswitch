@@ -1,0 +1,30 @@
+import {
+  "moonbitlang/core/json",
+  "moonbitlang/x/fs",
+  "moonbitlang/x/sys"
+}
+
+priv struct MoonMod {
+  version: String
+} derive(FromJson)
+
+fn generate_version_file() -> Unit raise Error {
+  let mod_content =  @fs.read_file_to_string("moon.mod.json")
+  let mod_json = @json.parse(mod_content)
+  let mod: MoonMod = @json.from_json(mod_json)
+  let version = mod.version
+
+  let version_file_content = "const ASWITCH_VERSION = \"\{version}\""
+  @fs.write_string_to_file("cmd/aswitch/version.mbt", version_file_content)
+}
+
+fn main {
+  let result = try? generate_version_file()
+  match result {
+    Ok(_) => ()
+    Err(err) => {
+      println(err)
+      @sys.exit(-1)
+    }
+  }
+}
