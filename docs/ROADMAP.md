@@ -106,6 +106,7 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 - [x] Temporary provider override workflow for one command or one shell session (`command` / `exec`, completed 2026-04-24)
 - [x] Safe command display: the `command` subcommand renders the temporary shell command to stdout for inspection without execution, preventing API key exposure in shell history; `exec` (`run` alias) prefixes a leading space to avoid shell history recording
 - [ ] Remember last used provider: `exec` and `command` commands recall the previously used provider so that subsequent invocations do not require a provider argument
+- [ ] Agent and provider name prefix matching for `set`, `exec` (`run`), and `command` commands: users can type unique prefixes instead of full names (e.g., `clau` resolves to `claude-code`, `ope` resolves to `open-code` if unambiguous; ambiguous prefixes produce an error listing candidates)
 - [ ] `sync` command to apply provider to multiple agents
 - [ ] `import`/`export` commands for configuration portability
 - [ ] Environment-specific profiles (dev/staging/prod)
@@ -172,18 +173,6 @@ Q4 2026 (Exploration - Advanced):
 
 ---
 
-## Success Metrics
-
-| Metric | Current | Q1 Target | Q2 Target | Q4 Target |
-|--------|---------|-----------|-----------|-----------|
-| Supported Agents | 3 | 3 | 3+ | 6+ |
-| Supported Providers | ∞ (manual) | ∞ (CLI) | 5 presets | 10 presets |
-| Setup Time | 10 min | 2 min | 2 min | 1 min |
-| Active Users | TBD baseline | 100 | 500 | 2000 |
-| GitHub Stars | TBD baseline | 50 | 200 | 1000 |
-
----
-
 ## What's NOT on the Roadmap
 
 **Explicitly Deferred:**
@@ -225,5 +214,5 @@ Q4 2026 (Exploration - Advanced):
 
 ---
 
-*Last updated: 2026-04-28*
+*Last updated: 2026-05-20*
 *Roadmap version: 2.3*
