@@ -9,7 +9,7 @@ options(
   targets: { "aswitch.mbt": [ "native", "llvm" ] },
   "pre-build": [
     {
-      "input": [ "../../moon.mod.json" ],
+      "input": [ "../../moon.mod" ],
       "output": "version.mbt",
       "command": "moon run scripts/generate_version_file.mbtx",
     },

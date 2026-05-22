@@ -137,7 +137,7 @@ fn string_to_utf8_bytes(str : String, append_nul : Bool) -> Bytes {
   if !append_nul {
     return bytes
   }
-  let buf = @buffer.new(size_hint=bytes.length() + 1)
+  let buf = Buffer::Buffer(size_hint=bytes.length() + 1)
   buf.write_bytes(bytes)
   buf.write_byte((0).to_byte())
   buf.to_bytes()

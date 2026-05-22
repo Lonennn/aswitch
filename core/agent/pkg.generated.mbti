@@ -73,9 +73,9 @@ pub struct TemporaryOverride {
 
 // Traits
 pub(open) trait Agent {
-  name(Self) -> String
-  apply_provider(Self, @provider.Provider, ApiFormat?) -> Unit raise
-  get_provider_diff(Self, @provider.Provider, ApiFormat?) -> ProviderDiff raise
-  get_temporary_override(Self, @provider.Provider, ApiFormat?) -> TemporaryOverride raise
+  fn name(Self) -> String
+  fn apply_provider(Self, @provider.Provider, ApiFormat?) -> Unit raise
+  fn get_provider_diff(Self, @provider.Provider, ApiFormat?) -> ProviderDiff raise
+  fn get_temporary_override(Self, @provider.Provider, ApiFormat?) -> TemporaryOverride raise
 }
 
