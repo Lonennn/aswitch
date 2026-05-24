@@ -34,10 +34,10 @@ pub struct TemporaryOverride {
 
 ///|
 pub(open) trait Agent {
-  name(Self) -> String
-  apply_provider(Self, @provider.Provider, ApiFormat?) -> Unit raise Error
-  get_provider_diff(Self, @provider.Provider, ApiFormat?) -> ProviderDiff raise Error
-  get_temporary_override(Self, @provider.Provider, ApiFormat?) -> TemporaryOverride raise Error
+  fn name(Self) -> String
+  fn apply_provider(Self, @provider.Provider, ApiFormat?) -> Unit raise Error
+  fn get_provider_diff(Self, @provider.Provider, ApiFormat?) -> ProviderDiff raise Error
+  fn get_temporary_override(Self, @provider.Provider, ApiFormat?) -> TemporaryOverride raise Error
 }
 
 ///|
@@ -159,7 +159,7 @@ pub suberror ProviderLackUrlError {
 }
 
 ///|
-impl Show for ProviderLackUrlError with output(self, logger) -> Unit {
+impl Show for ProviderLackUrlError with fn output(self, logger) -> Unit {
   match self {
     ProviderLackUrlError(msg) =>
       logger.write_string("ProviderLackUrlError: \{msg}")

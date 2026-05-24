@@ -228,7 +228,7 @@ fn OpenCode::apply_provider_to_json(
 }
 
 ///|
-pub impl Agent for OpenCode with apply_provider(_self, provider, api_format) -> Unit raise Error {
+pub impl Agent for OpenCode with fn apply_provider(_self, provider, api_format) -> Unit raise Error {
   let config_path = OpenCode::get_config_file_path()
   let dir_path = OpenCode::get_config_dir()
 
@@ -292,12 +292,16 @@ fn OpenCode::get_provider_diff(
 }
 
 ///|
-pub impl Agent for OpenCode with get_provider_diff(self, provider, api_format) -> ProviderDiff raise Error {
+pub impl Agent for OpenCode with fn get_provider_diff(
+  self,
+  provider,
+  api_format,
+) -> ProviderDiff raise Error {
   OpenCode::get_provider_diff(self, provider, api_format)
 }
 
 ///|
-pub impl Agent for OpenCode with get_temporary_override(
+pub impl Agent for OpenCode with fn get_temporary_override(
   self,
   provider,
   api_format,
@@ -306,6 +310,6 @@ pub impl Agent for OpenCode with get_temporary_override(
 }
 
 ///|
-pub impl Agent for OpenCode with name(_ : OpenCode) -> String {
+pub impl Agent for OpenCode with fn name(_ : OpenCode) -> String {
   "OpenCode"
 }

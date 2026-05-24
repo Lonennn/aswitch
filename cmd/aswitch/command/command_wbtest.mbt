@@ -1,7 +1,7 @@
 // This impl Show for Command is strange, but if we impl this in the command.mbt the build system will warn.
 
 ///|
-impl Show for Command with output(self, logger) -> Unit {
+impl Show for Command with fn output(self, logger) -> Unit {
   logger.write_string(self.to_repr().to_string())
 }
 
