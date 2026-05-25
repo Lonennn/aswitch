@@ -134,7 +134,7 @@ test "set_provider fails with invalid config" {
   @core.save_config(config).unwrap()
 
   // Run set_provider
-  let result = set_provider("claudecode", "openai", None, false)
+  let result = set_provider("claudecode", Some("openai"), None, false)
   assert_true(result == EXIT_CODE_CONFIG_ERROR)
 }
 
@@ -144,7 +144,7 @@ test "parse_args correctly parses dry-run flags" {
   match parse_args(["set", "claudecode", "openai", "--dry-run"]) {
     SetProvider(agent~, provider~, api_format~, dry_run~) => {
       assert_true(agent == "claudecode")
-      assert_true(provider == "openai")
+      assert_true(provider == Some("openai"))
       assert_true(api_format is None)
       assert_true(dry_run)
     }
@@ -155,7 +155,7 @@ test "parse_args correctly parses dry-run flags" {
   match parse_args(["switch", "open-code", "anthropic", "-n"]) {
     SetProvider(agent~, provider~, api_format~, dry_run~) => {
       assert_true(agent == "open-code")
-      assert_true(provider == "anthropic")
+      assert_true(provider == Some("anthropic"))
       assert_true(api_format is None)
       assert_true(dry_run)
     }
@@ -166,7 +166,7 @@ test "parse_args correctly parses dry-run flags" {
   match parse_args(["set", "--dry-run", "openclaw", "openai", "openai"]) {
     SetProvider(agent~, provider~, api_format~, dry_run~) => {
       assert_true(agent == "openclaw")
-      assert_true(provider == "openai")
+      assert_true(provider == Some("openai"))
       assert_true(api_format is Some(@agent.OpenAI))
       assert_true(dry_run)
     }
@@ -177,7 +177,7 @@ test "parse_args correctly parses dry-run flags" {
   match parse_args(["set", "claudecode", "openai"]) {
     SetProvider(agent~, provider~, api_format~, dry_run~) => {
       assert_true(agent == "claudecode")
-      assert_true(provider == "openai")
+      assert_true(provider == Some("openai"))
       assert_true(api_format is None)
       assert_false(dry_run)
     }
@@ -367,8 +367,8 @@ test "parse_args maps temporary command and exec variants" {
   match
     parse_args(["command", "claude-code", "seed", "--api-format", "anthropic"]) {
     TemporaryCommand(agent~, provider~, api_format~) => {
-      assert_true(agent == "claude-code")
-      assert_true(provider == "seed")
+      assert_true(agent == Some("claude-code"))
+      assert_true(provider == Some("seed"))
       assert_true(api_format is Some(@agent.Anthropic))
     }
     other => fail("Expected TemporaryCommand, got \{other}")
@@ -380,8 +380,8 @@ test "parse_args maps temporary command and exec variants" {
       "opencode", "run",
     ]) {
     TemporaryExec(agent~, provider~, api_format~, command~, print_command~) => {
-      assert_true(agent == "open-code")
-      assert_true(provider == "seed")
+      assert_true(agent == Some("open-code"))
+      assert_true(provider == Some("seed"))
       assert_true(api_format is Some(@agent.OpenAI))
       assert_true(command == ["opencode", "run"])
       assert_true(print_command)
@@ -391,8 +391,8 @@ test "parse_args maps temporary command and exec variants" {
 
   match parse_args(["exec", "claude-code", "seed"]) {
     TemporaryExec(agent~, provider~, api_format~, command~, print_command~) => {
-      assert_true(agent == "claude-code")
-      assert_true(provider == "seed")
+      assert_true(agent == Some("claude-code"))
+      assert_true(provider == Some("seed"))
       assert_true(api_format is None)
       assert_true(command == [])
       assert_false(print_command)
@@ -403,8 +403,8 @@ test "parse_args maps temporary command and exec variants" {
   // Verify `run` alias works identically to `exec`
   match parse_args(["run", "claude-code", "seed", "--", "claude"]) {
     TemporaryExec(agent~, provider~, api_format~, command~, print_command~) => {
-      assert_true(agent == "claude-code")
-      assert_true(provider == "seed")
+      assert_true(agent == Some("claude-code"))
+      assert_true(provider == Some("seed"))
       assert_true(api_format is None)
       assert_true(command == ["claude"])
       assert_false(print_command)
@@ -502,7 +502,84 @@ test "temporary_command rejects openclaw render-only workflow" {
       },
     ])
 
-    let status = temporary_command("openclaw", "seed", Some(@agent.OpenAI))
+    let status = temporary_command(
+      Some("openclaw"),
+      Some("seed"),
+      Some(@agent.OpenAI),
+    )
     assert_true(status == EXIT_CODE_CONFIG_ERROR)
   })
+}
+
+///|
+test "parse_args set with only agent omits provider" {
+  match parse_args(["set", "claudecode"]) {
+    SetProvider(agent~, provider~, api_format~, dry_run~) => {
+      assert_true(agent == "claudecode")
+      assert_true(provider is None)
+      assert_true(api_format is None)
+      assert_false(dry_run)
+    }
+    other => fail("Expected SetProvider, got \{other}")
+  }
+}
+
+///|
+test "parse_args set with no args returns help" {
+  match parse_args(["set"]) {
+    Help => assert_true(true)
+    other => fail("Expected Help, got \{other}")
+  }
+}
+
+///|
+test "parse_args exec with only agent omits provider" {
+  match parse_args(["run", "claudecode"]) {
+    TemporaryExec(agent~, provider~, api_format~, command~, print_command~) => {
+      assert_true(agent == Some("claudecode"))
+      assert_true(provider is None)
+      assert_true(api_format is None)
+      assert_true(command == [])
+      assert_false(print_command)
+    }
+    other => fail("Expected TemporaryExec, got \{other}")
+  }
+}
+
+///|
+test "parse_args exec with no args omits both" {
+  match parse_args(["run"]) {
+    TemporaryExec(agent~, provider~, api_format~, command~, print_command~) => {
+      assert_true(agent is None)
+      assert_true(provider is None)
+      assert_true(api_format is None)
+      assert_true(command == [])
+      assert_false(print_command)
+    }
+    other => fail("Expected TemporaryExec, got \{other}")
+  }
+}
+
+///|
+test "parse_args command with only agent omits provider" {
+  match parse_args(["command", "claudecode"]) {
+    TemporaryCommand(agent~, provider~, api_format~) => {
+      assert_true(agent == Some("claudecode"))
+      assert_true(provider is None)
+      assert_true(api_format is None)
+    }
+    other => fail("Expected TemporaryCommand, got \{other}")
+  }
+}
+
+///|
+test "parse_args command with no args omits both" {
+  match parse_args(["command"]) {
+    TemporaryCommand(agent~, provider~, api_format~) => {
+      assert_true(agent is None)
+      assert_true(provider is None)
+      assert_true(api_format is None)
+    }
+    other => fail("Expected TemporaryCommand, got \{other}")
+  }
 }

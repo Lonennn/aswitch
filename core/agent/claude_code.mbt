@@ -5,6 +5,16 @@
 pub struct ClaudeCode {}
 
 ///|
+pub fn ClaudeCode::canonical_name() -> String {
+  "Claude Code"
+}
+
+///|
+pub fn ClaudeCode::nicknames() -> Array[String] {
+  ["claude", "claude-code", "claudecode", "cc"]
+}
+
+///|
 /// Get the Claude Code configuration file path (~/.claude/settings.json)
 pub fn ClaudeCode::get_config_file_path() -> String {
   @path.Path::join(ClaudeCode::get_config_dir(), "settings.json").to_string()
@@ -213,5 +223,10 @@ pub impl Agent for ClaudeCode with fn get_temporary_override(
 
 ///|
 pub impl Agent for ClaudeCode with fn name(_ : ClaudeCode) -> String {
-  "Claude Code"
+  ClaudeCode::canonical_name()
+}
+
+///|
+pub impl Agent for ClaudeCode with fn supports_render_only(_ : ClaudeCode) -> Bool {
+  true
 }

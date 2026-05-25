@@ -10,20 +10,20 @@ pub enum Command {
   /// Set active provider (optional api_format: "openai" or "anthropic")
   SetProvider(
     agent~ : String,
-    provider~ : String,
+    provider~ : String?,
     api_format~ : @agent.ApiFormat?,
     dry_run~ : Bool
   )
   /// Render a shell command for a temporary provider override
   TemporaryCommand(
-    agent~ : String,
-    provider~ : String,
+    agent~ : String?,
+    provider~ : String?,
     api_format~ : @agent.ApiFormat?
   )
   /// Execute a command with a temporary provider override
   TemporaryExec(
-    agent~ : String,
-    provider~ : String,
+    agent~ : String?,
+    provider~ : String?,
     api_format~ : @agent.ApiFormat?,
     command~ : Array[String],
     print_command~ : Bool
@@ -65,7 +65,12 @@ fn parse_set_command(args : Array[String]) -> Command {
   match filtered_args {
     [agent, provider, .. rest] =>
       if rest.length() == 0 {
-        Command::SetProvider(agent~, provider~, api_format=None, dry_run~)
+        Command::SetProvider(
+          agent~,
+          provider=Some(provider),
+          api_format=None,
+          dry_run~,
+        )
       } else {
         let api_format = match rest[0].to_lower() {
           "openai" => @agent.OpenAI
@@ -77,17 +82,15 @@ fn parse_set_command(args : Array[String]) -> Command {
         }
         Command::SetProvider(
           agent~,
-          provider~,
+          provider=Some(provider),
           api_format=Some(api_format),
           dry_run~,
         )
       }
-    [_] => {
-      println("Error: 'set' requires at least 2 arguments: <agent> <provider>")
-      Command::Help
-    }
+    [agent] =>
+      Command::SetProvider(agent~, provider=None, api_format=None, dry_run~)
     [] => {
-      println("Error: 'set' requires at least 2 arguments: <agent> <provider>")
+      println("Error: 'set' requires at least 1 argument: <agent> [provider]")
       Command::Help
     }
   }
@@ -253,10 +256,17 @@ fn parse_temporary_command(args : Array[String]) -> Command {
   }
   match filtered_args {
     [agent, provider] =>
-      Command::TemporaryCommand(agent~, provider~, api_format~)
+      Command::TemporaryCommand(
+        agent=Some(agent),
+        provider=Some(provider),
+        api_format~,
+      )
+    [agent] =>
+      Command::TemporaryCommand(agent=Some(agent), provider=None, api_format~)
+    [] => Command::TemporaryCommand(agent=None, provider=None, api_format~)
     _ =>
       Command::ErrorParameter(
-        "Error: 'command' requires <agent> <provider> and optional --api-format <openai|anthropic>",
+        "Error: 'command' requires [agent] [provider] and optional --api-format <openai|anthropic>",
       )
   }
 }
@@ -313,15 +323,31 @@ fn parse_temporary_exec(args : Array[String]) -> Command {
   match filtered_args {
     [agent, provider] =>
       Command::TemporaryExec(
-        agent~,
-        provider~,
+        agent=Some(agent),
+        provider=Some(provider),
+        api_format~,
+        command~,
+        print_command~,
+      )
+    [agent] =>
+      Command::TemporaryExec(
+        agent=Some(agent),
+        provider=None,
+        api_format~,
+        command~,
+        print_command~,
+      )
+    [] =>
+      Command::TemporaryExec(
+        agent=None,
+        provider=None,
         api_format~,
         command~,
         print_command~,
       )
     _ =>
       Command::ErrorParameter(
-        "Error: 'exec' requires <agent> <provider> and optional --api-format <openai|anthropic> or --print-command before '--'",
+        "Error: 'exec' requires [agent] [provider] and optional --api-format <openai|anthropic> or --print-command before '--'",
       )
   }
 }

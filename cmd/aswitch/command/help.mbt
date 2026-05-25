@@ -10,17 +10,25 @@ pub fn print_help() -> Int {
   println("  providers                   List all configured providers")
   println("  agents                      List all supported agents")
   println(
-    "  set <agent name> <provider_name>                  Set to a different provider",
+    "  set <agent> [provider] [api_format]               Set to a different provider",
   )
   println(
-    "  command <agent> <provider> [--api-format <fmt>]   Print a temporary shell command",
-  )
-  println("                              Supported for env-based agents only")
-  println(
-    "  run <agent> <provider> [--api-format <fmt>] [--print-command] [-- <command...>]",
+    "                                                      (provider from state if omitted)",
   )
   println(
-    "                              Run a command with a temporary provider override",
+    "  command [agent] [provider] [--api-format <fmt>]   Print a temporary shell command",
+  )
+  println(
+    "                                                      (args from state if omitted)",
+  )
+  println(
+    "  run [agent] [provider] [--api-format <fmt>] [--print-command] [-- <command...>]",
+  )
+  println(
+    "                                                      Run with temporary provider override",
+  )
+  println(
+    "                                                      (args from state if omitted)",
   )
   println(
     "  add                         Add or update a provider (interactive)",

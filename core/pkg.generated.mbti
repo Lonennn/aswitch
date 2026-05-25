@@ -11,13 +11,21 @@ import {
 // Values
 pub const CONFIG_FILE_NAME : String = "aswitch.json"
 
+pub const STATE_FILE_NAME : String = "state.json"
+
 pub fn get_config_path() -> String
 
+pub fn get_state_path() -> String
+
 pub fn load_config(validate? : Bool) -> Config raise
+
+pub fn load_usage_state() -> UsageState
 
 pub fn save_config(Config) -> Result[Unit, String]
 
 pub fn save_providers_preserving_other_fields(String, @list.List[@provider.Provider]) -> Result[Unit, String]
+
+pub fn save_usage_state(UsageState) -> Result[Unit, String]
 
 pub fn validate_config(Config) -> Result[Unit, ValidationError]
 
@@ -28,6 +36,11 @@ pub fn validation_error_message(ValidationError) -> String
 // Errors
 
 // Types and methods
+pub(all) struct AgentState {
+  provider : String
+  api_format : String?
+} derive(ToJson, @json.FromJson)
+
 pub(all) struct Config {
   mut providers : @list.List[@provider.Provider]
 } derive(Eq, ToJson, @debug.Debug, @json.FromJson)
@@ -36,6 +49,14 @@ pub fn Config::get_provider(Self, String) -> @provider.Provider?
 pub fn Config::has_provider(Self, String) -> Bool
 pub fn Config::is_empty(Self) -> Bool
 pub fn Config::new() -> Self
+
+pub(all) struct UsageState {
+  mut last_agent : String?
+  agent_states : Map[String, AgentState]
+} derive(ToJson, @json.FromJson)
+pub fn UsageState::get_agent_state(Self, String) -> AgentState?
+pub fn UsageState::new() -> Self
+pub fn UsageState::set_agent_state(Self, String, String, String?) -> Unit
 
 pub enum ValidationError {
   EmptyProviderName

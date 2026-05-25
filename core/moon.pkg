@@ -7,3 +7,7 @@ import {
   "lonen44/aswitch/core/provider",
   "lonen44/aswitch/core/util",
 }
+
+import {
+  "moonbitlang/x/sys",
+} for "wbtest"

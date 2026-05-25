@@ -11,6 +11,16 @@ const AI_SDK_OPENAI = "@ai-sdk/openai-compatible"
 const AI_SDK_ANTHROPIC = "@ai-sdk/anthropic"
 
 ///|
+pub fn OpenCode::canonical_name() -> String {
+  "OpenCode"
+}
+
+///|
+pub fn OpenCode::nicknames() -> Array[String] {
+  ["open-code", "opencode"]
+}
+
+///|
 /// Get the OpenCode configuration file path (~/.config/opencode/opencode.json)
 pub fn OpenCode::get_config_file_path() -> String {
   @path.Path::join(OpenCode::get_config_dir(), "opencode.json").to_string()
@@ -311,5 +321,10 @@ pub impl Agent for OpenCode with fn get_temporary_override(
 
 ///|
 pub impl Agent for OpenCode with fn name(_ : OpenCode) -> String {
-  "OpenCode"
+  OpenCode::canonical_name()
+}
+
+///|
+pub impl Agent for OpenCode with fn supports_render_only(_ : OpenCode) -> Bool {
+  true
 }
