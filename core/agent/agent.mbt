@@ -110,7 +110,7 @@ let agent_meta : Array[AgentMeta] = [
 fn find_agent_meta(agent_name : String) -> AgentMeta? {
   let name_lower = agent_name.to_lower()
   for meta in agent_meta {
-    if meta.canonical_name == name_lower || meta.aliases.contains(name_lower) {
+    if meta.canonical_name.to_lower() == name_lower || meta.aliases.map((name) => name.to_lower()).contains(name_lower) {
       return Some(meta)
     }
   }
