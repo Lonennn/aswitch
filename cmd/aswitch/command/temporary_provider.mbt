@@ -294,13 +294,14 @@ pub fn temporary_exec(
   let temp_override = rendered_command.temporary_override
   apply_env_vars(temp_override.env_vars)
 
-  // Launch the command by replacing the current process.
-  // On success this never returns; the TUI agent takes over the terminal.
+  // Launch the command. On Unix this replaces the current process via execvp;
+  // on Windows it spawns and waits, then exits with the child's code. In both
+  // cases success never returns to this point.
   let executable = string_to_utf8_bytes(temp_override.executable, true)
   let args = build_args(temp_override.args, command)
   let status = launch_command_ffi(executable, args)
 
-  // Only reached if the exec failed.
+  // Only reached if the launch failed.
   let error_reason = match status {
     -2 => "No such file or directory"
     -7 => "Argument list too long"
