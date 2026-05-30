@@ -15,7 +15,7 @@ options(
     },
     {
       "command": "moon run scripts/copy_moon_headers.mbtx",
-      "input": [],
+      "input": [ ],
       "output": "../../.moon-include/moonbit.h",
     },
   ],
