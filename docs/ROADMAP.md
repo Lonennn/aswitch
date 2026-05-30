@@ -38,7 +38,7 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 - Partial error handling coverage for edge cases
 - No shell completion support yet
 - No package distribution yet (Homebrew/apt/scoop)
-- API keys stored in cleartext in `aswitch.json` — no integration with secret managers or OS keychains yet
+- API keys stored in cleartext in `aswitch.json` — Phase 3 at-rest encryption will secure the canonical store; agent configs may still receive cleartext until Phase 4 environment-variable support
 
 ---
 
@@ -95,6 +95,7 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 | **✅ Shell Integration** (Zsh & PowerShell completed 2026-04-28) | We believe that shell completions and aliases will reduce command execution time by 50% because users currently type full commands. | Command completion usage | S (1-2 weeks) |
 | **Provider Presets** | We believe that built-in provider templates will reduce onboarding time from 10 minutes to 2 minutes because users currently lookup provider URLs. | Time to first switch | S (1-2 weeks) |
 | **✅ Temporary Provider Override** (Completed 2026-04-24) | We believe that non-persistent provider overrides will unlock one-off tasks, CI jobs, and per-command experimentation because `set` currently rewrites agent config files even when the user only needs a temporary switch. | % of switches done without file writes | M (2-3 weeks) |
+| **At-Rest API Key Encryption** | We believe that encrypting API keys at rest will eliminate the single largest security risk in ASwitch and increase user trust, because currently API keys are stored in plaintext where any process with user file access can read them, and users are rightly hesitant to back up or version-control their configs. Encryption protects against accidental disclosure and backup leaks; agent config files may still receive cleartext until Phase 4 environment-variable support. | Security audit pass / backup confidence | M (3-4 weeks) |
 | **Multi-Agent Sync** | We believe that syncing provider across multiple agents will save power users 5 minutes per switch because they currently manually update each agent. | Multi-agent users | M (3-4 weeks) |
 | **Import/Export** | We believe that config portability will improve team adoption because teams currently share configs manually. | Team usage metrics | S (2 weeks) |
 
@@ -102,14 +103,15 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 - [x] Zsh completions (completed 2026-04-28)
 - [x] PowerShell completions (completed 2026-04-28)
 - [ ] Bash/Fish completions
-- [ ] Built-in presets for OpenAI, Anthropic, Moonshot, DeepSeek, etc.
 - [x] Temporary provider override workflow for one command or one shell session (`command` / `exec`, completed 2026-04-24)
-- [x] Safe command display: the `command` subcommand renders the temporary shell command to stdout for inspection without execution, preventing API key exposure in shell history; `exec` (`run` alias) prefixes a leading space to avoid shell history recording
+- [ ] Safe command display: the `command` subcommand renders the temporary shell command to stdout for inspection without execution, preventing API key exposure in shell history; `exec` (`run` alias) prefixes a leading space to avoid shell history recording
 - [x] Remember last used provider: `set`, `exec` (`run`), and `command` commands recall the previously used agent and provider from `~/.aswitch/state.json` so subsequent invocations do not require these arguments (completed 2026-05-25)
 - [ ] Agent and provider name prefix matching for `set`, `exec` (`run`), and `command` commands: users can type unique prefixes instead of full names (e.g., `clau` resolves to `claude-code`, `ope` resolves to `open-code` if unambiguous; ambiguous prefixes produce an error listing candidates)
-- [ ] `sync` command to apply provider to multiple agents
-- [ ] `import`/`export` commands for configuration portability
-- [ ] Environment-specific profiles (dev/staging/prod)
+- [ ] OS-native credential store integration (macOS Keychain, Windows Credential Manager, Linux libsecret/Secret Service) to host the encryption key
+- [ ] Field-level AES-256-GCM encryption of `apiKey` values in `aswitch.json` with transparent encrypt-on-save / decrypt-on-load
+- [ ] Automatic migration: detect and encrypt existing cleartext API keys on first load without user action
+- [ ] Graceful fallback when OS keychain is unavailable (password-derived key with PBKDF2, or cleartext mode with explicit security warning)
+- [ ] Documented threat model: protects canonical config against accidental commits, backup leaks, and passive file-system access; active user-account compromise requires Phase 4 env-var support for full mitigation
 
 Detailed requirements: [temporary-provider-override.md](/Users/zego/coding/project/aswitch/docs/temporary-provider-override.md)
 
@@ -158,10 +160,8 @@ Q2 2026 (Completed - Agent Expansion):
 
 Q3 2026 (Current - Developer Experience):
 ├── Shell Completions (Zsh ✅, PowerShell ✅, Bash/Fish pending)
-├── Provider Presets
 ├── Temporary Provider Override ✅ (Completed 2026-04-24)
-├── Multi-Agent Sync
-└── Import/Export
+└── At-Rest API Key Encryption
 
 Q4 2026 (Exploration - Advanced):
 ├── Programmatic API
@@ -210,9 +210,9 @@ Q4 2026 (Exploration - Advanced):
 | Direct config writes corrupt user settings | High | Backup before write, dry-run preview, stronger integration tests |
 | MoonBit ecosystem maturity | Medium | Keep dependencies minimal |
 | Low adoption | Medium | Focus on developer experience, community engagement |
-| Security concerns (API keys stored in cleartext) | High | Document security best practices, integrate with secret managers and OS keychains |
+| Security concerns (API keys stored in cleartext) | High | Phase 3 at-rest encryption with OS keychain-backed keys; Phase 4 env-var injection to avoid writing cleartext to agent configs |
 
 ---
 
-*Last updated: 2026-05-20*
-*Roadmap version: 2.3*
+*Last updated: 2026-05-31*
+*Roadmap version: 2.4*
