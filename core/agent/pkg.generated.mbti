@@ -13,6 +13,8 @@ pub fn create(String) -> &Agent?
 
 pub fn get_agent_config_path(String) -> String?
 
+pub fn get_canonical_name(String) -> String?
+
 pub fn is_agent_installed(String) -> Bool
 
 pub fn prepare_temporary_override(TemporaryOverride) -> Unit raise
@@ -34,7 +36,9 @@ pub(all) enum ApiFormat {
 
 pub struct ClaudeCode {
 }
+pub fn ClaudeCode::canonical_name() -> String
 pub fn ClaudeCode::get_config_file_path() -> String
+pub fn ClaudeCode::nicknames() -> Array[String]
 pub impl Agent for ClaudeCode
 
 pub struct EnvVar {
@@ -44,12 +48,16 @@ pub struct EnvVar {
 
 pub struct OpenClaw {
 }
+pub fn OpenClaw::canonical_name() -> String
 pub fn OpenClaw::get_config_file_path() -> String
+pub fn OpenClaw::nicknames() -> Array[String]
 pub impl Agent for OpenClaw
 
 pub struct OpenCode {
 }
+pub fn OpenCode::canonical_name() -> String
 pub fn OpenCode::get_config_file_path() -> String
+pub fn OpenCode::nicknames() -> Array[String]
 pub impl Agent for OpenCode
 
 pub struct ProviderDiff {
@@ -74,6 +82,7 @@ pub struct TemporaryOverride {
 // Traits
 pub(open) trait Agent {
   fn name(Self) -> String
+  fn supports_render_only(Self) -> Bool
   fn apply_provider(Self, @provider.Provider, ApiFormat?) -> Unit raise
   fn get_provider_diff(Self, @provider.Provider, ApiFormat?) -> ProviderDiff raise
   fn get_temporary_override(Self, @provider.Provider, ApiFormat?) -> TemporaryOverride raise

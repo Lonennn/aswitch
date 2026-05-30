@@ -26,7 +26,9 @@ Use `aswitch agents` to print the current supported list.
 aswitch init
 aswitch providers
 aswitch agents
-aswitch set <agent> <provider> [openai|anthropic] [--dry-run|-n]
+aswitch set <agent> [provider] [openai|anthropic] [--dry-run|-n]
+aswitch run [agent] [provider] [--api-format openai|anthropic] [--print-command] [-- <args...>]
+aswitch command [agent] [provider] [--api-format openai|anthropic]
 aswitch add
 aswitch add <name> <api_key> <base_url> <model>
 aswitch add --name <name> --api-key <key> --model <model> \
@@ -47,6 +49,30 @@ aswitch set claude-code anthropic
 aswitch set open-code openai openai --dry-run
 aswitch remove openai
 ```
+
+### Usage State Memory
+
+`aswitch` remembers the last used agent and provider in `~/.aswitch/state.json`.
+After the first explicit invocation, subsequent commands can omit arguments:
+
+```bash
+# First: explicit set
+aswitch set claude-code anthropic
+
+# Later: omit provider (uses last provider for claude-code)
+aswitch set claude-code
+
+# Run with explicit args
+aswitch run claude-code anthropic -- claude
+
+# Later: omit both (uses last agent and its last provider)
+aswitch run -- claude
+```
+
+The `run` command is the fastest way to start an agent with a temporary
+provider override without modifying any config files. The `command`
+subcommand prints the shell command without executing it, useful for
+inspection or scripting.
 
 ## Configuration
 

@@ -11,6 +11,16 @@ const AI_API_OPENAI = "openai-completions"
 const AI_API_ANTHROPIC = "anthropic-messages"
 
 ///|
+pub fn OpenClaw::canonical_name() -> String {
+  "OpenClaw"
+}
+
+///|
+pub fn OpenClaw::nicknames() -> Array[String] {
+  ["open-claw", "openclaw"]
+}
+
+///|
 /// Get the OpenClaw configuration file path (~/.openclaw/openclaw.json)
 pub fn OpenClaw::get_config_file_path() -> String {
   @path.Path::join(OpenClaw::get_config_dir(), "openclaw.json").to_string()
@@ -241,7 +251,7 @@ fn OpenClaw::apply_provider_to_json(
 }
 
 ///|
-pub impl Agent for OpenClaw with apply_provider(_self, provider, api_format) -> Unit raise Error {
+pub impl Agent for OpenClaw with fn apply_provider(_self, provider, api_format) -> Unit raise Error {
   let config_path = OpenClaw::get_config_file_path()
   let dir_path = OpenClaw::get_config_dir()
 
@@ -285,7 +295,11 @@ fn OpenClaw::get_provider_diff(
 }
 
 ///|
-pub impl Agent for OpenClaw with get_provider_diff(self, provider, api_format) -> ProviderDiff raise Error {
+pub impl Agent for OpenClaw with fn get_provider_diff(
+  self,
+  provider,
+  api_format,
+) -> ProviderDiff raise Error {
   OpenClaw::get_provider_diff(self, provider, api_format)
 }
 
@@ -312,7 +326,7 @@ fn OpenClaw::get_temporary_override(
 }
 
 ///|
-pub impl Agent for OpenClaw with get_temporary_override(
+pub impl Agent for OpenClaw with fn get_temporary_override(
   self,
   provider,
   api_format,
@@ -321,6 +335,11 @@ pub impl Agent for OpenClaw with get_temporary_override(
 }
 
 ///|
-pub impl Agent for OpenClaw with name(_ : OpenClaw) -> String {
-  "OpenClaw"
+pub impl Agent for OpenClaw with fn name(_ : OpenClaw) -> String {
+  OpenClaw::canonical_name()
+}
+
+///|
+pub impl Agent for OpenClaw with fn supports_render_only(_ : OpenClaw) -> Bool {
+  false
 }

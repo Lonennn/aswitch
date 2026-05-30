@@ -1,6 +1,6 @@
 ///|
 test "supported_agents returns canonical agent names" {
-  assert_true(supported_agents() == ["claude-code", "open-code", "openclaw"])
+  assert_true(supported_agents() == ["Claude Code", "OpenCode", "OpenClaw"])
 }
 
 ///|

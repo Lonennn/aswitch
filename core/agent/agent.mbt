@@ -34,10 +34,11 @@ pub struct TemporaryOverride {
 
 ///|
 pub(open) trait Agent {
-  name(Self) -> String
-  apply_provider(Self, @provider.Provider, ApiFormat?) -> Unit raise Error
-  get_provider_diff(Self, @provider.Provider, ApiFormat?) -> ProviderDiff raise Error
-  get_temporary_override(Self, @provider.Provider, ApiFormat?) -> TemporaryOverride raise Error
+  fn name(Self) -> String
+  fn supports_render_only(Self) -> Bool
+  fn apply_provider(Self, @provider.Provider, ApiFormat?) -> Unit raise Error
+  fn get_provider_diff(Self, @provider.Provider, ApiFormat?) -> ProviderDiff raise Error
+  fn get_temporary_override(Self, @provider.Provider, ApiFormat?) -> TemporaryOverride raise Error
 }
 
 ///|
@@ -85,20 +86,20 @@ priv struct AgentMeta {
 /// Single source of truth for all supported agents
 let agent_meta : Array[AgentMeta] = [
   AgentMeta::{
-    canonical_name: "claude-code",
-    aliases: ["claude", "claudecode"],
+    canonical_name: ClaudeCode::canonical_name(),
+    aliases: ClaudeCode::nicknames(),
     get_config_path: () => ClaudeCode::get_config_file_path(),
     create_instance: () => ClaudeCode::{  },
   },
   AgentMeta::{
-    canonical_name: "open-code",
-    aliases: ["opencode"],
+    canonical_name: OpenCode::canonical_name(),
+    aliases: OpenCode::nicknames(),
     get_config_path: () => OpenCode::get_config_file_path(),
     create_instance: () => OpenCode::{  },
   },
   AgentMeta::{
-    canonical_name: "openclaw",
-    aliases: ["open-claw"],
+    canonical_name: OpenClaw::canonical_name(),
+    aliases: OpenClaw::nicknames(),
     get_config_path: () => OpenClaw::get_config_file_path(),
     create_instance: () => OpenClaw::{  },
   },
@@ -109,7 +110,7 @@ let agent_meta : Array[AgentMeta] = [
 fn find_agent_meta(agent_name : String) -> AgentMeta? {
   let name_lower = agent_name.to_lower()
   for meta in agent_meta {
-    if meta.canonical_name == name_lower || meta.aliases.contains(name_lower) {
+    if meta.canonical_name.to_lower() == name_lower || meta.aliases.map((name) => name.to_lower()).contains(name_lower) {
       return Some(meta)
     }
   }
@@ -120,6 +121,14 @@ fn find_agent_meta(agent_name : String) -> AgentMeta? {
 pub fn create(agent_name : String) -> &Agent? {
   match find_agent_meta(agent_name) {
     Some(meta) => Some((meta.create_instance)())
+    None => None
+  }
+}
+
+///|
+pub fn get_canonical_name(agent_name : String) -> String? {
+  match find_agent_meta(agent_name) {
+    Some(meta) => Some(meta.canonical_name)
     None => None
   }
 }
@@ -159,7 +168,7 @@ pub suberror ProviderLackUrlError {
 }
 
 ///|
-impl Show for ProviderLackUrlError with output(self, logger) -> Unit {
+impl Show for ProviderLackUrlError with fn output(self, logger) -> Unit {
   match self {
     ProviderLackUrlError(msg) =>
       logger.write_string("ProviderLackUrlError: \{msg}")
@@ -222,26 +231,12 @@ pub fn render_posix_shell_command(
 }
 
 ///|
-fn ensure_dir(path : String) -> Unit raise Error {
-  if path == "." || path == "" || @fs.path_exists(path) {
-    return ()
-  }
-  let dir_path = @path.Path(path)
-  let parent = dir_path.dirname().to_string()
-  if parent != path {
-    ensure_dir(parent)
-  }
-  let result = try? @fs.create_dir(path)
-  guard result is Ok(_) else { raise result.unwrap_err() }
-}
-
-///|
 pub fn prepare_temporary_override(
   temporary_override : TemporaryOverride,
 ) -> Unit raise Error {
   for temp_file in temporary_override.temp_files {
     let parent_dir = @path.Path(temp_file.path).dirname().to_string()
-    ensure_dir(parent_dir)
+    @util.create_dirs(parent_dir)
     let write_result = try? @fs.write_string_to_file(
       temp_file.path,
       temp_file.content,

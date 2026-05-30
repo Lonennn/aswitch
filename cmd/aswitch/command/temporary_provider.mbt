@@ -47,11 +47,6 @@ fn resolve_temporary_selection(
 }
 
 ///|
-fn command_supports_render_only(agent : &@agent.Agent) -> Bool {
-  agent.name() != "OpenClaw"
-}
-
-///|
 fn render_temporary_command(
   agent_name : String,
   provider_name : String,
@@ -99,15 +94,45 @@ fn prepare_temporary_override(
 
 ///|
 pub fn temporary_command(
-  agent_name : String,
-  provider_name : String,
+  agent_name : String?,
+  provider_name : String?,
   api_format : @agent.ApiFormat?,
 ) -> Int {
-  let selection_result = resolve_temporary_selection(agent_name, provider_name)
+  let state = @core.load_usage_state()
+
+  let resolved_agent_name = resolve_agent_from_state(agent_name, state)
+  guard resolved_agent_name is Ok(agent) else {
+    return resolved_agent_name.unwrap_err()
+  }
+
+  let (resolved_provider_name, resolved_api_format) = match provider_name {
+    Some(name) =>
+      // Provider explicitly given: only use explicitly provided api_format.
+      (name, api_format)
+    None =>
+      match state.get_agent_state(agent) {
+        Some(agent_state) =>
+          (
+            agent_state.provider,
+            resolve_api_format_from_state(agent, api_format, state),
+          )
+        None => {
+          println("Error: No previous provider found for agent '\{agent}'")
+          println(
+            "Usage: aswitch command [agent] [provider] [--api-format <fmt>]",
+          )
+          return EXIT_CODE_CONFIG_ERROR
+        }
+      }
+  }
+
+  let selection_result = resolve_temporary_selection(
+    agent, resolved_provider_name,
+  )
   guard selection_result is Ok(selection) else {
     return selection_result.unwrap_err()
   }
-  if !command_supports_render_only(selection.agent) {
+  if !selection.agent.supports_render_only() {
     println(
       "Error: 'command' does not support agent '\{selection.agent.name()}'; use 'exec' instead",
     )
@@ -115,12 +140,29 @@ pub fn temporary_command(
   }
 
   let command_result = render_temporary_command(
-    agent_name, provider_name, api_format,
+    agent, resolved_provider_name, resolved_api_format,
   )
   guard command_result is Ok(rendered_command) else {
     return command_result.unwrap_err()
   }
   println(rendered_command.command)
+
+  // Save state on success (consistent with temporary_exec)
+  let api_format_str = match resolved_api_format {
+    Some(@agent.OpenAI) => Some("openai")
+    Some(@agent.Anthropic) => Some("anthropic")
+    None => None
+  }
+  state.set_agent_state(
+    selection.agent.name(),
+    selection.provider.name,
+    api_format_str,
+  )
+  let save_result = @core.save_usage_state(state)
+  if save_result is Err(err) {
+    println("Warning: Failed to save usage state: \{err}")
+  }
+
   EXIT_CODE_SUCCESS
 }
 
@@ -171,21 +213,49 @@ fn build_args(
 
 ///|
 pub fn temporary_exec(
-  agent_name : String,
-  provider_name : String,
+  agent_name : String?,
+  provider_name : String?,
   api_format : @agent.ApiFormat?,
   command : Array[String],
   print_command : Bool,
 ) -> Int {
-  let selection_result = resolve_temporary_selection(agent_name, provider_name)
+  let state = @core.load_usage_state()
+
+  let resolved_agent_name = resolve_agent_from_state(agent_name, state)
+  guard resolved_agent_name is Ok(agent) else {
+    return resolved_agent_name.unwrap_err()
+  }
+
+  let (resolved_provider_name, resolved_api_format) = match provider_name {
+    Some(name) =>
+      // Provider explicitly given: only use explicitly provided api_format.
+      (name, api_format)
+    None =>
+      match state.get_agent_state(agent) {
+        Some(agent_state) =>
+          (
+            agent_state.provider,
+            resolve_api_format_from_state(agent, api_format, state),
+          )
+        None => {
+          println("Error: No previous provider found for agent '\{agent}'")
+          println("Usage: aswitch run [agent] [provider] [-- <command...>]")
+          return EXIT_CODE_CONFIG_ERROR
+        }
+      }
+  }
+
+  let selection_result = resolve_temporary_selection(
+    agent, resolved_provider_name,
+  )
   guard selection_result is Ok(selection) else {
     return selection_result.unwrap_err()
   }
 
   let command_result = render_temporary_command(
-    agent_name,
-    provider_name,
-    api_format,
+    agent,
+    resolved_provider_name,
+    resolved_api_format,
     extra_args=command,
   )
   guard command_result is Ok(rendered_command) else {
@@ -200,6 +270,22 @@ pub fn temporary_exec(
 
   if print_command {
     println(rendered_command.command)
+  }
+
+  // Save state on success BEFORE exec (exec replaces process and never returns)
+  let api_format_str = match resolved_api_format {
+    Some(@agent.OpenAI) => Some("openai")
+    Some(@agent.Anthropic) => Some("anthropic")
+    None => None
+  }
+  state.set_agent_state(
+    selection.agent.name(),
+    selection.provider.name,
+    api_format_str,
+  )
+  let save_result = @core.save_usage_state(state)
+  if save_result is Err(err) {
+    println("Warning: Failed to save usage state: \{err}")
   }
 
   // execvp does not accept a custom environment — it inherits the current
@@ -226,4 +312,30 @@ pub fn temporary_exec(
   }
   println("Error: '\{temp_override.executable}' - \{error_reason}")
   EXIT_CODE_CONFIG_ERROR
+}
+
+///|
+fn resolve_agent_from_state(
+  agent_name : String?,
+  state : @core.UsageState,
+) -> Result[String, Int] {
+  match agent_name {
+    Some(name) =>
+      match @agent.create(name) {
+        Some(agent) => Ok(agent.name())
+        None => {
+          println("Error: Unknown agent '\{name}'")
+          Err(EXIT_CODE_UNKNOWN_AGENT)
+        }
+      }
+    None =>
+      match state.last_agent {
+        Some(last) => Ok(last)
+        None => {
+          println("Error: No previous agent found. Please specify an agent.")
+          println("Usage: aswitch run [agent] [provider] [-- <command...>]")
+          Err(EXIT_CODE_CONFIG_ERROR)
+        }
+      }
+  }
 }

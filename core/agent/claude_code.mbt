@@ -5,6 +5,16 @@
 pub struct ClaudeCode {}
 
 ///|
+pub fn ClaudeCode::canonical_name() -> String {
+  "Claude Code"
+}
+
+///|
+pub fn ClaudeCode::nicknames() -> Array[String] {
+  ["claude", "claude-code", "claudecode", "cc"]
+}
+
+///|
 /// Get the Claude Code configuration file path (~/.claude/settings.json)
 pub fn ClaudeCode::get_config_file_path() -> String {
   @path.Path::join(ClaudeCode::get_config_dir(), "settings.json").to_string()
@@ -94,7 +104,7 @@ fn ClaudeCode::apply_provider_to_json(
 }
 
 ///|
-pub impl Agent for ClaudeCode with apply_provider(_, provider, _) -> Unit raise Error {
+pub impl Agent for ClaudeCode with fn apply_provider(_, provider, _) -> Unit raise Error {
   let config_path = ClaudeCode::get_config_file_path()
   let dir_path = ClaudeCode::get_config_dir()
 
@@ -137,7 +147,11 @@ fn ClaudeCode::get_provider_diff(
 }
 
 ///|
-pub impl Agent for ClaudeCode with get_provider_diff(self, provider, api_format) -> ProviderDiff raise Error {
+pub impl Agent for ClaudeCode with fn get_provider_diff(
+  self,
+  provider,
+  api_format,
+) -> ProviderDiff raise Error {
   ClaudeCode::get_provider_diff(self, provider, api_format)
 }
 
@@ -199,7 +213,7 @@ fn ClaudeCode::get_temporary_override(
 }
 
 ///|
-pub impl Agent for ClaudeCode with get_temporary_override(
+pub impl Agent for ClaudeCode with fn get_temporary_override(
   self,
   provider,
   api_format,
@@ -208,6 +222,11 @@ pub impl Agent for ClaudeCode with get_temporary_override(
 }
 
 ///|
-pub impl Agent for ClaudeCode with name(_ : ClaudeCode) -> String {
-  "Claude Code"
+pub impl Agent for ClaudeCode with fn name(_ : ClaudeCode) -> String {
+  ClaudeCode::canonical_name()
+}
+
+///|
+pub impl Agent for ClaudeCode with fn supports_render_only(_ : ClaudeCode) -> Bool {
+  true
 }
