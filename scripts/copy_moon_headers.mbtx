@@ -1,0 +1,45 @@
+import {
+  "moonbitlang/x/fs",
+  "moonbitlang/x/sys"
+}
+
+fn get_home_dir() -> String raise Failure {
+  match @sys.get_env_var("HOME") {
+    Some(h) => h
+    None => match @sys.get_env_var("USERPROFILE") {
+      Some(h) => h
+      None => raise Failure::Failure("Cannot determine home directory: neither HOME nor USERPROFILE is set")
+    }
+  }
+}
+
+fn copy_headers() -> Unit raise Error {
+  let home = get_home_dir()
+  let src_dir = home + "/.moon/include"
+  let dst_dir = ".moon-include"
+
+  if !@fs.path_exists(dst_dir) {
+    @fs.create_dir(dst_dir)
+  }
+
+  let files = @fs.read_dir(src_dir)
+  for file in files {
+    let src_path = src_dir + "/" + file
+    if @fs.is_file(src_path) {
+      let content = @fs.read_file_to_bytes(src_path)
+      let dst_path = dst_dir + "/" + file
+      @fs.write_bytes_to_file(dst_path, content)
+    }
+  }
+}
+
+fn main {
+  let result = try? copy_headers()
+  match result {
+    Ok(_) => ()
+    Err(err) => {
+      println(err)
+      @sys.exit(-1)
+    }
+  }
+}
