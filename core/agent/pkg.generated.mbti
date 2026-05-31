@@ -21,6 +21,8 @@ pub fn prepare_temporary_override(TemporaryOverride) -> Unit raise
 
 pub fn render_posix_shell_command(TemporaryOverride, extra_args? : Array[String]) -> String
 
+pub fn resolve_agent_name(String) -> Result[String, String]
+
 pub fn supported_agents() -> Array[String]
 
 // Errors

@@ -13,11 +13,24 @@ pub fn set_provider(
   let config_path = @core.get_config_path()
   println("Loading configuration from: \{config_path}")
 
-  // Resolve agent name to canonical form for state lookup
-  let canonical_agent = match @agent.get_canonical_name(agent_name) {
-    Some(agent) => agent
-    None => {
-      println("Error: Unknown agent '\{agent_name}'")
+  let load_config_result = try? @core.load_config()
+  guard load_config_result is Ok(config) else {
+    println(
+      "Error: Failed to load config file, \{load_config_result.unwrap_err()}",
+    )
+    return EXIT_CODE_CONFIG_ERROR
+  }
+
+  // Resolve agent name to canonical form
+  let canonical_agent = match @agent.resolve_agent_name(agent_name) {
+    Ok(agent) => {
+      if agent.to_lower() != agent_name.to_lower() {
+        println("Resolved agent '\{agent_name}' to '\{agent}'")
+      }
+      agent
+    }
+    Err(err) => {
+      println("Error: \{err}")
       return EXIT_CODE_UNKNOWN_AGENT
     }
   }
@@ -25,11 +38,33 @@ pub fn set_provider(
   // Resolve provider and api_format from state if needed
   let state = @core.load_usage_state()
 
-  let resolved_provider_name = match provider_name {
-    Some(name) => name
+  let provider = match provider_name {
+    Some(name) =>
+      match config.resolve_provider(name) {
+        Ok(p) => {
+          if p.name.to_lower() != name.to_lower() {
+            println("Resolved provider '\{name}' to '\{p.name}'")
+          }
+          p
+        }
+        Err(err) => {
+          println("Error: \{err}")
+          return EXIT_CODE_UNKNOWN_PROVIDER
+        }
+      }
     None =>
       match state.get_agent_state(canonical_agent) {
-        Some(agent_state) => agent_state.provider
+        Some(agent_state) =>
+          match config.get_provider(agent_state.provider) {
+            Some(p) => p
+            None => {
+              println(
+                "Error: Provider '\{agent_state.provider}' from state no longer exists in config",
+              )
+              print_help() |> ignore
+              return EXIT_CODE_CONFIG_ERROR
+            }
+          }
         None => {
           println(
             "Error: No previous provider found for agent '\{canonical_agent}'",
@@ -44,14 +79,13 @@ pub fn set_provider(
     canonical_agent, api_format, state,
   )
 
-  let selection_result = resolve_temporary_selection(
-    agent_name, resolved_provider_name,
-  )
-  guard selection_result is Ok(selection) else {
-    return selection_result.unwrap_err()
+  let agent = match @agent.create(canonical_agent) {
+    Some(a) => a
+    None => {
+      println("Error: Unknown agent '\{canonical_agent}'")
+      return EXIT_CODE_UNKNOWN_AGENT
+    }
   }
-  let agent = selection.agent
-  let provider = selection.provider
 
   // Apply the provider to the agent (with optional api_format)
   if dry_run {

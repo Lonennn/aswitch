@@ -48,6 +48,41 @@ pub fn Config::get_provider(
 }
 
 ///|
+/// Resolve a provider by exact match or unique prefix match.
+/// Returns the provider, or an error if ambiguous or unknown.
+pub fn Config::resolve_provider(
+  self : Config,
+  name : String,
+) -> Result[@provider.Provider, String] {
+  // Try exact match first
+  match self.get_provider(name) {
+    Some(provider) => Ok(provider)
+    None => {
+      if name.length() < @agent.MIN_PREFIX_LENGTH {
+        return Err(
+          "Provider name too short: '\{name}' (minimum \{@agent.MIN_PREFIX_LENGTH} characters)",
+        )
+      }
+      let prefix = name.to_lower()
+      let matches : Array[@provider.Provider] = []
+      for provider in self.providers {
+        if provider.name.to_lower().has_prefix(prefix) {
+          matches.push(provider)
+        }
+      }
+      match matches {
+        [provider] => Ok(provider)
+        [] => Err("Unknown provider '\{name}'")
+        _ => {
+          let candidates = matches.map(fn(p) { "'\{p.name}'" }).join(", ")
+          Err("Ambiguous provider '\{name}': matches \{candidates}")
+        }
+      }
+    }
+  }
+}
+
+///|
 pub fn Config::deep_copy(self : Config) -> Config {
   let providers = self.providers
     .to_array()

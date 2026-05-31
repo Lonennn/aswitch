@@ -93,6 +93,29 @@ fn prepare_temporary_override(
 }
 
 ///|
+fn resolve_provider_name(name : String) -> Result[String, Int] {
+  let load_config_result = try? @core.load_config()
+  guard load_config_result is Ok(config) else {
+    println(
+      "Error: Failed to load config file, \{load_config_result.unwrap_err()}",
+    )
+    return Err(EXIT_CODE_CONFIG_ERROR)
+  }
+  match config.resolve_provider(name) {
+    Ok(provider) => {
+      if provider.name.to_lower() != name.to_lower() {
+        println("Resolved provider '\{name}' to '\{provider.name}'")
+      }
+      Ok(provider.name)
+    }
+    Err(err) => {
+      println("Error: \{err}")
+      Err(EXIT_CODE_UNKNOWN_PROVIDER)
+    }
+  }
+}
+
+///|
 pub fn temporary_command(
   agent_name : String?,
   provider_name : String?,
@@ -107,8 +130,10 @@ pub fn temporary_command(
 
   let (resolved_provider_name, resolved_api_format) = match provider_name {
     Some(name) =>
-      // Provider explicitly given: only use explicitly provided api_format.
-      (name, api_format)
+      match resolve_provider_name(name) {
+        Ok(provider_name) => (provider_name, api_format)
+        Err(code) => return code
+      }
     None =>
       match state.get_agent_state(agent) {
         Some(agent_state) =>
@@ -228,8 +253,10 @@ pub fn temporary_exec(
 
   let (resolved_provider_name, resolved_api_format) = match provider_name {
     Some(name) =>
-      // Provider explicitly given: only use explicitly provided api_format.
-      (name, api_format)
+      match resolve_provider_name(name) {
+        Ok(provider_name) => (provider_name, api_format)
+        Err(code) => return code
+      }
     None =>
       match state.get_agent_state(agent) {
         Some(agent_state) =>
@@ -322,10 +349,15 @@ fn resolve_agent_from_state(
 ) -> Result[String, Int] {
   match agent_name {
     Some(name) =>
-      match @agent.create(name) {
-        Some(agent) => Ok(agent.name())
-        None => {
-          println("Error: Unknown agent '\{name}'")
+      match @agent.resolve_agent_name(name) {
+        Ok(resolved) => {
+          if resolved.to_lower() != name.to_lower() {
+            println("Resolved agent '\{name}' to '\{resolved}'")
+          }
+          Ok(resolved)
+        }
+        Err(err) => {
+          println("Error: \{err}")
           Err(EXIT_CODE_UNKNOWN_AGENT)
         }
       }

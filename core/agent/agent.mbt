@@ -42,6 +42,10 @@ pub(open) trait Agent {
 }
 
 ///|
+/// Minimum length for prefix matching
+pub const MIN_PREFIX_LENGTH : Int = 2
+
+///|
 /// Shared helper to generate provider diff for any agent type
 /// Eliminates duplicate code across agent implementations
 fn generate_provider_diff(
@@ -131,6 +135,38 @@ pub fn get_canonical_name(agent_name : String) -> String? {
   match find_agent_meta(agent_name) {
     Some(meta) => Some(meta.canonical_name)
     None => None
+  }
+}
+
+///|
+/// Resolve an agent name by exact match or unique prefix match.
+/// Returns the canonical name, or an error if ambiguous or unknown.
+pub fn resolve_agent_name(agent_name : String) -> Result[String, String] {
+  // Try exact match first (canonical name or alias)
+  match get_canonical_name(agent_name) {
+    Some(name) => Ok(name)
+    None => {
+      if agent_name.length() < MIN_PREFIX_LENGTH {
+        return Err(
+          "Agent name too short: '\{agent_name}' (minimum \{MIN_PREFIX_LENGTH} characters)",
+        )
+      }
+      let prefix = agent_name.to_lower()
+      let matches : Array[String] = []
+      for meta in agent_meta {
+        if meta.canonical_name.to_lower().has_prefix(prefix) {
+          matches.push(meta.canonical_name)
+        }
+      }
+      match matches {
+        [name] => Ok(name)
+        [] => Err("Unknown agent '\{agent_name}'")
+        _ => {
+          let candidates = matches.map(fn(n) { "'\{n}'" }).join(", ")
+          Err("Ambiguous agent '\{agent_name}': matches \{candidates}")
+        }
+      }
+    }
   }
 }
 

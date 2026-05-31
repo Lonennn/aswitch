@@ -279,3 +279,40 @@ test "is_agent_installed returns false when OpenClaw config file does not exist"
     None => @sys.unset_env_var("HOME")
   }
 }
+
+///|
+test "resolve_agent_name exact match canonical" {
+  assert_true(resolve_agent_name("Claude Code") is Ok("Claude Code"))
+  assert_true(resolve_agent_name("OpenCode") is Ok("OpenCode"))
+  assert_true(resolve_agent_name("OpenClaw") is Ok("OpenClaw"))
+}
+
+///|
+test "resolve_agent_name exact match alias" {
+  assert_true(resolve_agent_name("claude") is Ok("Claude Code"))
+  assert_true(resolve_agent_name("claude-code") is Ok("Claude Code"))
+  assert_true(resolve_agent_name("opencode") is Ok("OpenCode"))
+}
+
+///|
+test "resolve_agent_name prefix match" {
+  assert_true(resolve_agent_name("clau") is Ok("Claude Code"))
+  assert_true(resolve_agent_name("openco") is Ok("OpenCode"))
+  assert_true(resolve_agent_name("opencl") is Ok("OpenClaw"))
+}
+
+///|
+test "resolve_agent_name ambiguous prefix" {
+  assert_true(resolve_agent_name("open") is Err(_))
+}
+
+///|
+test "resolve_agent_name too short prefix" {
+  assert_true(resolve_agent_name("c") is Err(_))
+}
+
+///|
+test "resolve_agent_name unknown agent" {
+  assert_true(resolve_agent_name("unknown") is Err(_))
+  assert_true(resolve_agent_name("cursor") is Err(_))
+}
