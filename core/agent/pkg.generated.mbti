@@ -7,6 +7,8 @@ import {
 }
 
 // Values
+pub const MIN_PREFIX_LENGTH : Int = 2
+
 pub fn backup_config_before_write(String) -> Unit raise
 
 pub fn create(String) -> &Agent?

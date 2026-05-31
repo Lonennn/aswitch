@@ -7,8 +7,6 @@ import {
 }
 
 // Values
-pub const MIN_PREFIX_LENGTH : Int = 2
-
 pub fn create_dirs(@path.Path) -> Unit raise @fs.IOError
 
 pub fn generate_json_diff(String, String) -> String
