@@ -38,7 +38,7 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 - Partial error handling coverage for edge cases
 - No shell completion support yet
 - No package distribution yet (Homebrew/apt/scoop)
-- API keys stored in cleartext in `aswitch.json` — Phase 3 at-rest encryption will secure the canonical store; agent configs may still receive cleartext until Phase 4 environment-variable support
+- API keys stored in cleartext in `aswitch.json` — Phase 4 at-rest encryption will secure the canonical store; agent configs may still receive cleartext until Phase 5 environment-variable support
 
 ---
 
@@ -95,23 +95,14 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 | **✅ Shell Integration** (Zsh & PowerShell completed 2026-04-28) | We believe that shell completions and aliases will reduce command execution time by 50% because users currently type full commands. | Command completion usage | S (1-2 weeks) |
 | **Provider Presets** | We believe that built-in provider templates will reduce onboarding time from 10 minutes to 2 minutes because users currently lookup provider URLs. | Time to first switch | S (1-2 weeks) |
 | **✅ Temporary Provider Override** (Completed 2026-04-24) | We believe that non-persistent provider overrides will unlock one-off tasks, CI jobs, and per-command experimentation because `set` currently rewrites agent config files even when the user only needs a temporary switch. | % of switches done without file writes | M (2-3 weeks) |
-| **At-Rest API Key Encryption** | We believe that encrypting API keys at rest will eliminate the single largest security risk in ASwitch and increase user trust, because currently API keys are stored in plaintext where any process with user file access can read them, and users are rightly hesitant to back up or version-control their configs. Encryption protects against accidental disclosure and backup leaks; agent config files may still receive cleartext until Phase 4 environment-variable support. | Security audit pass / backup confidence | M (3-4 weeks) |
-| **Multi-Agent Sync** | We believe that syncing provider across multiple agents will save power users 5 minutes per switch because they currently manually update each agent. | Multi-agent users | M (3-4 weeks) |
-| **Import/Export** | We believe that config portability will improve team adoption because teams currently share configs manually. | Team usage metrics | S (2 weeks) |
 
 **Key Deliverables:**
 - [x] Zsh completions (completed 2026-04-28)
 - [x] PowerShell completions (completed 2026-04-28)
 - [ ] Bash/Fish completions
 - [x] Temporary provider override workflow for one command or one shell session (`command` / `exec`, completed 2026-04-24)
-- [ ] Safe command display: the `command` subcommand renders the temporary shell command to stdout for inspection without execution, preventing API key exposure in shell history; `exec` (`run` alias) prefixes a leading space to avoid shell history recording
 - [x] Remember last used provider: `set`, `exec` (`run`), and `command` commands recall the previously used agent and provider from `~/.aswitch/state.json` so subsequent invocations do not require these arguments (completed 2026-05-25)
 - [x] Agent and provider name prefix matching for `set`, `exec` (`run`), and `command` commands: users can type unique prefixes instead of full names (e.g., `clau` resolves to `claude-code`, `ope` resolves to `open-code` if unambiguous; ambiguous prefixes produce an error listing candidates) (completed 2026-05-31)
-- [ ] OS-native credential store integration (macOS Keychain, Windows Credential Manager, Linux libsecret/Secret Service) to host the encryption key
-- [ ] Field-level AES-256-GCM encryption of `apiKey` values in `aswitch.json` with transparent encrypt-on-save / decrypt-on-load
-- [ ] Automatic migration: detect and encrypt existing cleartext API keys on first load without user action
-- [ ] Graceful fallback when OS keychain is unavailable (password-derived key with PBKDF2, or cleartext mode with explicit security warning)
-- [ ] Documented threat model: protects canonical config against accidental commits, backup leaks, and passive file-system access; active user-account compromise requires Phase 4 env-var support for full mitigation
 
 Detailed requirements: [temporary-provider-override.md](/Users/zego/coding/project/aswitch/docs/temporary-provider-override.md)
 
@@ -119,7 +110,31 @@ Detailed requirements: [temporary-provider-override.md](/Users/zego/coding/proje
 
 ---
 
-### Phase 4: Advanced Features (Q4 2026) - Exploration
+### Phase 4: Security & Secrets (Q4 2026)
+
+**Theme: Protect Sensitive Configuration**
+
+| Epic | Hypothesis | Success Metric | Effort |
+|------|------------|----------------|--------|
+| **At-Rest API Key Encryption** | We believe that encrypting API keys at rest will eliminate the single largest security risk in ASwitch and increase user trust, because currently API keys are stored in plaintext where any process with user file access can read them, and users are rightly hesitant to back up or version-control their configs. Encryption protects against accidental disclosure and backup leaks; agent config files may still receive cleartext until Phase 5 environment-variable support. | Security audit pass / backup confidence | M (3-4 weeks) |
+| **Secret Manager Integration** | We believe that integrating with password managers (1Password, Bitwarden) will increase enterprise adoption because security-conscious teams prefer to store secrets in dedicated vaults rather than local keychains. | Enterprise sign-ups | M (3-4 weeks) |
+| **Agent Environment Variable Mapping** | We believe that injecting provider credentials via environment variables will eliminate the need to write cleartext API keys to agent config files, closing the final gap in our security model. | % of switches done without file writes | M (3-4 weeks) |
+
+**Key Deliverables:**
+- [ ] OS-native credential store integration (macOS Keychain, Windows Credential Manager, Linux libsecret/Secret Service) to host the encryption key
+- [ ] Field-level AES-256-GCM encryption of `apiKey` values in `aswitch.json` with transparent encrypt-on-save / decrypt-on-load
+- [ ] Automatic migration: detect and encrypt existing cleartext API keys on first load without user action
+- [ ] Graceful fallback when OS keychain is unavailable (password-derived key with PBKDF2, or cleartext mode with explicit security warning)
+- [ ] Documented threat model: protects canonical config against accidental commits, backup leaks, and passive file-system access; active user-account compromise requires Phase 5 env-var support for full mitigation
+- [ ] Integration with secret managers (1Password, Bitwarden)
+- [ ] Agent-specific environment variable mapping
+- [ ] Safe command display: the `command` subcommand renders the temporary shell command to stdout for inspection without execution, preventing API key exposure in shell history; `exec` (`run` alias) prefixes a leading space to avoid shell history recording
+
+**Dependencies:** Phase 3 (mature UX)
+
+---
+
+### Phase 5: Advanced Features (Q1 2027) - Exploration
 
 **Theme: Enterprise & Power Users**
 
@@ -135,12 +150,10 @@ Detailed requirements: [temporary-provider-override.md](/Users/zego/coding/proje
 - [ ] Configuration versioning with rollback
 - [ ] Team workspace support
 - [ ] Audit logging for provider switches
-- [ ] Integration with secret managers (1Password, Bitwarden)
 - [ ] Generic agent configuration template system
-- [ ] Agent-specific environment variable mapping
 - [ ] Plugin sandboxing and distribution mechanism
 
-**Dependencies:** Phase 3 (mature product)
+**Dependencies:** Phase 4 (security fundamentals)
 
 ---
 
@@ -160,14 +173,18 @@ Q2 2026 (Completed - Agent Expansion):
 
 Q3 2026 (Current - Developer Experience):
 ├── Shell Completions (Zsh ✅, PowerShell ✅, Bash/Fish pending)
-├── Temporary Provider Override ✅ (Completed 2026-04-24)
-└── At-Rest API Key Encryption
+├── Provider Presets
+└── Temporary Provider Override ✅ (Completed 2026-04-24)
 
-Q4 2026 (Exploration - Advanced):
+Q4 2026 (Security & Secrets):
+├── At-Rest API Key Encryption
+├── Secret Manager Integration
+└── Agent Environment Variable Mapping
+
+Q1 2027 (Exploration - Advanced):
 ├── Programmatic API
 ├── Configuration Versioning
 ├── Team Workspaces
-├── Secret Manager Integration
 └── Generic Agent Plugin Framework
 ```
 
@@ -210,9 +227,9 @@ Q4 2026 (Exploration - Advanced):
 | Direct config writes corrupt user settings | High | Backup before write, dry-run preview, stronger integration tests |
 | MoonBit ecosystem maturity | Medium | Keep dependencies minimal |
 | Low adoption | Medium | Focus on developer experience, community engagement |
-| Security concerns (API keys stored in cleartext) | High | Phase 3 at-rest encryption with OS keychain-backed keys; Phase 4 env-var injection to avoid writing cleartext to agent configs |
+| Security concerns (API keys stored in cleartext) | High | Phase 4 at-rest encryption with OS keychain-backed keys; Phase 5 env-var injection to avoid writing cleartext to agent configs |
 
 ---
 
 *Last updated: 2026-05-31*
-*Roadmap version: 2.4*
+*Roadmap version: 2.5*
