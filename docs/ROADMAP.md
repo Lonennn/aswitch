@@ -106,7 +106,7 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 - [x] Temporary provider override workflow for one command or one shell session (`command` / `exec`, completed 2026-04-24)
 - [ ] Safe command display: the `command` subcommand renders the temporary shell command to stdout for inspection without execution, preventing API key exposure in shell history; `exec` (`run` alias) prefixes a leading space to avoid shell history recording
 - [x] Remember last used provider: `set`, `exec` (`run`), and `command` commands recall the previously used agent and provider from `~/.aswitch/state.json` so subsequent invocations do not require these arguments (completed 2026-05-25)
-- [ ] Agent and provider name prefix matching for `set`, `exec` (`run`), and `command` commands: users can type unique prefixes instead of full names (e.g., `clau` resolves to `claude-code`, `ope` resolves to `open-code` if unambiguous; ambiguous prefixes produce an error listing candidates)
+- [x] Agent and provider name prefix matching for `set`, `exec` (`run`), and `command` commands: users can type unique prefixes instead of full names (e.g., `clau` resolves to `claude-code`, `ope` resolves to `open-code` if unambiguous; ambiguous prefixes produce an error listing candidates) (completed 2026-05-31)
 - [ ] OS-native credential store integration (macOS Keychain, Windows Credential Manager, Linux libsecret/Secret Service) to host the encryption key
 - [ ] Field-level AES-256-GCM encryption of `apiKey` values in `aswitch.json` with transparent encrypt-on-save / decrypt-on-load
 - [ ] Automatic migration: detect and encrypt existing cleartext API keys on first load without user action
