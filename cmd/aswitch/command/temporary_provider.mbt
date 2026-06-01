@@ -116,7 +116,10 @@ fn resolve_provider_name(name : String) -> Result[String, Int] {
 }
 
 ///|
-pub fn temporary_command(
+/// This function is async because it may invoke a pager subprocess
+/// (@terminal.display_with_pager) to prevent secrets from leaking into
+/// terminal scrollback.
+pub async fn temporary_command(
   agent_name : String?,
   provider_name : String?,
   api_format : @agent.ApiFormat?,
@@ -170,7 +173,7 @@ pub fn temporary_command(
   guard command_result is Ok(rendered_command) else {
     return command_result.unwrap_err()
   }
-  println(rendered_command.command)
+  @terminal.display_with_pager(rendered_command.command)
 
   // Save state on success (consistent with temporary_exec)
   let api_format_str = match resolved_api_format {
@@ -237,7 +240,10 @@ fn build_args(
 }
 
 ///|
-pub fn temporary_exec(
+/// This function is async because it may invoke a pager subprocess
+/// (@terminal.display_with_pager) when --print-command is used, to prevent
+/// secrets from leaking into terminal scrollback.
+pub async fn temporary_exec(
   agent_name : String?,
   provider_name : String?,
   api_format : @agent.ApiFormat?,
@@ -296,7 +302,7 @@ pub fn temporary_exec(
   guard prepare_result is Ok(_) else { return prepare_result.unwrap_err() }
 
   if print_command {
-    println(rendered_command.command)
+    @terminal.display_with_pager(rendered_command.command)
   }
 
   // Save state on success BEFORE exec (exec replaces process and never returns)

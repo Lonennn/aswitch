@@ -15,6 +15,8 @@ pub fn get_aswitch_home() -> String
 
 pub fn get_user_home() -> String
 
+pub fn is_blank(String) -> Bool
+
 // Errors
 
 // Types and methods

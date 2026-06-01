@@ -490,25 +490,36 @@ async test "render_temporary_command renders opencode override with config conte
 }
 
 ///|
-test "temporary_command rejects openclaw render-only workflow" {
-  command_with_temp_aswitch_home("_aswitch_test_temp_command_openclaw", fn() raise {
-    write_test_config([
-      @provider.Provider::{
-        name: "seed",
-        api_key: "sk-openclaw",
-        openai_base_url: Some("https://seed.example.com/openai"),
-        anthropic_base_url: None,
-        models: [@provider.Model::new(name="seed-model")],
-      },
-    ])
+async test "temporary_command rejects openclaw render-only workflow" {
+  let temp_dir = "_aswitch_test_temp_command_openclaw"
+  cleanup_command_temp_dir(temp_dir)
+  try! @fs.create_dir(temp_dir)
+  let original_home = @sys.get_env_var("ASWITCH_HOME")
+  @sys.set_env_var("ASWITCH_HOME", temp_dir)
+  defer {
+    cleanup_command_temp_dir(temp_dir)
+    match original_home {
+      Some(home) => @sys.set_env_var("ASWITCH_HOME", home)
+      None => @sys.unset_env_var("ASWITCH_HOME")
+    }
+  }
 
-    let status = temporary_command(
-      Some("openclaw"),
-      Some("seed"),
-      Some(@agent.OpenAI),
-    )
-    assert_true(status == EXIT_CODE_CONFIG_ERROR)
-  })
+  write_test_config([
+    @provider.Provider::{
+      name: "seed",
+      api_key: "sk-openclaw",
+      openai_base_url: Some("https://seed.example.com/openai"),
+      anthropic_base_url: None,
+      models: [@provider.Model::new(name="seed-model")],
+    },
+  ])
+
+  let status = temporary_command(
+    Some("openclaw"),
+    Some("seed"),
+    Some(@agent.OpenAI),
+  )
+  assert_true(status == EXIT_CODE_CONFIG_ERROR)
 }
 
 ///|

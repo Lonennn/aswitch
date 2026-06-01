@@ -1,0 +1,16 @@
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/process",
+  "moonbitlang/async/stdio",
+  "lonen44/aswitch/core/util",
+  "moonbitlang/core/argparse",
+  "moonbitlang/x/sys",
+}
+
+options(
+  "native-stub": [ "tty.c" ],
+  targets: {
+    "pager.mbt": [ "native", "llvm" ],
+    "pager_test.mbt": [ "native", "llvm" ],
+  },
+)

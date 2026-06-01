@@ -1,4 +1,10 @@
 ///|
+/// Check whether a string is blank (empty or whitespace-only).
+pub fn is_blank(s : String) -> Bool {
+  s.trim().is_empty()
+}
+
+///|
 /// Generate a human-readable diff between two JSON strings
 /// Shows added/removed/changed fields with context
 pub fn generate_json_diff(original : String, updated : String) -> String {

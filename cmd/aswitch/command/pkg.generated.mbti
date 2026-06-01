@@ -25,9 +25,9 @@ pub async fn remove_provider(String) -> Int
 
 pub fn set_provider(String, String?, @agent.ApiFormat?, Bool) -> Int
 
-pub fn temporary_command(String?, String?, @agent.ApiFormat?) -> Int
+pub async fn temporary_command(String?, String?, @agent.ApiFormat?) -> Int
 
-pub fn temporary_exec(String?, String?, @agent.ApiFormat?, Array[String], Bool) -> Int
+pub async fn temporary_exec(String?, String?, @agent.ApiFormat?, Array[String], Bool) -> Int
 
 // Errors
 
