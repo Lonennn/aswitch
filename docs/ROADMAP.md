@@ -103,8 +103,6 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 - [x] Remember last used provider: `set`, `exec` (`run`), and `command` commands recall the previously used agent and provider from `~/.aswitch/state.json` so subsequent invocations do not require these arguments (completed 2026-05-25)
 - [x] Agent and provider name prefix matching for `set`, `exec` (`run`), and `command` commands: users can type unique prefixes instead of full names (e.g., `clau` resolves to `claude-code`, `ope` resolves to `open-code` if unambiguous; ambiguous prefixes produce an error listing candidates) (completed 2026-05-31)
 
-Detailed requirements: [temporary-provider-override.md](/Users/zego/coding/project/aswitch/docs/temporary-provider-override.md)
-
 **Dependencies:** Phase 2 (multiple agents)
 
 ---
@@ -127,7 +125,7 @@ Detailed requirements: [temporary-provider-override.md](/Users/zego/coding/proje
 - [ ] Documented threat model: protects canonical config against accidental commits, backup leaks, and passive file-system access; active user-account compromise requires Phase 5 env-var support for full mitigation
 - [ ] Integration with secret managers (1Password, Bitwarden)
 - [ ] Agent-specific environment variable mapping
-- [ ] Safe command display: the `command` subcommand renders the temporary shell command to stdout for inspection without execution, preventing API key exposure in shell history; `exec` (`run` alias) prefixes a leading space to avoid shell history recording
+- [x] Safe command display via pager: `command` and `exec --print-command` render the temporary shell command through a pager subprocess (`less` or `$PAGER`) when stdout is a TTY, preventing API keys from leaking into terminal scrollback history. Falls back to direct stdout with a warning when piped or redirected, or when no pager is available (completed 2026-05-31)
 
 **Dependencies:** Phase 3 (mature UX)
 
