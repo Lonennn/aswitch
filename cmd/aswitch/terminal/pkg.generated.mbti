@@ -2,6 +2,8 @@
 package "lonen44/aswitch/cmd/aswitch/terminal"
 
 // Values
+pub async fn display_in_temporary_terminal_buffer(String) -> Unit
+
 pub async fn display_with_pager(String) -> Unit
 
 pub fn is_stdout_tty() -> Bool

@@ -1,4 +1,12 @@
 ///|
+#cfg(platform="windows")
+const DEFAULT_PAGER = "more.com"
+
+///|
+#cfg(not(platform="windows"))
+const DEFAULT_PAGER = "less"
+
+///|
 test "resolve_pager returns PAGER env var when set" {
   let original = @sys.get_env_var("PAGER")
   @sys.set_env_var("PAGER", "custom-pager")
@@ -11,14 +19,32 @@ test "resolve_pager returns PAGER env var when set" {
 }
 
 ///|
-test "resolve_pager returns less when PAGER is unset" {
+test "resolve_pager returns platform default when PAGER is unset" {
   let original = @sys.get_env_var("PAGER")
   @sys.unset_env_var("PAGER")
   let result = resolve_pager()
-  assert_true(result is Some("less"))
+  assert_true(result == Some(DEFAULT_PAGER))
   match original {
     Some(v) => @sys.set_env_var("PAGER", v)
     None => @sys.unset_env_var("PAGER")
+  }
+}
+
+///|
+test "resolve_pager ignores WT_SESSION when PAGER is unset" {
+  let original_pager = @sys.get_env_var("PAGER")
+  let original_wt_session = @sys.get_env_var("WT_SESSION")
+  @sys.unset_env_var("PAGER")
+  @sys.set_env_var("WT_SESSION", "1")
+  let result = resolve_pager()
+  assert_true(result == Some(DEFAULT_PAGER))
+  match original_pager {
+    Some(v) => @sys.set_env_var("PAGER", v)
+    None => @sys.unset_env_var("PAGER")
+  }
+  match original_wt_session {
+    Some(v) => @sys.set_env_var("WT_SESSION", v)
+    None => @sys.unset_env_var("WT_SESSION")
   }
 }
 

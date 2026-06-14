@@ -125,7 +125,7 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 - [ ] Documented threat model: protects canonical config against accidental commits, backup leaks, and passive file-system access; active user-account compromise requires Phase 5 env-var support for full mitigation
 - [ ] Integration with secret managers (1Password, Bitwarden)
 - [ ] Agent-specific environment variable mapping
-- [x] Safe command display via pager: `command` and `exec --print-command` render the temporary shell command through a pager subprocess (`less` or `$PAGER`) when stdout is a TTY, preventing API keys from leaking into terminal scrollback history. Falls back to direct stdout with a warning when piped or redirected, or when no pager is available (completed 2026-05-31)
+- [x] Safe command display via temporary terminal buffer: `command` and `exec --print-command` render the temporary shell command in an ephemeral terminal view when stdout is a TTY, preventing API keys from leaking into terminal scrollback history. On POSIX systems this routes through a pager subprocess (`$PAGER` or a platform-appropriate default such as `less`); on Windows it uses the Windows Terminal alternate screen buffer when available. Falls back to direct stdout with a warning when piped or redirected, or when the temporary buffer backend is unavailable (completed 2026-06-14)
 
 **Dependencies:** Phase 3 (mature UX)
 
@@ -228,5 +228,5 @@ Q1 2027 (Exploration - Advanced):
 
 ---
 
-*Last updated: 2026-05-31*
-*Roadmap version: 2.5*
+*Last updated: 2026-06-14*
+*Roadmap version: 2.6*

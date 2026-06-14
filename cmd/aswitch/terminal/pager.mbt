@@ -8,8 +8,20 @@ pub fn is_stdout_tty() -> Bool {
 }
 
 ///|
+#cfg(platform="windows")
+fn get_default_pager() -> String {
+  "more.com"
+}
+
+///|
+#cfg(not(platform="windows"))
+fn get_default_pager() -> String {
+  "less"
+}
+
+///|
 /// Resolve the pager command to use.
-/// Priority: $PAGER environment variable → "less" → None
+/// Priority: $PAGER environment variable → platform default pager → None
 pub fn resolve_pager() -> String? {
   match @sys.get_env_var("PAGER") {
     Some(pager) =>
@@ -18,7 +30,7 @@ pub fn resolve_pager() -> String? {
       } else {
         Some(pager.trim().to_owned())
       }
-    None => Some("less")
+    None => Some(get_default_pager())
   }
 }
 
