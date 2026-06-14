@@ -1,0 +1,105 @@
+import {
+  "moonbitlang/x/fs",
+  "moonbitlang/x/sys"
+}
+
+struct Counts {
+  mut mbt_source : Int
+  mut mbt_test : Int
+  mut mbt_wbtest : Int
+  mut c : Int
+  mut h : Int
+}
+
+fn should_skip_dir(name : String) -> Bool {
+  // Skip generated or external directories so the report stays focused on repo sources.
+  name == ".git" ||
+  name == "_build" ||
+  name == ".mooncakes" ||
+  name == ".moonagent" ||
+  name == "_aswitch_test" ||
+  name == ".moon-include" ||
+  name == ".worktrees"
+}
+
+fn count_non_empty_lines(path : String) -> Int raise Error {
+  @fs
+    .read_file_to_string(path)
+    .split("\n")
+    .filter(fn(line) { !line.trim().is_empty() })
+    .collect()
+    .length()
+}
+
+fn update_counts(path : String, counts : Counts) -> Unit raise Error {
+  let lines = count_non_empty_lines(path)
+  if path.has_suffix("_wbtest.mbt") {
+    counts.mbt_wbtest = counts.mbt_wbtest + lines
+  } else if path.has_suffix("_test.mbt") {
+    counts.mbt_test = counts.mbt_test + lines
+  } else if path.has_suffix(".mbt") {
+    counts.mbt_source = counts.mbt_source + lines
+  } else if path.has_suffix(".c") {
+    counts.c = counts.c + lines
+  } else if path.has_suffix(".h") {
+    counts.h = counts.h + lines
+  }
+}
+
+fn walk_dir(path : String, counts : Counts) -> Unit raise Error {
+  let entries = @fs.read_dir(path)
+  for entry in entries {
+    let child_path = if path == "." {
+      entry
+    } else {
+      path + "/" + entry
+    }
+    if @fs.is_dir(child_path) {
+      if !should_skip_dir(entry) {
+        walk_dir(child_path, counts)
+      }
+    } else if @fs.is_file(child_path) {
+      update_counts(child_path, counts)
+    }
+  }
+}
+
+fn print_report(counts : Counts) -> Unit {
+  let total =
+    counts.mbt_source +
+    counts.mbt_test +
+    counts.mbt_wbtest +
+    counts.c +
+    counts.h
+
+  println("Code line counts (non-empty lines)")
+  println("  .mbt source : \{counts.mbt_source}")
+  println("  .mbt test   : \{counts.mbt_test}")
+  println("  .mbt wbtest : \{counts.mbt_wbtest}")
+  println("  .c          : \{counts.c}")
+  println("  .h          : \{counts.h}")
+  println("  total       : \{total}")
+}
+
+fn count_code_lines() -> Unit raise Error {
+  let counts = {
+    mbt_source: 0,
+    mbt_test: 0,
+    mbt_wbtest: 0,
+    c: 0,
+    h: 0,
+  }
+  walk_dir(".", counts)
+  print_report(counts)
+}
+
+fn main {
+  let result = try? count_code_lines()
+  match result {
+    Ok(_) => ()
+    Err(err) => {
+      println(err)
+      @sys.exit(-1)
+    }
+  }
+}
