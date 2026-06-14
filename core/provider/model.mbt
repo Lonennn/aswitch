@@ -41,7 +41,7 @@ pub fn Model::deep_copy(self : Model) -> Model {
 }
 
 ///|
-impl FromJson for Model with from_json(json, path) {
+impl FromJson for Model with fn from_json(json, path) {
   match json {
     Json::Object(map) => {
 
