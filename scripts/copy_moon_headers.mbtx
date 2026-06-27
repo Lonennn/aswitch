@@ -34,10 +34,8 @@ fn copy_headers() -> Unit raise Error {
 }
 
 fn main {
-  let result = try? copy_headers()
-  match result {
-    Ok(_) => ()
-    Err(err) => {
+  copy_headers() catch {
+    err => {
       println(err)
       @sys.exit(-1)
     }

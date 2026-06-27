@@ -8,14 +8,16 @@ fn cleanup_temp_dir(temp_dir : String) -> Unit {
   if !@fs.path_exists(temp_dir) {
     return
   }
-  let entries_result = try? @fs.read_dir(temp_dir)
-  if entries_result is Ok(entries) {
-    for entry in entries {
-      let file_path = @path.Path(temp_dir).join(entry).to_string()
-      let _ = try? @fs.remove_file(file_path)
+  let entries = @fs.read_dir(temp_dir) catch { _ => [] }
+  for entry in entries {
+    let file_path = @path.Path(temp_dir).join(entry).to_string()
+    @fs.remove_file(file_path) catch {
+      _ => ()
     }
   }
-  let _ = try? @fs.remove_dir(temp_dir)
+  @fs.remove_dir(temp_dir) catch {
+    _ => ()
+  }
 }
 
 ///|

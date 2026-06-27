@@ -70,11 +70,8 @@ fn load_agent_settings_json(config_path : String) -> Json raise Error {
   if !@fs.path_exists(config_path) {
     return Json::object(Map([]))
   }
-  let read_result = try? @fs.read_file_to_string(config_path)
-  guard read_result is Ok(content) else { raise read_result.unwrap_err() }
-  let json_result = try? @json.parse(content)
-  guard json_result is Ok(json) else { raise json_result.unwrap_err() }
-  json
+  let content = @fs.read_file_to_string(config_path)
+  @json.parse(content)
 }
 
 ///|
@@ -274,10 +271,6 @@ pub fn prepare_temporary_override(
   for temp_file in temporary_override.temp_files {
     let parent_dir = @path.Path(temp_file.path).dirname().to_string()
     @util.create_dirs(parent_dir)
-    let write_result = try? @fs.write_string_to_file(
-      temp_file.path,
-      temp_file.content,
-    )
-    guard write_result is Ok(_) else { raise write_result.unwrap_err() }
+    @fs.write_string_to_file(temp_file.path, temp_file.content)
   }
 }

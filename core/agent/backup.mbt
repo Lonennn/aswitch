@@ -11,10 +11,8 @@ fn backup_file_path(config_path : String, index : Int) -> String {
 
 ///|
 fn copy_file(src : String, dst : String) -> Unit raise Error {
-  let read_result = try? @fs.read_file_to_bytes(src)
-  guard read_result is Ok(content) else { raise read_result.unwrap_err() }
-  let write_result = try? @fs.write_bytes_to_file(dst, content)
-  guard write_result is Ok(_) else { raise write_result.unwrap_err() }
+  let content = @fs.read_file_to_bytes(src)
+  @fs.write_bytes_to_file(dst, content)
 }
 
 ///|
@@ -30,13 +28,11 @@ fn rotate_backups(
     let current_slot = backup_file_path(config_path, index)
     if @fs.path_exists(current_slot) {
       if index == max_backups {
-        let remove_result = try? @fs.remove_file(current_slot)
-        guard remove_result is Ok(_) else { raise remove_result.unwrap_err() }
+        @fs.remove_file(current_slot)
       } else {
         let next_slot = backup_file_path(config_path, index + 1)
         copy_file(current_slot, next_slot)
-        let remove_result = try? @fs.remove_file(current_slot)
-        guard remove_result is Ok(_) else { raise remove_result.unwrap_err() }
+        @fs.remove_file(current_slot)
       }
     }
   }
@@ -58,6 +54,5 @@ fn write_config_with_backup(
   content : String,
 ) -> Unit raise Error {
   backup_config_before_write(config_path)
-  let write_result = try? @fs.write_string_to_file(config_path, content)
-  guard write_result is Ok(_) else { raise write_result.unwrap_err() }
+  @fs.write_string_to_file(config_path, content)
 }

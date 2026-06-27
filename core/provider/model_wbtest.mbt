@@ -68,56 +68,60 @@ test "FromJson for Model - null optional fields are handled correctly" {
 ///|
 test "FromJson for Model - error when name is missing" {
   let json : Json = { "context_limit": 1000 }
-  let result : Result[Model, Error] = try? @json.from_json(json)
-  match result {
-    Err(_) =>
+  try {
+    let _ : Model = @json.from_json(json)
+    fail("should have raised error for missing name")
+  } catch {
+    _ =>
       inspect(
         "missing name error raised correctly",
         content="missing name error raised correctly",
       )
-    Ok(_) => fail("should have raised error for missing name")
   }
 }
 
 ///|
 test "FromJson for Model - error when name is not a string" {
   let json : Json = { "name": 123 }
-  let result : Result[Model, Error] = try? @json.from_json(json)
-  match result {
-    Err(_) =>
+  try {
+    let _ : Model = @json.from_json(json)
+    fail("should have raised error for non-string name")
+  } catch {
+    _ =>
       inspect(
         "invalid name type error raised correctly",
         content="invalid name type error raised correctly",
       )
-    Ok(_) => fail("should have raised error for non-string name")
   }
 }
 
 ///|
 test "FromJson for Model - error when context_limit is not a number" {
   let json : Json = { "name": "test", "context_limit": "not-a-number" }
-  let result : Result[Model, Error] = try? @json.from_json(json)
-  match result {
-    Err(_) =>
+  try {
+    let _ : Model = @json.from_json(json)
+    fail("should have raised error for non-number context_limit")
+  } catch {
+    _ =>
       inspect(
         "invalid context_limit type error raised correctly",
         content="invalid context_limit type error raised correctly",
       )
-    Ok(_) => fail("should have raised error for non-number context_limit")
   }
 }
 
 ///|
 test "FromJson for Model - error when output_limit is not a number" {
   let json : Json = { "name": "test", "output_limit": ["wrong", "type"] }
-  let result : Result[Model, Error] = try? @json.from_json(json)
-  match result {
-    Err(_) =>
+  try {
+    let _ : Model = @json.from_json(json)
+    fail("should have raised error for non-number output_limit")
+  } catch {
+    _ =>
       inspect(
         "invalid output_limit type error raised correctly",
         content="invalid output_limit type error raised correctly",
       )
-    Ok(_) => fail("should have raised error for non-number output_limit")
   }
 }
 
@@ -127,13 +131,14 @@ test "FromJson for Model - error when modality is invalid" {
     "name": "test",
     "input_modality": ["text", "invalid-modality"],
   }
-  let result : Result[Model, Error] = try? @json.from_json(json)
-  match result {
-    Err(_) =>
+  try {
+    let _ : Model = @json.from_json(json)
+    fail("should have raised error for invalid modality")
+  } catch {
+    _ =>
       inspect(
         "invalid modality error raised correctly",
         content="invalid modality error raised correctly",
       )
-    Ok(_) => fail("should have raised error for invalid modality")
   }
 }

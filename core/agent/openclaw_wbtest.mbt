@@ -53,19 +53,29 @@ fn cleanup_openclaw_temp_dir(temp_dir : String) -> Unit {
   if !@fs.path_exists(temp_dir) {
     return ()
   }
-  let entries_result = try? @fs.read_dir(temp_dir)
-  guard entries_result is Ok(entries) else {
-    let _ = try? @fs.remove_dir(temp_dir)
-    return ()
+  let entries = @fs.read_dir(temp_dir) catch {
+    _ => {
+      @fs.remove_dir(temp_dir) catch {
+        _ => ()
+      }
+      return ()
+    }
   }
   for entry in entries {
     let child_path = @path.Path(temp_dir).join(entry).to_string()
-    let remove_file_result = try? @fs.remove_file(child_path)
-    if remove_file_result is Err(_) {
+    let removed = try {
+      @fs.remove_file(child_path)
+      true
+    } catch {
+      _ => false
+    }
+    if !removed {
       cleanup_openclaw_temp_dir(child_path)
     }
   }
-  let _ = try? @fs.remove_dir(temp_dir)
+  @fs.remove_dir(temp_dir) catch {
+    _ => ()
+  }
 }
 
 ///|
@@ -97,9 +107,8 @@ test "get_temporary_override preserves existing openclaw settings" {
     Some(OpenAI),
   )
   let temp_content = temporary_override.temp_files[0].content
-  let json_result = try? @json.parse(temp_content)
-  guard json_result is Ok(json) else {
-    fail("temporary override should contain valid JSON")
+  let json = @json.parse(temp_content) catch {
+    _ => fail("temporary override should contain valid JSON")
   }
   match json {
     {

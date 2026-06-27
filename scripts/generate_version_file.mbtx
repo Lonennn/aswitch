@@ -25,10 +25,8 @@ fn generate_version_file() -> Unit raise Error {
 }
 
 fn main {
-  let result = try? generate_version_file()
-  match result {
-    Ok(_) => ()
-    Err(err) => {
+  generate_version_file() catch {
+    err => {
       println(err)
       @sys.exit(-1)
     }

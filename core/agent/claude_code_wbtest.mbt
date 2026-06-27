@@ -338,11 +338,11 @@ test "apply_provider_to_json - raises error when anthropic_base_url is None" {
     models: [@provider.Model::new(name="model-1")],
   }
   let original_json = sample_settings_json()
-  let result = try? ClaudeCode::apply_provider_to_json(original_json, provider)
-  match result {
-    Err(_) =>
-      inspect("error raised as expected", content="error raised as expected")
-    Ok(_) => fail("should have raised error")
+  try {
+    ignore(ClaudeCode::apply_provider_to_json(original_json, provider))
+    fail("should have raised error")
+  } catch {
+    _ => inspect("error raised as expected", content="error raised as expected")
   }
 }
 
@@ -356,11 +356,11 @@ test "apply_provider_to_json - raises error when models is empty" {
     models: [],
   }
   let original_json = sample_settings_json()
-  let result = try? ClaudeCode::apply_provider_to_json(original_json, provider)
-  match result {
-    Err(_) =>
-      inspect("error raised as expected", content="error raised as expected")
-    Ok(_) => fail("should have raised error")
+  try {
+    ignore(ClaudeCode::apply_provider_to_json(original_json, provider))
+    fail("should have raised error")
+  } catch {
+    _ => inspect("error raised as expected", content="error raised as expected")
   }
 }
 

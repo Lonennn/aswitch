@@ -35,28 +35,24 @@ pub fn load_usage_state() -> UsageState {
   if !@fs.path_exists(path) {
     return UsageState::new()
   }
-  let read_result = try? @fs.read_file_to_string(path)
-  guard read_result is Ok(content) else {
-    println(
-      "Failed to read file '\{path}', \{read_result.unwrap_err()}, ignore the state",
-    )
-    return UsageState::new()
+  let content = @fs.read_file_to_string(path) catch {
+    err => {
+      println("Failed to read file '\{path}', \{err}, ignore the state")
+      return UsageState::new()
+    }
   }
-  let parse_result = try? @json.parse(content)
-  guard parse_result is Ok(json) else {
-    println(
-      "Failed to parse the file '\{path}', \{parse_result.unwrap_err()}, ignore the state",
-    )
-    return UsageState::new()
+  let json = @json.parse(content) catch {
+    err => {
+      println("Failed to parse the file '\{path}', \{err}, ignore the state")
+      return UsageState::new()
+    }
   }
-  let state_result : Result[UsageState, _] = try? @json.from_json(json)
-  guard state_result is Ok(state) else {
-    println(
-      "Failed to convert state json \{path}, \{state_result.unwrap_err()}, ignore the state",
-    )
-    return UsageState::new()
+  @json.from_json(json) catch {
+    err => {
+      println("Failed to convert state json \{path}, \{err}, ignore the state")
+      UsageState::new()
+    }
   }
-  state
 }
 
 ///|
@@ -64,15 +60,14 @@ pub fn load_usage_state() -> UsageState {
 pub fn save_usage_state(state : UsageState) -> Result[Unit, String] {
   let path = get_state_path()
   let parent_dir = @path.Path(path).dirname().to_string()
-  let create_dir_result = try? @util.create_dirs(parent_dir)
-  guard create_dir_result is Ok(_) else {
-    return Err("Failed to create directory: \{create_dir_result.unwrap_err()}")
+  @util.create_dirs(parent_dir) catch {
+    err => return Err("Failed to create directory: \{err}")
   }
   let content = state.to_json().stringify(indent=2)
-  let write_result = try? @fs.write_string_to_file(path, content)
-  match write_result {
-    Ok(_) => Ok(())
-    Err(e) => Err("Failed to write state file: \{e}")
+  try @fs.write_string_to_file(path, content) catch {
+    err => Err("Failed to write state file: \{err}")
+  } noraise {
+    _ => Ok(())
   }
 }
 

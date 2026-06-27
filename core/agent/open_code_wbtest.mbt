@@ -54,19 +54,29 @@ fn cleanup_open_code_temp_dir(temp_dir : String) -> Unit {
   if !@fs.path_exists(temp_dir) {
     return ()
   }
-  let entries_result = try? @fs.read_dir(temp_dir)
-  guard entries_result is Ok(entries) else {
-    let _ = try? @fs.remove_dir(temp_dir)
-    return ()
+  let entries = @fs.read_dir(temp_dir) catch {
+    _ => {
+      @fs.remove_dir(temp_dir) catch {
+        _ => ()
+      }
+      return ()
+    }
   }
   for entry in entries {
     let child_path = @path.Path(temp_dir).join(entry).to_string()
-    let remove_file_result = try? @fs.remove_file(child_path)
-    if remove_file_result is Err(_) {
+    let removed = try {
+      @fs.remove_file(child_path)
+      true
+    } catch {
+      _ => false
+    }
+    if !removed {
       cleanup_open_code_temp_dir(child_path)
     }
   }
-  let _ = try? @fs.remove_dir(temp_dir)
+  @fs.remove_dir(temp_dir) catch {
+    _ => ()
+  }
 }
 
 ///|
@@ -102,9 +112,8 @@ test "get_temporary_override preserves existing opencode settings" {
     Some(OpenAI),
   )
   let content = temporary_override.env_vars[0].value
-  let json_result = try? @json.parse(content)
-  guard json_result is Ok(json) else {
-    fail("temporary override should contain valid JSON")
+  let json = @json.parse(content) catch {
+    _ => fail("temporary override should contain valid JSON")
   }
   match json {
     {
@@ -329,15 +338,13 @@ test "apply_provider_to_json - raises error when no base URL is provided" {
     models: [@provider.Model::new(name="model-1")],
   }
   let original_json = sample_opencode_json()
-  let result = try? OpenCode::apply_provider_to_json(
-    original_json,
-    provider,
-    Some(Anthropic),
-  )
-  match result {
-    Err(_) =>
-      inspect("error raised as expected", content="error raised as expected")
-    Ok(_) => fail("should have raised error")
+  try {
+    ignore(
+      OpenCode::apply_provider_to_json(original_json, provider, Some(Anthropic)),
+    )
+    fail("should have raised error")
+  } catch {
+    _ => inspect("error raised as expected", content="error raised as expected")
   }
 }
 
@@ -351,15 +358,13 @@ test "apply_provider_to_json - raises error when models is empty" {
     models: [],
   }
   let original_json = sample_opencode_json()
-  let result = try? OpenCode::apply_provider_to_json(
-    original_json,
-    provider,
-    Some(Anthropic),
-  )
-  match result {
-    Err(_) =>
-      inspect("error raised as expected", content="error raised as expected")
-    Ok(_) => fail("should have raised error")
+  try {
+    ignore(
+      OpenCode::apply_provider_to_json(original_json, provider, Some(Anthropic)),
+    )
+    fail("should have raised error")
+  } catch {
+    _ => inspect("error raised as expected", content="error raised as expected")
   }
 }
 
@@ -731,18 +736,11 @@ test "apply_provider_to_json - None api_format with both base URLs raises error"
     models: [@provider.Model::new(name="test-model")],
   }
   let original_json = sample_opencode_json()
-  let result = try? OpenCode::apply_provider_to_json(
-    original_json,
-    provider,
-    None,
-  )
-  match result {
-    Err(_) =>
-      inspect("error raised as expected", content="error raised as expected")
-    Ok(_) =>
-      fail(
-        "should have raised error when both URLs provided without api_format",
-      )
+  try {
+    ignore(OpenCode::apply_provider_to_json(original_json, provider, None))
+    fail("should have raised error when both URLs provided without api_format")
+  } catch {
+    _ => inspect("error raised as expected", content="error raised as expected")
   }
 }
 
@@ -880,14 +878,16 @@ test "apply_provider_to_json - errors when Anthropic format has no anthropic bas
     anthropic_base_url: None,
     models: [@provider.Model::new(name="test-model")],
   }
-  let result = try? OpenCode::apply_provider_to_json(
-    sample_opencode_json(),
-    provider,
-    Some(Anthropic),
-  )
-  match result {
-    Err(_) =>
-      inspect("error raised as expected", content="error raised as expected")
-    Ok(_) => fail("should have raised error for missing anthropic base URL")
+  try {
+    ignore(
+      OpenCode::apply_provider_to_json(
+        sample_opencode_json(),
+        provider,
+        Some(Anthropic),
+      ),
+    )
+    fail("should have raised error for missing anthropic base URL")
+  } catch {
+    _ => inspect("error raised as expected", content="error raised as expected")
   }
 }

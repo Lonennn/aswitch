@@ -249,11 +249,8 @@ pub impl Agent for OpenCode with fn apply_provider(_self, provider, api_format) 
 
   // Load existing config or create new one
   let settings_json = if @fs.path_exists(config_path) {
-    let read_result = try? @fs.read_file_to_string(config_path)
-    guard read_result is Ok(content) else { raise read_result.unwrap_err() }
-    let json_result = try? @json.parse(content)
-    guard json_result is Ok(json) else { raise json_result.unwrap_err() }
-    json
+    let content = @fs.read_file_to_string(config_path)
+    @json.parse(content)
   } else {
     Json::object(Map([]))
   }

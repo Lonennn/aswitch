@@ -29,12 +29,12 @@ async fn run_remove_provider(
     return (EXIT_CODE_CONFIG_ERROR, "Error: provider name cannot be empty")
   }
 
-  let load_result = try? @core.load_config()
-  guard load_result is Ok(config) else {
-    return (
-      EXIT_CODE_CONFIG_ERROR,
-      "Error: Failed to load config file, \{load_result.unwrap_err()}",
-    )
+  let config = @core.load_config() catch {
+    err =>
+      return (
+        EXIT_CODE_CONFIG_ERROR,
+        "Error: Failed to load config file, \{err}",
+      )
   }
 
   guard config.get_provider(provider_name) is Some(existing_provider) else {
@@ -73,12 +73,12 @@ async fn run_remove_provider(
   }
 
   let config_path = @core.get_config_path()
-  let backup_result = try? @agent.backup_config_before_write(config_path)
-  guard backup_result is Ok(_) else {
-    return (
-      EXIT_CODE_CONFIG_ERROR,
-      "Error: Failed to backup config file: \{backup_result.unwrap_err()}",
-    )
+  @agent.backup_config_before_write(config_path) catch {
+    err =>
+      return (
+        EXIT_CODE_CONFIG_ERROR,
+        "Error: Failed to backup config file: \{err}",
+      )
   }
 
   let save_result = @core.save_providers_preserving_other_fields(

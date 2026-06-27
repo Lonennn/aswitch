@@ -51,21 +51,29 @@ fn cleanup_temp_dir(temp_dir : String) -> Unit {
   if !@fs.path_exists(temp_dir) {
     return ()
   }
-  let entries_result = try? @fs.read_dir(temp_dir)
-  guard entries_result is Ok(entries) else {
-    // If we can't read the dir, try to remove it anyway
-    let _ = try? @fs.remove_dir(temp_dir)
-    return ()
+  let entries = @fs.read_dir(temp_dir) catch {
+    _ => {
+      @fs.remove_dir(temp_dir) catch {
+        _ => ()
+      }
+      return ()
+    }
   }
   for entry in entries {
     let file_path = @path.Path(temp_dir).join(entry).to_string()
-    // Try to remove as file first, then as dir
-    let remove_result = try? @fs.remove_file(file_path)
-    if remove_result is Err(_) {
+    let removed = try {
+      @fs.remove_file(file_path)
+      true
+    } catch {
+      _ => false
+    }
+    if !removed {
       cleanup_temp_dir(file_path)
     }
   }
-  let _ = try? @fs.remove_dir(temp_dir)
+  @fs.remove_dir(temp_dir) catch {
+    _ => ()
+  }
 }
 
 ///|

@@ -123,8 +123,12 @@ test "set_provider fails with invalid config" {
     let temp_config_path = @path.Path(temp_dir)
       .join(@core.CONFIG_FILE_NAME)
       .to_string()
-    let _ = try? @fs.remove_file(temp_config_path)
-    let _ = try? @fs.remove_dir(temp_dir)
+    @fs.remove_file(temp_config_path) catch {
+      _ => ()
+    }
+    @fs.remove_dir(temp_dir) catch {
+      _ => ()
+    }
     // Restore original environment
     @sys.set_env_var("ASWITCH_HOME", original_home.unwrap_or(""))
   }
@@ -190,19 +194,29 @@ fn cleanup_command_temp_dir(temp_dir : String) -> Unit {
   if !@fs.path_exists(temp_dir) {
     return ()
   }
-  let entries_result = try? @fs.read_dir(temp_dir)
-  guard entries_result is Ok(entries) else {
-    let _ = try? @fs.remove_dir(temp_dir)
-    return ()
+  let entries = @fs.read_dir(temp_dir) catch {
+    _ => {
+      @fs.remove_dir(temp_dir) catch {
+        _ => ()
+      }
+      return ()
+    }
   }
   for entry in entries {
     let child_path = @path.Path(temp_dir).join(entry).to_string()
-    let remove_file_result = try? @fs.remove_file(child_path)
-    if remove_file_result is Err(_) {
+    let removed = try {
+      @fs.remove_file(child_path)
+      true
+    } catch {
+      _ => false
+    }
+    if !removed {
       cleanup_command_temp_dir(child_path)
     }
   }
-  let _ = try? @fs.remove_dir(temp_dir)
+  @fs.remove_dir(temp_dir) catch {
+    _ => ()
+  }
 }
 
 ///|

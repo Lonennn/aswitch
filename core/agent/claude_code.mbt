@@ -110,17 +110,13 @@ pub impl Agent for ClaudeCode with fn apply_provider(_, provider, _) -> Unit rai
 
   // Create directory if needed
   if !@fs.path_exists(dir_path) {
-    let result = try? @fs.create_dir(dir_path)
-    guard result is Ok(_) else { raise result.unwrap_err() }
+    @fs.create_dir(dir_path)
   }
 
   // Load existing config or create new one
   let settings_json = if @fs.path_exists(config_path) {
-    let read_result = try? @fs.read_file_to_string(config_path)
-    guard read_result is Ok(content) else { raise read_result.unwrap_err() }
-    let json_result = try? @json.parse(content)
-    guard json_result is Ok(json) else { raise json_result.unwrap_err() }
-    json
+    let content = @fs.read_file_to_string(config_path)
+    @json.parse(content)
   } else {
     Json::object(Map([]))
   }

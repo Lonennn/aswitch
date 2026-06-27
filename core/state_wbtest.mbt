@@ -34,7 +34,9 @@ test "load_usage_state returns empty state when file missing" {
   let temp_dir = "_aswitch_test_state_load_missing"
   try! @fs.create_dir(temp_dir)
   defer {
-    let _ = try? @fs.remove_dir(temp_dir)
+    @fs.remove_dir(temp_dir) catch {
+      _ => ()
+    }
     match original_home {
       Some(home) => @sys.set_env_var("ASWITCH_HOME", home)
       None => @sys.unset_env_var("ASWITCH_HOME")
@@ -54,8 +56,12 @@ test "save and load usage state roundtrip" {
   try! @fs.create_dir(temp_dir)
   defer {
     let state_path = @path.Path(temp_dir).join("state.json").to_string()
-    let _ = try? @fs.remove_file(state_path)
-    let _ = try? @fs.remove_dir(temp_dir)
+    @fs.remove_file(state_path) catch {
+      _ => ()
+    }
+    @fs.remove_dir(temp_dir) catch {
+      _ => ()
+    }
     match original_home {
       Some(home) => @sys.set_env_var("ASWITCH_HOME", home)
       None => @sys.unset_env_var("ASWITCH_HOME")

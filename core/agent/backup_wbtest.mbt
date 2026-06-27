@@ -16,16 +16,16 @@ fn cleanup_dir(dir : String) -> Unit {
   if !@fs.path_exists(dir) {
     return ()
   }
-  let entries_result = try? @fs.read_dir(dir)
-  match entries_result {
-    Ok(entries) =>
-      for entry in entries {
-        let path = join_path(dir, entry)
-        let _ = try? @fs.remove_file(path)
-      }
-    Err(_) => ()
+  let entries = @fs.read_dir(dir) catch { _ => [] }
+  for entry in entries {
+    let path = join_path(dir, entry)
+    @fs.remove_file(path) catch {
+      _ => ()
+    }
   }
-  let _ = try? @fs.remove_dir(dir)
+  @fs.remove_dir(dir) catch {
+    _ => ()
+  }
 }
 
 ///|

@@ -13,12 +13,11 @@ pub fn set_provider(
   let config_path = @core.get_config_path()
   println("Loading configuration from: \{config_path}")
 
-  let load_config_result = try? @core.load_config()
-  guard load_config_result is Ok(config) else {
-    println(
-      "Error: Failed to load config file, \{load_config_result.unwrap_err()}",
-    )
-    return EXIT_CODE_CONFIG_ERROR
+  let config = @core.load_config() catch {
+    err => {
+      println("Error: Failed to load config file, \{err}")
+      return EXIT_CODE_CONFIG_ERROR
+    }
   }
 
   // Resolve agent name to canonical form
@@ -90,15 +89,13 @@ pub fn set_provider(
   // Apply the provider to the agent (with optional api_format)
   if dry_run {
     // For dry run, we need to get the diff without writing
-    let diff_result = try? agent.get_provider_diff(
-      provider, resolved_api_format,
-    )
-    guard diff_result is Ok(diff) else {
-      let err = diff_result.unwrap_err()
-      println(
-        "Error: Failed to generate diff for provider '\{provider.name}' to agent '\{agent.name()}', \{err}",
-      )
-      return EXIT_CODE_CONFIG_ERROR
+    let diff = agent.get_provider_diff(provider, resolved_api_format) catch {
+      err => {
+        println(
+          "Error: Failed to generate diff for provider '\{provider.name}' to agent '\{agent.name()}', \{err}",
+        )
+        return EXIT_CODE_CONFIG_ERROR
+      }
     }
 
     println("Dry run mode enabled - no changes will be written to disk")
@@ -115,13 +112,13 @@ pub fn set_provider(
     EXIT_CODE_SUCCESS
   } else {
     // Normal flow - apply and write changes
-    let apply_result = try? agent.apply_provider(provider, resolved_api_format)
-    guard apply_result is Ok(_) else {
-      let err = apply_result.unwrap_err()
-      println(
-        "Error: Failed to apply provider '\{provider.name}' to agent '\{agent.name()}', \{err}",
-      )
-      return EXIT_CODE_CONFIG_ERROR
+    agent.apply_provider(provider, resolved_api_format) catch {
+      err => {
+        println(
+          "Error: Failed to apply provider '\{provider.name}' to agent '\{agent.name()}', \{err}",
+        )
+        return EXIT_CODE_CONFIG_ERROR
+      }
     }
     println("Successfully set \{agent.name()} to use \{provider.name}")
 

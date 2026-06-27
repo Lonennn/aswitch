@@ -21,12 +21,11 @@ fn resolve_temporary_selection(
     return Err(EXIT_CODE_UNKNOWN_AGENT)
   }
 
-  let load_config_result = try? @core.load_config()
-  guard load_config_result is Ok(config) else {
-    println(
-      "Error: Failed to load config file, \{load_config_result.unwrap_err()}",
-    )
-    return Err(EXIT_CODE_CONFIG_ERROR)
+  let config = @core.load_config() catch {
+    err => {
+      println("Error: Failed to load config file, \{err}")
+      return Err(EXIT_CODE_CONFIG_ERROR)
+    }
   }
 
   let validate_result = @core.validate_config(config)
@@ -58,15 +57,16 @@ fn render_temporary_command(
     return Err(selection_result.unwrap_err())
   }
 
-  let override_result = try? selection.agent.get_temporary_override(
+  let temporary_override = selection.agent.get_temporary_override(
     selection.provider,
     api_format,
-  )
-  guard override_result is Ok(temporary_override) else {
-    println(
-      "Error: Failed to render temporary override for provider '\{selection.provider.name}' and agent '\{selection.agent.name()}', \{override_result.unwrap_err()}",
-    )
-    return Err(EXIT_CODE_CONFIG_ERROR)
+  ) catch {
+    err => {
+      println(
+        "Error: Failed to render temporary override for provider '\{selection.provider.name}' and agent '\{selection.agent.name()}', \{err}",
+      )
+      return Err(EXIT_CODE_CONFIG_ERROR)
+    }
   }
 
   Ok(RenderedTemporaryCommand::{
@@ -80,26 +80,24 @@ fn prepare_temporary_override(
   temporary_override : @agent.TemporaryOverride,
   agent_display_name : String,
 ) -> Result[Unit, Int] {
-  let prepare_result = try? @agent.prepare_temporary_override(
-    temporary_override,
-  )
-  guard prepare_result is Ok(_) else {
-    println(
-      "Error: Failed to prepare temporary override for agent '\{agent_display_name}', \{prepare_result.unwrap_err()}",
-    )
-    return Err(EXIT_CODE_CONFIG_ERROR)
+  @agent.prepare_temporary_override(temporary_override) catch {
+    err => {
+      println(
+        "Error: Failed to prepare temporary override for agent '\{agent_display_name}', \{err}",
+      )
+      return Err(EXIT_CODE_CONFIG_ERROR)
+    }
   }
   Ok(())
 }
 
 ///|
 fn resolve_provider_name(name : String) -> Result[String, Int] {
-  let load_config_result = try? @core.load_config()
-  guard load_config_result is Ok(config) else {
-    println(
-      "Error: Failed to load config file, \{load_config_result.unwrap_err()}",
-    )
-    return Err(EXIT_CODE_CONFIG_ERROR)
+  let config = @core.load_config() catch {
+    err => {
+      println("Error: Failed to load config file, \{err}")
+      return Err(EXIT_CODE_CONFIG_ERROR)
+    }
   }
   match config.resolve_provider(name) {
     Ok(provider) => {

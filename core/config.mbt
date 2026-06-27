@@ -108,16 +108,9 @@ pub fn load_config(validate? : Bool = true) -> Config raise Error {
   if !@fs.path_exists(path) {
     return Config::new()
   }
-  let read_file_result = try? @fs.read_file_to_string(path)
-  guard read_file_result is Ok(file_content) else {
-    raise read_file_result.unwrap_err()
-  }
-  let parse_json_result = try? @json.parse(file_content)
-  guard parse_json_result is Ok(json) else {
-    raise parse_json_result.unwrap_err()
-  }
-  let config_result : Result[Config, _] = try? @json.from_json(json)
-  guard config_result is Ok(config) else { raise config_result.unwrap_err() }
+  let file_content = @fs.read_file_to_string(path)
+  let json = @json.parse(file_content)
+  let config : Config = @json.from_json(json)
 
   // Validate config if requested (enabled by default)
   if validate {
@@ -149,10 +142,10 @@ pub fn load_config(validate? : Bool = true) -> Config raise Error {
 pub fn save_config(config : Config) -> Result[Unit, String] {
   let path = get_config_path()
   let content = config.to_json().stringify(indent=4)
-  let write_result = try? @fs.write_string_to_file(path, content)
-  match write_result {
-    Ok(_) => Ok(())
-    Err(e) => Err("Failed to write config file: \{e}")
+  try @fs.write_string_to_file(path, content) catch {
+    err => Err("Failed to write config file: \{err}")
+  } noraise {
+    _ => Ok(())
   }
 }
 
@@ -164,28 +157,20 @@ pub fn save_providers_preserving_other_fields(
 ) -> Result[Unit, String] {
   let mut config_json = Json::object({})
   if @fs.path_exists(config_path) {
-    let read_result = try? @fs.read_file_to_string(config_path)
-    guard read_result is Ok(content) else {
-      return Err(
-        "Failed to read existing config file: \{read_result.unwrap_err()}",
-      )
+    let content = @fs.read_file_to_string(config_path) catch {
+      err => return Err("Failed to read existing config file: \{err}")
     }
-    let parse_result = try? @json.parse(content)
-    guard parse_result is Ok(parsed) else {
-      return Err(
-        "Failed to parse existing config file: \{parse_result.unwrap_err()}",
-      )
+    config_json = @json.parse(content) catch {
+      err => return Err("Failed to parse existing config file: \{err}")
     }
-    config_json = parsed
   }
 
   match config_json {
     Json::Object(entries) => {
       entries["providers"] = providers.to_json()
       let content = Json::object(entries).stringify(indent=4)
-      let write_result = try? @fs.write_string_to_file(config_path, content)
-      guard write_result is Ok(_) else {
-        return Err("Failed to write config file: \{write_result.unwrap_err()}")
+      @fs.write_string_to_file(config_path, content) catch {
+        err => return Err("Failed to write config file: \{err}")
       }
       Ok(())
     }

@@ -21,66 +21,60 @@ pub fn init_config() -> Int {
       "providers": Json::array([]),
     }
     let content = config_json.stringify(indent=4)
-    let write_result = try? @fs.write_string_to_file(path, content)
-    match write_result {
-      Ok(_) => {
-        println("Configuration initialized at: \{path}")
-        EXIT_CODE_SUCCESS
-      }
-      Err(e) => {
+    try @fs.write_string_to_file(path, content) catch {
+      e => {
         println("Error initializing config: \{e}")
         EXIT_CODE_CONFIG_ERROR
       }
+    } noraise {
+      _ => {
+        println("Configuration initialized at: \{path}")
+        EXIT_CODE_SUCCESS
+      }
     }
   } else {
-    let read_result = try? @fs.read_file_to_string(path)
-    match read_result {
-      Ok(content) => {
-        let parse_result = try? @json.parse(content)
-        match parse_result {
-          Ok(Json::Object(entries)) =>
-            if entries.contains("$schema") {
+    let content = @fs.read_file_to_string(path) catch {
+      e => {
+        println("Error patching config schema field: \{e}")
+        return EXIT_CODE_CONFIG_ERROR
+      }
+    }
+    let parsed = @json.parse(content) catch {
+      e => {
+        println("Error patching config schema field: \{e}")
+        return EXIT_CODE_CONFIG_ERROR
+      }
+    }
+    match parsed {
+      Json::Object(entries) =>
+        if entries.contains("$schema") {
+          println("Configuration file already exists at: \{path}")
+          println("Schema field already exists; no changes made.")
+          println("To add providers to the existing config, use `aswitch add`.")
+          EXIT_CODE_SUCCESS
+        } else {
+          entries["$schema"] = Json::string(SCHEMA_URL)
+          let updated_content = Json::object(entries).stringify(indent=4)
+          try @fs.write_string_to_file(path, updated_content) catch {
+            e => {
+              println("Error patching config schema field: \{e}")
+              EXIT_CODE_CONFIG_ERROR
+            }
+          } noraise {
+            _ => {
               println("Configuration file already exists at: \{path}")
-              println("Schema field already exists; no changes made.")
+              println("Added missing $schema field to existing config.")
               println(
                 "To add providers to the existing config, use `aswitch add`.",
               )
               EXIT_CODE_SUCCESS
-            } else {
-              entries["$schema"] = Json::string(SCHEMA_URL)
-              let updated_content = Json::object(entries).stringify(indent=4)
-              let write_result = try? @fs.write_string_to_file(
-                path, updated_content,
-              )
-              match write_result {
-                Ok(_) => {
-                  println("Configuration file already exists at: \{path}")
-                  println("Added missing $schema field to existing config.")
-                  println(
-                    "To add providers to the existing config, use `aswitch add`.",
-                  )
-                  EXIT_CODE_SUCCESS
-                }
-                Err(e) => {
-                  println("Error patching config schema field: \{e}")
-                  EXIT_CODE_CONFIG_ERROR
-                }
-              }
             }
-          Ok(_) => {
-            println(
-              "Error patching config schema field: config root must be a JSON object",
-            )
-            EXIT_CODE_CONFIG_ERROR
-          }
-          Err(e) => {
-            println("Error patching config schema field: \{e}")
-            EXIT_CODE_CONFIG_ERROR
           }
         }
-      }
-      Err(e) => {
-        println("Error patching config schema field: \{e}")
+      _ => {
+        println(
+          "Error patching config schema field: config root must be a JSON object",
+        )
         EXIT_CODE_CONFIG_ERROR
       }
     }

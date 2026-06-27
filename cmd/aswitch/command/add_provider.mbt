@@ -233,9 +233,8 @@ async fn upsert_provider(
     )
   }
 
-  let load_result = try? @core.load_config()
-  guard load_result is Ok(config) else {
-    return Err("Failed to load config file, \{load_result.unwrap_err()}")
+  let config = @core.load_config() catch {
+    err => return Err("Failed to load config file, \{err}")
   }
 
   let existed = config.get_provider(provider.name) is Some(_)
@@ -262,9 +261,8 @@ async fn upsert_provider(
     )
   }
   let config_path = @core.get_config_path()
-  let backup_result = try? @agent.backup_config_before_write(config_path)
-  guard backup_result is Ok(_) else {
-    return Err("Failed to backup config file: \{backup_result.unwrap_err()}")
+  @agent.backup_config_before_write(config_path) catch {
+    err => return Err("Failed to backup config file: \{err}")
   }
   let save_result = @core.save_providers_preserving_other_fields(
     config_path, updated_providers,
