@@ -12,6 +12,8 @@ _aswitch_test/
 .claude/commands
 .pi/
 
+.vscode/
+
 .moon-include
 .worktrees/
 
