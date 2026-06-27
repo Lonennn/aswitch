@@ -27,8 +27,8 @@ async fn execute_command(command : @command.Command) -> Int {
     @command.Command::ListAgents => @command.list_agents()
     @command.Command::SetProvider(agent~, provider~, api_format~, dry_run~) =>
       @command.set_provider(agent, provider, api_format, dry_run)
-    @command.Command::TemporaryCommand(agent~, provider~, api_format~) =>
-      @command.temporary_command(agent, provider, api_format)
+    @command.Command::TemporaryCommand(agent~, provider~, api_format~, raw~) =>
+      @command.temporary_command(agent, provider, api_format, raw~)
     @command.Command::TemporaryExec(
       agent~,
       provider~,

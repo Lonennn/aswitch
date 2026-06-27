@@ -15,11 +15,12 @@ pub fn print_help() -> Int {
   println(
     "                                                      (provider from state if omitted)",
   )
+  println("  command [agent] [provider] [--api-format <fmt>] [--raw]")
   println(
-    "  command [agent] [provider] [--api-format <fmt>]   Print a temporary shell command",
+    "                                                      Show a temporary shell command",
   )
   println(
-    "                                                      (args from state if omitted)",
+    "                                                      (args from state if omitted; --raw prints command only)",
   )
   println(
     "  run [agent] [provider] [--api-format <fmt>] [--print-command] [-- <command...>]",
@@ -55,6 +56,7 @@ pub fn print_help() -> Int {
   println("  aswitch agents")
   println("  aswitch set claude glm")
   println("  aswitch command claude-code seed")
+  println("  aswitch command claude-code seed --raw")
   println("  aswitch run open-code seed -- opencode run")
   println("  aswitch run open-code seed --print-command -- opencode run")
   println("  aswitch run claude-code seed -- claude")

@@ -30,6 +30,7 @@ pub struct TemporaryOverride {
   args : Array[String]
   env_vars : Array[EnvVar]
   temp_files : Array[TempFile]
+  api_format : ApiFormat
 }
 
 ///|

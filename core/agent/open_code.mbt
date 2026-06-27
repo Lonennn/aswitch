@@ -40,11 +40,11 @@ fn OpenCode::get_config_dir() -> String {
 
 ///|
 /// Determine both npm package and base URL based on api_format and available base URLs
-/// Returns (npm_package, base_url) tuple or raises ProviderLackUrlError if ambiguous
+/// Returns (npm_package, base_url, selected_api_format) tuple or raises ProviderLackUrlError if ambiguous
 fn OpenCode::determine_api_config(
   provider : @provider.Provider,
   api_format : ApiFormat?,
-) -> (String, String) raise ProviderLackUrlError {
+) -> (String, String, ApiFormat) raise ProviderLackUrlError {
   match api_format {
     Some(OpenAI) =>
       (
@@ -54,6 +54,7 @@ fn OpenCode::determine_api_config(
             "openai_base_url is required in your aswitch.json when you choose to use OpenAI compatible API",
           ),
         ),
+        OpenAI,
       )
     Some(Anthropic) =>
       (
@@ -63,11 +64,12 @@ fn OpenCode::determine_api_config(
             "anthropic_base_url is required in your aswitch.json when you choose to use Anthropic compatible API",
           ),
         ),
+        Anthropic,
       )
     None =>
       match (provider.openai_base_url, provider.anthropic_base_url) {
-        (Some(url), None) => (AI_SDK_OPENAI, url)
-        (None, Some(url)) => (AI_SDK_ANTHROPIC, url)
+        (Some(url), None) => (AI_SDK_OPENAI, url, OpenAI)
+        (None, Some(url)) => (AI_SDK_ANTHROPIC, url, Anthropic)
         (Some(_), Some(_)) =>
           raise ProviderLackUrlError(
             "both openai_base_url and anthropic_base_url are provided, please specify api-format via command line",
@@ -168,7 +170,7 @@ fn OpenCode::apply_provider_to_json(
   }
 
   // Determine both npm package and base URL
-  let (npm_package, base_url) = OpenCode::determine_api_config(
+  let (npm_package, base_url, _) = OpenCode::determine_api_config(
     provider, api_format,
   )
 
@@ -273,8 +275,13 @@ fn OpenCode::get_temporary_override(
 ) -> TemporaryOverride raise Error {
   let config_path = OpenCode::get_config_file_path()
   let settings_json = load_agent_settings_json(config_path)
+  let (_, _, selected_api_format) = OpenCode::determine_api_config(
+    provider, api_format,
+  )
   let updated_json = OpenCode::apply_provider_to_json(
-    settings_json, provider, api_format,
+    settings_json,
+    provider,
+    Some(selected_api_format),
   )
   let content = updated_json.stringify(indent=2)
   TemporaryOverride::{
@@ -282,6 +289,7 @@ fn OpenCode::get_temporary_override(
     args: [],
     env_vars: [EnvVar::{ key: "OPENCODE_CONFIG_CONTENT", value: content }],
     temp_files: [],
+    api_format: selected_api_format,
   }
 }
 

@@ -380,10 +380,24 @@ test "init_config returns error for non-object config root" {
 test "parse_args maps temporary command and exec variants" {
   match
     parse_args(["command", "claude-code", "seed", "--api-format", "anthropic"]) {
-    TemporaryCommand(agent~, provider~, api_format~) => {
+    TemporaryCommand(agent~, provider~, api_format~, raw~) => {
       assert_true(agent == Some("claude-code"))
       assert_true(provider == Some("seed"))
       assert_true(api_format is Some(@agent.Anthropic))
+      assert_false(raw)
+    }
+    other => fail("Expected TemporaryCommand, got \{other}")
+  }
+
+  match
+    parse_args([
+      "command", "--raw", "claude-code", "seed", "--api-format", "anthropic",
+    ]) {
+    TemporaryCommand(agent~, provider~, api_format~, raw~) => {
+      assert_true(agent == Some("claude-code"))
+      assert_true(provider == Some("seed"))
+      assert_true(api_format is Some(@agent.Anthropic))
+      assert_true(raw)
     }
     other => fail("Expected TemporaryCommand, got \{other}")
   }
@@ -445,6 +459,7 @@ async test "render_temporary_command renders claude override from isolated confi
     ])
 
     let rendered = render_temporary_command("claude", "seed", None).unwrap()
+    assert_true(rendered.temporary_override.api_format is @agent.Anthropic)
     inspect(
       rendered.command,
       content=(
@@ -452,6 +467,46 @@ async test "render_temporary_command renders claude override from isolated confi
       ),
     )
   })
+}
+
+///|
+test "render_temporary_command_buffer includes resolved selection and command" {
+  inspect(
+    render_temporary_command_buffer(
+      "claude-code",
+      "seed",
+      @agent.Anthropic,
+      "ANTHROPIC_AUTH_TOKEN='sk-test' claude",
+    ),
+    content=(
+      #|Agent: claude-code
+      #|Provider: seed
+      #|API format: anthropic
+      #|
+      #|Command:
+      #|ANTHROPIC_AUTH_TOKEN='sk-test' claude
+    ),
+  )
+}
+
+///|
+test "render_temporary_command_buffer shows inferred api format" {
+  inspect(
+    render_temporary_command_buffer(
+      "OpenCode",
+      "seed",
+      @agent.OpenAI,
+      "OPENCODE_CONFIG_CONTENT='{}' opencode",
+    ),
+    content=(
+      #|Agent: OpenCode
+      #|Provider: seed
+      #|API format: openai
+      #|
+      #|Command:
+      #|OPENCODE_CONFIG_CONTENT='{}' opencode
+    ),
+  )
 }
 
 ///|
@@ -475,6 +530,7 @@ async test "render_temporary_command renders opencode override with config conte
           "seed",
           Some(@agent.OpenAI),
         ).unwrap()
+        assert_true(rendered.temporary_override.api_format is @agent.OpenAI)
         inspect(
           rendered.command,
           content=(
@@ -498,6 +554,29 @@ async test "render_temporary_command renders opencode override with config conte
             #|}' opencode
           ),
         )
+      },
+    )
+  })
+}
+
+///|
+async test "render_temporary_command reports inferred opencode api format" {
+  command_with_temp_aswitch_home("_aswitch_test_temp_command_opencode_infer", fn() raise {
+    command_with_temp_xdg_config_home(
+      "_aswitch_test_temp_xdg_command_opencode_infer",
+      fn() raise {
+        write_test_config([
+          @provider.Provider::{
+            name: "seed",
+            api_key: "sk-opencode",
+            openai_base_url: Some("https://seed.example.com/openai"),
+            anthropic_base_url: None,
+            models: [@provider.Model::new(name="seed-model")],
+          },
+        ])
+
+        let rendered = render_temporary_command("open-code", "seed", None).unwrap()
+        assert_true(rendered.temporary_override.api_format is @agent.OpenAI)
       },
     )
   })
@@ -588,10 +667,11 @@ test "parse_args exec with no args omits both" {
 ///|
 test "parse_args command with only agent omits provider" {
   match parse_args(["command", "claudecode"]) {
-    TemporaryCommand(agent~, provider~, api_format~) => {
+    TemporaryCommand(agent~, provider~, api_format~, raw~) => {
       assert_true(agent == Some("claudecode"))
       assert_true(provider is None)
       assert_true(api_format is None)
+      assert_false(raw)
     }
     other => fail("Expected TemporaryCommand, got \{other}")
   }
@@ -600,10 +680,11 @@ test "parse_args command with only agent omits provider" {
 ///|
 test "parse_args command with no args omits both" {
   match parse_args(["command"]) {
-    TemporaryCommand(agent~, provider~, api_format~) => {
+    TemporaryCommand(agent~, provider~, api_format~, raw~) => {
       assert_true(agent is None)
       assert_true(provider is None)
       assert_true(api_format is None)
+      assert_false(raw)
     }
     other => fail("Expected TemporaryCommand, got \{other}")
   }

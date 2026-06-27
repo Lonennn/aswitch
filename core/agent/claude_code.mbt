@@ -205,6 +205,7 @@ fn ClaudeCode::get_temporary_override(
     args: [],
     env_vars,
     temp_files: [],
+    api_format: Anthropic,
   }
 }
 

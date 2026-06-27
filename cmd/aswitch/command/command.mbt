@@ -18,7 +18,9 @@ pub enum Command {
   TemporaryCommand(
     agent~ : String?,
     provider~ : String?,
-    api_format~ : @agent.ApiFormat?
+    api_format~ : @agent.ApiFormat?,
+    /// Print only the rendered shell command, without the informational buffer.
+    raw~ : Bool
   )
   /// Execute a command with a temporary provider override
   TemporaryExec(
@@ -254,19 +256,35 @@ fn parse_temporary_command(args : Array[String]) -> Command {
   guard parse_result is Ok((filtered_args, api_format)) else {
     return Command::ErrorParameter(parse_result.unwrap_err())
   }
-  match filtered_args {
+  let mut raw = false
+  let positional_args : Array[String] = []
+  for arg in filtered_args {
+    if arg == "--raw" {
+      raw = true
+    } else {
+      positional_args.push(arg)
+    }
+  }
+  match positional_args {
     [agent, provider] =>
       Command::TemporaryCommand(
         agent=Some(agent),
         provider=Some(provider),
         api_format~,
+        raw~,
       )
     [agent] =>
-      Command::TemporaryCommand(agent=Some(agent), provider=None, api_format~)
-    [] => Command::TemporaryCommand(agent=None, provider=None, api_format~)
+      Command::TemporaryCommand(
+        agent=Some(agent),
+        provider=None,
+        api_format~,
+        raw~,
+      )
+    [] =>
+      Command::TemporaryCommand(agent=None, provider=None, api_format~, raw~)
     _ =>
       Command::ErrorParameter(
-        "Error: 'command' requires [agent] [provider] and optional --api-format <openai|anthropic>",
+        "Error: 'command' requires [agent] [provider] and optional --api-format <openai|anthropic> or --raw",
       )
   }
 }

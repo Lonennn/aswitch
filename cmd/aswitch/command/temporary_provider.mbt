@@ -92,7 +92,10 @@ fn prepare_temporary_override(
 }
 
 ///|
-fn resolve_provider_name(name : String) -> Result[String, Int] {
+fn resolve_provider_name(
+  name : String,
+  print_resolution? : Bool = true,
+) -> Result[String, Int] {
   let config = @core.load_config() catch {
     err => {
       println("Error: Failed to load config file, \{err}")
@@ -101,7 +104,7 @@ fn resolve_provider_name(name : String) -> Result[String, Int] {
   }
   match config.resolve_provider(name) {
     Ok(provider) => {
-      if provider.name.to_lower() != name.to_lower() {
+      if print_resolution && provider.name.to_lower() != name.to_lower() {
         println("Resolved provider '\{name}' to '\{provider.name}'")
       }
       Ok(provider.name)
@@ -114,6 +117,24 @@ fn resolve_provider_name(name : String) -> Result[String, Int] {
 }
 
 ///|
+fn api_format_display(api_format : @agent.ApiFormat) -> String {
+  match api_format {
+    @agent.OpenAI => "openai"
+    @agent.Anthropic => "anthropic"
+  }
+}
+
+///|
+fn render_temporary_command_buffer(
+  agent_name : String,
+  provider_name : String,
+  api_format : @agent.ApiFormat,
+  command : String,
+) -> String {
+  "Agent: \{agent_name}\nProvider: \{provider_name}\nAPI format: \{api_format_display(api_format)}\n\nCommand:\n\{command}"
+}
+
+///|
 /// This function is async because it may render the command inside a
 /// temporary terminal buffer (@terminal.display_in_temporary_terminal_buffer)
 /// to prevent secrets from leaking into terminal scrollback.
@@ -121,17 +142,23 @@ pub async fn temporary_command(
   agent_name : String?,
   provider_name : String?,
   api_format : @agent.ApiFormat?,
+  raw? : Bool = false,
 ) -> Int {
   let state = @core.load_usage_state()
 
-  let resolved_agent_name = resolve_agent_from_state(agent_name, state)
+  let resolved_agent_name = resolve_agent_from_state(
+    agent_name,
+    state,
+    usage="Usage: aswitch command [agent] [provider] [--api-format <fmt>] [--raw]",
+    print_resolution=false,
+  )
   guard resolved_agent_name is Ok(agent) else {
     return resolved_agent_name.unwrap_err()
   }
 
   let (resolved_provider_name, resolved_api_format) = match provider_name {
     Some(name) =>
-      match resolve_provider_name(name) {
+      match resolve_provider_name(name, print_resolution=false) {
         Ok(provider_name) => (provider_name, api_format)
         Err(code) => return code
       }
@@ -145,7 +172,7 @@ pub async fn temporary_command(
         None => {
           println("Error: No previous provider found for agent '\{agent}'")
           println(
-            "Usage: aswitch command [agent] [provider] [--api-format <fmt>]",
+            "Usage: aswitch command [agent] [provider] [--api-format <fmt>] [--raw]",
           )
           return EXIT_CODE_CONFIG_ERROR
         }
@@ -171,22 +198,32 @@ pub async fn temporary_command(
   guard command_result is Ok(rendered_command) else {
     return command_result.unwrap_err()
   }
-  @terminal.display_in_temporary_terminal_buffer(rendered_command.command)
-
   // Save state on success (consistent with temporary_exec)
-  let api_format_str = match resolved_api_format {
-    Some(@agent.OpenAI) => Some("openai")
-    Some(@agent.Anthropic) => Some("anthropic")
-    None => None
-  }
   state.set_agent_state(
     selection.agent.name(),
     selection.provider.name,
-    api_format_str,
+    Some(api_format_display(rendered_command.temporary_override.api_format)),
   )
   let save_result = @core.save_usage_state(state)
   if save_result is Err(err) {
-    println("Warning: Failed to save usage state: \{err}")
+    if raw {
+      @stdio.stderr.write("Warning: Failed to save usage state: \{err}\n")
+    } else {
+      println("Warning: Failed to save usage state: \{err}")
+    }
+  }
+
+  if raw {
+    println(rendered_command.command)
+  } else {
+    @terminal.display_in_temporary_terminal_buffer(
+      render_temporary_command_buffer(
+        selection.agent.name(),
+        selection.provider.name,
+        rendered_command.temporary_override.api_format,
+        rendered_command.command,
+      ),
+    )
   }
 
   EXIT_CODE_SUCCESS
@@ -251,7 +288,11 @@ pub async fn temporary_exec(
 ) -> Int {
   let state = @core.load_usage_state()
 
-  let resolved_agent_name = resolve_agent_from_state(agent_name, state)
+  let resolved_agent_name = resolve_agent_from_state(
+    agent_name,
+    state,
+    usage="Usage: aswitch run [agent] [provider] [-- <command...>]",
+  )
   guard resolved_agent_name is Ok(agent) else {
     return resolved_agent_name.unwrap_err()
   }
@@ -305,15 +346,10 @@ pub async fn temporary_exec(
   }
 
   // Save state on success BEFORE exec (exec replaces process and never returns)
-  let api_format_str = match resolved_api_format {
-    Some(@agent.OpenAI) => Some("openai")
-    Some(@agent.Anthropic) => Some("anthropic")
-    None => None
-  }
   state.set_agent_state(
     selection.agent.name(),
     selection.provider.name,
-    api_format_str,
+    Some(api_format_display(rendered_command.temporary_override.api_format)),
   )
   let save_result = @core.save_usage_state(state)
   if save_result is Err(err) {
@@ -351,12 +387,14 @@ pub async fn temporary_exec(
 fn resolve_agent_from_state(
   agent_name : String?,
   state : @core.UsageState,
+  usage~ : String,
+  print_resolution? : Bool = true,
 ) -> Result[String, Int] {
   match agent_name {
     Some(name) =>
       match @agent.resolve_agent_name(name) {
         Ok(resolved) => {
-          if resolved.to_lower() != name.to_lower() {
+          if print_resolution && resolved.to_lower() != name.to_lower() {
             println("Resolved agent '\{name}' to '\{resolved}'")
           }
           Ok(resolved)
@@ -371,7 +409,7 @@ fn resolve_agent_from_state(
         Some(last) => Ok(last)
         None => {
           println("Error: No previous agent found. Please specify an agent.")
-          println("Usage: aswitch run [agent] [provider] [-- <command...>]")
+          println(usage)
           Err(EXIT_CODE_CONFIG_ERROR)
         }
       }

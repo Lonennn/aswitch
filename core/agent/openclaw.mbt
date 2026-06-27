@@ -46,12 +46,11 @@ fn OpenClaw::get_temporary_override_dir() -> String {
 ///|
 fn OpenClaw::get_temporary_override_path(
   provider : @provider.Provider,
-  api_format : ApiFormat?,
+  api_format : ApiFormat,
 ) -> String {
   let format_name = match api_format {
-    Some(OpenAI) => "openai"
-    Some(Anthropic) => "anthropic"
-    None => "auto"
+    OpenAI => "openai"
+    Anthropic => "anthropic"
   }
   @path.Path(OpenClaw::get_temporary_override_dir())
   .join("openclaw-\{provider.name.to_lower()}-\{format_name}.json")
@@ -60,11 +59,11 @@ fn OpenClaw::get_temporary_override_path(
 
 ///|
 /// Determine both API type and base URL based on api_format and available base URLs
-/// Returns (api_type, base_url) tuple or raises ProviderLackUrlError if ambiguous
+/// Returns (api_type, base_url, selected_api_format) tuple or raises ProviderLackUrlError if ambiguous
 fn OpenClaw::determine_api_config(
   provider : @provider.Provider,
   api_format : ApiFormat?,
-) -> (String, String) raise ProviderLackUrlError {
+) -> (String, String, ApiFormat) raise ProviderLackUrlError {
   match api_format {
     Some(OpenAI) =>
       (
@@ -74,6 +73,7 @@ fn OpenClaw::determine_api_config(
             "openai_base_url is required in your aswitch.json when you choose to use OpenAI compatible API",
           ),
         ),
+        OpenAI,
       )
     Some(Anthropic) =>
       (
@@ -83,11 +83,12 @@ fn OpenClaw::determine_api_config(
             "anthropic_base_url is required in your aswitch.json when you choose to use Anthropic compatible API",
           ),
         ),
+        Anthropic,
       )
     None =>
       match (provider.openai_base_url, provider.anthropic_base_url) {
-        (None, Some(url)) => (AI_API_ANTHROPIC, url)
-        (Some(url), _) => (AI_API_OPENAI, url)
+        (None, Some(url)) => (AI_API_ANTHROPIC, url, Anthropic)
+        (Some(url), _) => (AI_API_OPENAI, url, OpenAI)
         (None, None) =>
           raise ProviderLackUrlError(
             "anthropic_base_url or openai_base_url is required for OpenClaw agent",
@@ -174,7 +175,7 @@ fn OpenClaw::apply_provider_to_json(
   }
 
   // Determine API config
-  let (api_type, base_url) = OpenClaw::determine_api_config(
+  let (api_type, base_url, _) = OpenClaw::determine_api_config(
     provider, api_format,
   )
 
@@ -308,10 +309,17 @@ fn OpenClaw::get_temporary_override(
 ) -> TemporaryOverride raise Error {
   let config_path = OpenClaw::get_config_file_path()
   let settings_json = load_agent_settings_json(config_path)
-  let updated_json = OpenClaw::apply_provider_to_json(
-    settings_json, provider, api_format,
+  let (_, _, selected_api_format) = OpenClaw::determine_api_config(
+    provider, api_format,
   )
-  let temp_path = OpenClaw::get_temporary_override_path(provider, api_format)
+  let updated_json = OpenClaw::apply_provider_to_json(
+    settings_json,
+    provider,
+    Some(selected_api_format),
+  )
+  let temp_path = OpenClaw::get_temporary_override_path(
+    provider, selected_api_format,
+  )
   TemporaryOverride::{
     executable: "openclaw",
     args: [],
@@ -319,6 +327,7 @@ fn OpenClaw::get_temporary_override(
     temp_files: [
       TempFile::{ path: temp_path, content: updated_json.stringify(indent=2) },
     ],
+    api_format: selected_api_format,
   }
 }
 
