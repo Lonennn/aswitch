@@ -94,6 +94,8 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 |------|------------|----------------|--------|
 | **✅ Shell Integration** (Zsh & PowerShell completed 2026-04-28) | We believe that shell completions and aliases will reduce command execution time by 50% because users currently type full commands. | Command completion usage | S (1-2 weeks) |
 | **✅ Temporary Provider Override** (Completed 2026-04-24) | We believe that non-persistent provider overrides will unlock one-off tasks, CI jobs, and per-command experimentation because `set` currently rewrites agent config files even when the user only needs a temporary switch. | % of switches done without file writes | M (2-3 weeks) |
+| **Codex Support** | We believe that supporting Codex will expand ASwitch coverage for OpenAI-native coding workflows because users who switch between Claude Code, OpenCode, OpenClaw, and Codex should be able to manage provider selection from the same config. | Active Codex users / successful switches | M (2-3 weeks) |
+| **Unset Command** | We believe that an `unset` command will make provider switching safer and more reversible because users need a first-class way to remove ASwitch-managed provider settings from an agent without manually editing JSON files. | Successful restore/unset operations | S (1-2 weeks) |
 
 **Key Deliverables:**
 - [x] Zsh completions (completed 2026-04-28)
@@ -102,6 +104,8 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 - [x] Temporary provider override workflow for one command or one shell session (`command` / `exec`, completed 2026-04-24)
 - [x] Remember last used provider: `set`, `exec` (`run`), and `command` commands recall the previously used agent and provider from `~/.aswitch/state.json` so subsequent invocations do not require these arguments (completed 2026-05-25)
 - [x] Agent and provider name prefix matching for `set`, `exec` (`run`), and `command` commands: users can type unique prefixes instead of full names (e.g., `clau` resolves to `claude-code`, `ope` resolves to `open-code` if unambiguous; ambiguous prefixes produce an error listing candidates) (completed 2026-05-31)
+- [ ] Codex agent implementation with provider apply, dry-run diff, detection, aliases, and temporary override support
+- [ ] `unset` command to remove ASwitch-managed provider settings from an agent, with backup, dry-run preview, and state cleanup
 
 **Dependencies:** Phase 2 (multiple agents)
 
@@ -171,6 +175,8 @@ Q2 2026 (Completed - Agent Expansion):
 Q3 2026 (Current - Developer Experience):
 ├── Shell Completions (Zsh ✅, PowerShell ✅, Bash/Fish pending)
 ├── Provider Presets
+├── Codex Agent Support
+├── Unset Command
 └── Temporary Provider Override ✅ (Completed 2026-04-24)
 
 Q4 2026 (Security & Secrets):
@@ -202,7 +208,7 @@ Q1 2027 (Exploration - Advanced):
 ## Open Questions
 
 1. Should we support non-OpenAI-compatible API formats natively?
-2. What's the priority order for additional agents (for example Cursor, Copilot, etc.)?
+2. What's the priority order for additional agents after Codex (for example Cursor, Copilot, etc.)?
 3. Which agents can be reliably driven by environment variables alone, and which still require file-based writes for full support?
 4. Is there demand for a Homebrew/apt package distribution?
 
@@ -211,8 +217,10 @@ Q1 2027 (Exploration - Advanced):
 ## Immediate Priorities (Next 30-60 Days)
 
 1. Deliver package distribution (Homebrew first, then apt/scoop).
-2. Add shell completions for Bash/Fish (Zsh & PowerShell already complete).
-3. Add built-in provider presets for common model providers (OpenAI, Anthropic, Moonshot, DeepSeek, etc.).
+2. Add Codex agent support.
+3. Add `unset` command support.
+4. Add shell completions for Bash/Fish (Zsh & PowerShell already complete).
+5. Add built-in provider presets for common model providers (OpenAI, Anthropic, Moonshot, DeepSeek, etc.).
 
 ---
 
@@ -228,5 +236,5 @@ Q1 2027 (Exploration - Advanced):
 
 ---
 
-*Last updated: 2026-06-14*
-*Roadmap version: 2.6*
+*Last updated: 2026-06-28*
+*Roadmap version: 2.8*
