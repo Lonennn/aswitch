@@ -41,15 +41,3 @@ async fn display_with_windows_alternate_screen(text : String) -> Bool {
   @stdio.stdout.write(windows_alternate_screen_exit)
   true
 }
-
-///|
-#cfg(not(platform="windows"))
-fn can_use_windows_alternate_screen() -> Bool {
-  false
-}
-
-///|
-#cfg(not(platform="windows"))
-async fn display_with_windows_alternate_screen(_text : String) -> Bool {
-  false
-}
