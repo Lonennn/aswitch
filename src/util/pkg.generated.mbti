@@ -1,5 +1,5 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "lonen44/aswitch/core/util"
+package "lonen44/aswitch/util"
 
 import {
   "moonbitlang/x/fs",

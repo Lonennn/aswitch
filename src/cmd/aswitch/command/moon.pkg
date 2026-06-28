@@ -3,7 +3,7 @@ import {
   "lonen44/aswitch/core",
   "lonen44/aswitch/core/agent",
   "lonen44/aswitch/core/provider",
-  "lonen44/aswitch/core/util",
+  "lonen44/aswitch/util",
   "lonen44/aswitch/cmd/aswitch/terminal",
   "moonbitlang/core/debug",
   "moonbitlang/core/json",
