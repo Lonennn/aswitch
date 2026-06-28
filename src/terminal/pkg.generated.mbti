@@ -1,5 +1,5 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "lonen44/aswitch/cmd/aswitch/terminal"
+package "lonen44/aswitch/terminal"
 
 // Values
 pub async fn display_in_temporary_terminal_buffer(String) -> Unit
