@@ -2,7 +2,7 @@ import {
   "moonbitlang/async",
   "moonbitlang/async/process",
   "moonbitlang/async/stdio",
-  "lonen44/aswitch/core/util",
+  "lonen44/aswitch/util",
   "moonbitlang/core/argparse",
   "moonbitlang/x/sys",
   // "moonbitlang/x/path",
