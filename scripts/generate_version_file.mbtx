@@ -21,13 +21,13 @@ fn generate_version_file() -> Unit raise Error {
   }
 
   let version_file_content = "const ASWITCH_VERSION = \"\{version}\""
-  @fs.write_string_to_file("cmd/aswitch/version.mbt", version_file_content)
+  @fs.write_string_to_file("src/cmd/aswitch/version.mbt", version_file_content)
 }
 
 fn main {
   generate_version_file() catch {
     err => {
-      println(err)
+      println("Failed to generate version file: \{err}")
       @sys.exit(-1)
     }
   }

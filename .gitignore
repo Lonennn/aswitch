@@ -17,4 +17,4 @@ _aswitch_test/
 .moon-include
 .worktrees/
 
-cmd/aswitch/version.mbt
+src/cmd/aswitch/version.mbt

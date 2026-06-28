@@ -18,3 +18,7 @@ preferred_target = "native"
 keywords = [ ]
 
 description = ""
+
+options(
+  source: "src",
+)
