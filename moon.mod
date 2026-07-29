@@ -4,7 +4,7 @@ version = "0.6.0"
 
 import {
   "moonbitlang/x@0.4.41",
-  "moonbitlang/async@0.16.6",
+  "moonbitlang/async@0.20.3",
 }
 
 readme = "README.mbt.md"
@@ -19,6 +19,4 @@ keywords = [ ]
 
 description = ""
 
-options(
-  source: "src",
-)
+source = "src"

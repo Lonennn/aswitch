@@ -8,7 +8,7 @@ test "resolve_provider exact match" {
     anthropic_base_url: None,
     models: [@provider.Model::new(name="gpt-4")],
   }
-  config.providers = @list.from_array([provider])
+  config.providers = @list.List([provider])
   assert_true(config.resolve_provider("openai") is Ok(p) && p.name == "openai")
 }
 
@@ -22,7 +22,7 @@ test "resolve_provider prefix match" {
     anthropic_base_url: None,
     models: [@provider.Model::new(name="gpt-4")],
   }
-  config.providers = @list.from_array([provider])
+  config.providers = @list.List([provider])
   assert_true(config.resolve_provider("ope") is Ok(p) && p.name == "openai")
 }
 
@@ -36,7 +36,7 @@ test "resolve_provider case-insensitive exact match" {
     anthropic_base_url: None,
     models: [@provider.Model::new(name="gpt-4")],
   }
-  config.providers = @list.from_array([provider])
+  config.providers = @list.List([provider])
   assert_true(config.resolve_provider("openai") is Ok(p) && p.name == "OpenAI")
 }
 
@@ -57,7 +57,7 @@ test "resolve_provider ambiguous prefix" {
     anthropic_base_url: None,
     models: [@provider.Model::new(name="llama")],
   }
-  config.providers = @list.from_array([p1, p2])
+  config.providers = @list.List([p1, p2])
   assert_true(config.resolve_provider("open") is Err(_))
 }
 
@@ -71,7 +71,7 @@ test "resolve_provider too short prefix" {
     anthropic_base_url: None,
     models: [@provider.Model::new(name="gpt-4")],
   }
-  config.providers = @list.from_array([provider])
+  config.providers = @list.List([provider])
   assert_true(config.resolve_provider("o") is Err(_))
 }
 

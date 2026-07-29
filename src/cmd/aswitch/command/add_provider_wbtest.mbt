@@ -143,7 +143,7 @@ async test "upsert_provider asks confirmation before overwrite and can cancel" {
       None,
       ["gpt-4o"],
     )
-    @core.save_config(@core.Config::{ providers: @list.from_array([initial]) }).unwrap()
+    @core.save_config(@core.Config::{ providers: @list.List([initial]) }).unwrap()
 
     let updated = single_provider(
       "OpenAI",
@@ -173,7 +173,7 @@ async test "upsert_provider overwrites provider when confirmed" {
       None,
       ["gpt-4o"],
     )
-    @core.save_config(@core.Config::{ providers: @list.from_array([initial]) }).unwrap()
+    @core.save_config(@core.Config::{ providers: @list.List([initial]) }).unwrap()
 
     let updated = single_provider(
       "openai",
@@ -208,9 +208,7 @@ async test "upsert_provider creates backup before saving updated config" {
       None,
       ["gpt-4o"],
     )
-    let initial_config = @core.Config::{
-      providers: @list.from_array([initial]),
-    }
+    let initial_config = @core.Config::{ providers: @list.List([initial]) }
     @core.save_config(initial_config).unwrap()
     let config_path = @core.get_config_path()
 
