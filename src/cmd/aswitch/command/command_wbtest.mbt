@@ -108,9 +108,7 @@ test "set_provider fails with invalid config" {
     models: [@provider.Model::new(name="gpt-4o", context_limit=128000)],
   }
 
-  let config = @core.Config::{
-    providers: @list.from_array([provider1, provider2]),
-  }
+  let config = @core.Config::{ providers: @list.List([provider1, provider2]) }
 
   // Create 100% isolated temporary directory for test config - NO RISK to user data
   let original_home = @sys.get_env_var("ASWITCH_HOME")
@@ -265,7 +263,7 @@ fn command_with_temp_xdg_config_home(
 
 ///|
 fn write_test_config(providers : Array[@provider.Provider]) -> Unit {
-  let config = @core.Config::{ providers: @list.from_array(providers) }
+  let config = @core.Config::{ providers: @list.List(providers) }
   @core.save_config(config).unwrap()
 }
 

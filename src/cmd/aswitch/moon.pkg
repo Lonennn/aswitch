@@ -4,8 +4,9 @@ import {
   "moonbitlang/x/sys",
 }
 
+pkgtype(kind: "executable")
+
 options(
-  "is-main": true,
   targets: { "aswitch.mbt": [ "native", "llvm" ] },
   "pre-build": [
     {

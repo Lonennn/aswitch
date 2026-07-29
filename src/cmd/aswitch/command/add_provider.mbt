@@ -293,9 +293,9 @@ fn replace_or_append_provider(
   if providers.any(fn(existing) {
       existing.name.to_lower() == existing_name_lower
     }) {
-    @list.from_array(provider_array)
+    @list.List(provider_array)
   } else {
-    @list.from_array(provider_array + [provider])
+    @list.List(provider_array + [provider])
   }
 }
 

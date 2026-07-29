@@ -87,7 +87,7 @@ pub fn Config::deep_copy(self : Config) -> Config {
   let providers = self.providers
     .to_array()
     .map(fn(provider) { provider.deep_copy() })
-  Config::{ providers: @list.from_array(providers) }
+  Config::{ providers: @list.List(providers) }
 }
 
 ///|

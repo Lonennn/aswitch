@@ -57,7 +57,7 @@ async fn run_remove_provider(
   }
 
   let remove_name_lower = existing_provider.name.to_lower()
-  let updated_providers = @list.from_array(
+  let updated_providers = @list.List(
     config.providers
     .to_array()
     .filter(fn(provider) { provider.name.to_lower() != remove_name_lower }),
