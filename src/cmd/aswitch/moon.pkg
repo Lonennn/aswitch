@@ -1,5 +1,6 @@
 import {
   "moonbitlang/async",
+  "moonbitlang/core/env",
   "lonen44/aswitch/cmd/aswitch/command",
   "moonbitlang/x/sys",
 }

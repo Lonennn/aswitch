@@ -1,7 +1,7 @@
 ///|
 /// Main entry point for the aswitch CLI tool
 async fn main {
-  let args = @sys.get_cli_args()
+  let args = @env.args()
 
   // Skip the program name (first argument)
   let cmd_args : Array[String] = match args {
