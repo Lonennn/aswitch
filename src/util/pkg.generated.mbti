@@ -24,4 +24,3 @@ pub fn is_blank(String) -> Bool
 // Type aliases
 
 // Traits
-
