@@ -101,7 +101,7 @@ test "get_temporary_override preserves existing opencode settings" {
 
   let provider = @provider.Provider::{
     name: "temp-provider",
-    api_key: "sk-temp-key",
+    api_key: Some("sk-temp-key"),
     openai_base_url: Some("https://temp.example.com/v1"),
     anthropic_base_url: None,
     models: [@provider.Model::new(name="temp-model")],
@@ -145,7 +145,7 @@ test "apply_provider_to_json - adds new provider and preserves all other propert
   // Create a provider with 2 models
   let provider = @provider.Provider::{
     name: "new-provider",
-    api_key: "sk-new-provider-api-key",
+    api_key: Some("sk-new-provider-api-key"),
     openai_base_url: None,
     anthropic_base_url: Some("https://new-provider.example.com/api/v1"),
     models: [
@@ -258,7 +258,7 @@ test "apply_provider_to_json - adds new provider and preserves all other propert
 test "apply_provider_to_json - updates existing provider" {
   let provider = @provider.Provider::{
     name: "existing-provider",
-    api_key: "sk-updated-api-key",
+    api_key: Some("sk-updated-api-key"),
     openai_base_url: None,
     anthropic_base_url: Some("https://updated.example.com/api"),
     models: [
@@ -332,7 +332,7 @@ test "apply_provider_to_json - updates existing provider" {
 test "apply_provider_to_json - raises error when no base URL is provided" {
   let provider = @provider.Provider::{
     name: "no-base-url-provider",
-    api_key: "some-key",
+    api_key: Some("some-key"),
     openai_base_url: None,
     anthropic_base_url: None,
     models: [@provider.Model::new(name="model-1")],
@@ -352,7 +352,7 @@ test "apply_provider_to_json - raises error when no base URL is provided" {
 test "apply_provider_to_json - raises error when models is empty" {
   let provider = @provider.Provider::{
     name: "no-models-provider",
-    api_key: "some-key",
+    api_key: Some("some-key"),
     openai_base_url: Some("https://openai.example.com/v1"),
     anthropic_base_url: None,
     models: [],
@@ -373,7 +373,7 @@ test "apply_provider_to_json - works with empty JSON (creates new structure)" {
   let empty_json : Json = Json::object(Map([]))
   let provider = @provider.Provider::{
     name: "test-provider",
-    api_key: "new-key",
+    api_key: Some("new-key"),
     openai_base_url: None,
     anthropic_base_url: Some("https://new.example.com/api"),
     models: [@provider.Model::new(name="test-model")],
@@ -407,7 +407,7 @@ test "apply_provider_to_json - works with empty JSON (creates new structure)" {
 test "apply_provider_to_json - OpenAI API format" {
   let provider = @provider.Provider::{
     name: "openai-provider",
-    api_key: "sk-openai-key",
+    api_key: Some("sk-openai-key"),
     openai_base_url: Some("https://api.openai.com/v1"),
     anthropic_base_url: None,
     models: [
@@ -461,7 +461,7 @@ test "apply_provider_to_json - OpenAI API format" {
 test "apply_provider_to_json - None api_format uses Anthropic SDK when only anthropic_base_url provided" {
   let provider = @provider.Provider::{
     name: "default-provider",
-    api_key: "sk-default-key",
+    api_key: Some("sk-default-key"),
     openai_base_url: None,
     anthropic_base_url: Some("https://anthropic.example.com/v1"),
     models: [@provider.Model::new(name="claude-3-opus")],
@@ -507,7 +507,7 @@ test "apply_provider_to_json - None api_format uses Anthropic SDK when only anth
 test "apply_provider_to_json - None api_format uses openai_base_url when anthropic not available" {
   let provider = @provider.Provider::{
     name: "fallback-provider",
-    api_key: "sk-fallback-key",
+    api_key: Some("sk-fallback-key"),
     openai_base_url: Some("https://fallback.example.com/v1"),
     anthropic_base_url: None,
     models: [@provider.Model::new(name="fallback-model")],
@@ -651,7 +651,7 @@ test "apply_provider_to_json - preserves schema if already present" {
   }
   let provider = @provider.Provider::{
     name: "schema-provider",
-    api_key: "sk-schema-key",
+    api_key: Some("sk-schema-key"),
     openai_base_url: Some("https://schema.example.com/v1"),
     anthropic_base_url: None,
     models: [@provider.Model::new(name="schema-model")],
@@ -684,7 +684,7 @@ test "apply_provider_to_json - preserves schema if already present" {
 test "apply_provider_to_json - None api_format uses OpenAI SDK when only openai_base_url provided" {
   let provider = @provider.Provider::{
     name: "openai-only-provider",
-    api_key: "sk-openai-key",
+    api_key: Some("sk-openai-key"),
     openai_base_url: Some("https://openai.example.com/v1"),
     anthropic_base_url: None,
     models: [@provider.Model::new(name="gpt-4")],
@@ -730,7 +730,7 @@ test "apply_provider_to_json - None api_format uses OpenAI SDK when only openai_
 test "apply_provider_to_json - None api_format with both base URLs raises error" {
   let provider = @provider.Provider::{
     name: "dual-url-provider",
-    api_key: "sk-dual-key",
+    api_key: Some("sk-dual-key"),
     openai_base_url: Some("https://openai.example.com/v1"),
     anthropic_base_url: Some("https://anthropic.example.com/v1"),
     models: [@provider.Model::new(name="test-model")],
@@ -748,7 +748,7 @@ test "apply_provider_to_json - None api_format with both base URLs raises error"
 test "apply_provider_to_json - picks correct base URL when both are provided" {
   let provider = @provider.Provider::{
     name: "dual-base-provider",
-    api_key: "sk-dual-key",
+    api_key: Some("sk-dual-key"),
     openai_base_url: Some("https://openai.example.com/v1"),
     anthropic_base_url: Some("https://anthropic.example.com/v1"),
     models: [@provider.Model::new(name="dual-model")],
@@ -840,7 +840,7 @@ test "apply_provider_to_json - preserves unknown top-level fields" {
   }
   let provider = @provider.Provider::{
     name: "custom-field-provider",
-    api_key: "sk-custom-key",
+    api_key: Some("sk-custom-key"),
     openai_base_url: Some("https://custom.example.com/v1"),
     anthropic_base_url: None,
     models: [@provider.Model::new(name="custom-model")],
@@ -873,7 +873,7 @@ test "apply_provider_to_json - preserves unknown top-level fields" {
 test "apply_provider_to_json - errors when Anthropic format has no anthropic base URL" {
   let provider = @provider.Provider::{
     name: "invalid-anthropic-provider",
-    api_key: "sk-test-key",
+    api_key: Some("sk-test-key"),
     openai_base_url: Some("https://openai.example.com/v1"),
     anthropic_base_url: None,
     models: [@provider.Model::new(name="test-model")],

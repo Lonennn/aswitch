@@ -9,6 +9,9 @@ import {
 // Values
 
 // Errors
+pub suberror ProviderLackApiKeyError {
+  ProviderLackApiKeyError(String)
+}
 
 // Types and methods
 pub(all) enum Modality {
@@ -29,14 +32,16 @@ pub fn Model::new(name~ : String, context_limit? : Int, output_limit? : Int) -> 
 
 pub(all) struct Provider {
   name : String
-  api_key : String
+  api_key : String?
   openai_base_url : String?
   anthropic_base_url : String?
   models : Array[Model]
 } derive(Eq, ToJson, @debug.Debug, @json.FromJson)
 pub fn Provider::deep_copy(Self) -> Self
+pub fn Provider::require_api_key(Self) -> String raise
+pub fn Provider::with_api_key(Self, String) -> Self
+pub fn Provider::without_api_key(Self) -> Self
 
 // Type aliases
 
 // Traits
-

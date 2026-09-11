@@ -28,7 +28,7 @@ pub async fn add_provider(
 ) -> Int {
   let provider = @provider.Provider::{
     name,
-    api_key,
+    api_key: Some(api_key),
     openai_base_url,
     anthropic_base_url,
     models: [@provider.Model::new(name=model)],
@@ -75,7 +75,7 @@ async fn run_add_provider_interactive(
 
   let provider = @provider.Provider::{
     name,
-    api_key: key,
+    api_key: Some(key),
     openai_base_url,
     anthropic_base_url,
     models,
@@ -252,7 +252,30 @@ async fn upsert_provider(
     }
   }
 
-  let updated_providers = replace_or_append_provider(config.providers, provider)
+  let mut keychain_provider_to_cleanup : String? = None
+  let provider_to_save = match provider.api_key {
+    Some(key) =>
+      match @credential.write_os_keychain_secret(provider.name, key) {
+        Ok(_) => {
+          write_line(
+            "Stored API key for provider '\{provider.name}' in the OS keychain",
+          )
+          keychain_provider_to_cleanup = Some(provider.name)
+          provider.without_api_key()
+        }
+        Err(@credential.Unavailable) => provider
+        Err(err) =>
+          return Err(
+            "Failed to store API key in the OS keychain: \{@credential.credential_backend_status_message(err)}",
+          )
+      }
+    None => provider
+  }
+
+  let updated_providers = replace_or_append_provider(
+    config.providers,
+    provider_to_save,
+  )
   let updated_config = @core.Config::{ providers: updated_providers }
   let validate_config_result = @core.validate_config(updated_config)
   guard validate_config_result is Ok(_) else {
@@ -267,7 +290,13 @@ async fn upsert_provider(
   let save_result = @core.save_providers_preserving_other_fields(
     config_path, updated_providers,
   )
-  guard save_result is Ok(_) else { return Err(save_result.unwrap_err()) }
+  guard save_result is Ok(_) else {
+    match keychain_provider_to_cleanup {
+      Some(name) => ignore(@credential.delete_os_keychain_secret(name))
+      None => ()
+    }
+    return Err(save_result.unwrap_err())
+  }
   if existed {
     Ok("Updated provider '\{provider.name}'")
   } else {

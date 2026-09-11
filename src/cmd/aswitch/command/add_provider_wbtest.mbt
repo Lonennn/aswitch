@@ -26,6 +26,7 @@ async fn with_temp_aswitch_home(
   body : async () -> Unit,
 ) -> Unit {
   let original_home = @sys.get_env_var("ASWITCH_HOME")
+  let original_disable_keychain = @sys.get_env_var("ASWITCH_DISABLE_KEYCHAIN")
   if !@fs.path_exists("_aswitch_test") {
     try! @fs.create_dir("_aswitch_test")
   }
@@ -39,9 +40,17 @@ async fn with_temp_aswitch_home(
   try! @fs.create_dir(temp_dir)
   defer {
     cleanup_temp_dir(temp_dir)
-    @sys.set_env_var("ASWITCH_HOME", original_home.unwrap_or(""))
+    match original_home {
+      Some(home) => @sys.set_env_var("ASWITCH_HOME", home)
+      None => @sys.unset_env_var("ASWITCH_HOME")
+    }
+    match original_disable_keychain {
+      Some(value) => @sys.set_env_var("ASWITCH_DISABLE_KEYCHAIN", value)
+      None => @sys.unset_env_var("ASWITCH_DISABLE_KEYCHAIN")
+    }
   }
   @sys.set_env_var("ASWITCH_HOME", temp_dir)
+  @sys.set_env_var("ASWITCH_DISABLE_KEYCHAIN", "1")
   body()
 }
 
@@ -74,7 +83,7 @@ fn single_provider(
 ) -> @provider.Provider {
   @provider.Provider::{
     name,
-    api_key,
+    api_key: Some(api_key),
     openai_base_url,
     anthropic_base_url,
     models: model_names.map(fn(model_name) {
@@ -101,7 +110,7 @@ async test "run_add_provider_interactive adds provider with multiple models" {
 
     let config = @core.load_config()
     let provider = config.get_provider("openai").unwrap()
-    assert_true(provider.api_key == "sk-test")
+    assert_true(provider.api_key == Some("sk-test"))
     assert_true(provider.openai_base_url is Some("https://api.openai.com/v1"))
     assert_true(provider.anthropic_base_url is None)
     assert_true(provider.models.length() == 2)
@@ -158,7 +167,7 @@ async test "upsert_provider asks confirmation before overwrite and can cancel" {
 
     let config = @core.load_config()
     let provider = config.get_provider("openai").unwrap()
-    assert_true(provider.api_key == "sk-old")
+    assert_true(provider.api_key == Some("sk-old"))
     assert_true(provider.models[0].name == "gpt-4o")
   })
 }
@@ -188,7 +197,7 @@ async test "upsert_provider overwrites provider when confirmed" {
 
     let config = @core.load_config()
     let provider = config.get_provider("openai").unwrap()
-    assert_true(provider.api_key == "sk-new")
+    assert_true(provider.api_key == Some("sk-new"))
     assert_true(
       provider.anthropic_base_url is Some("https://api.anthropic.com"),
     )
@@ -229,10 +238,10 @@ async test "upsert_provider creates backup before saving updated config" {
     let backup_json = try! @json.parse(backup_content)
     let backup_config : @core.Config = try! @json.from_json(backup_json)
     let backup_provider = backup_config.get_provider("openai").unwrap()
-    assert_true(backup_provider.api_key == "sk-old")
+    assert_true(backup_provider.api_key == Some("sk-old"))
 
     let current_config = @core.load_config()
     let current_provider = current_config.get_provider("openai").unwrap()
-    assert_true(current_provider.api_key == "sk-new")
+    assert_true(current_provider.api_key == Some("sk-new"))
   })
 }

@@ -42,7 +42,16 @@ fn resolve_temporary_selection(
     return Err(EXIT_CODE_UNKNOWN_PROVIDER)
   }
 
-  Ok(ResolvedTemporarySelection::{ agent, provider })
+  let provider_with_credential = match
+    @credential.provider_with_resolved_credential(provider) {
+    Ok(resolved) => resolved
+    Err(err) => {
+      println("Error: \{err}")
+      return Err(EXIT_CODE_CONFIG_ERROR)
+    }
+  }
+
+  Ok(ResolvedTemporarySelection::{ agent, provider: provider_with_credential })
 }
 
 ///|

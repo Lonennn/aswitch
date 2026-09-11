@@ -78,6 +78,15 @@ pub fn set_provider(
     canonical_agent, api_format, state,
   )
 
+  let provider_with_credential = match
+    @credential.provider_with_resolved_credential(provider) {
+    Ok(resolved) => resolved
+    Err(err) => {
+      println("Error: \{err}")
+      return EXIT_CODE_CONFIG_ERROR
+    }
+  }
+
   let agent = match @agent.create(canonical_agent) {
     Some(a) => a
     None => {
@@ -89,7 +98,9 @@ pub fn set_provider(
   // Apply the provider to the agent (with optional api_format)
   if dry_run {
     // For dry run, we need to get the diff without writing
-    let diff = agent.get_provider_diff(provider, resolved_api_format) catch {
+    let diff = agent.get_provider_diff(
+      provider_with_credential, resolved_api_format,
+    ) catch {
       err => {
         println(
           "Error: Failed to generate diff for provider '\{provider.name}' to agent '\{agent.name()}', \{err}",
@@ -112,7 +123,7 @@ pub fn set_provider(
     EXIT_CODE_SUCCESS
   } else {
     // Normal flow - apply and write changes
-    agent.apply_provider(provider, resolved_api_format) catch {
+    agent.apply_provider(provider_with_credential, resolved_api_format) catch {
       err => {
         println(
           "Error: Failed to apply provider '\{provider.name}' to agent '\{agent.name()}', \{err}",

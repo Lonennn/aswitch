@@ -88,5 +88,14 @@ async fn run_remove_provider(
     return (EXIT_CODE_CONFIG_ERROR, "Error: \{save_result.unwrap_err()}")
   }
 
-  (EXIT_CODE_SUCCESS, "Removed provider '\{existing_provider.name}'")
+  let remove_message = "Removed provider '\{existing_provider.name}'"
+  match @credential.delete_os_keychain_secret(existing_provider.name) {
+    Ok(_) | Err(@credential.Unavailable) => (EXIT_CODE_SUCCESS, remove_message)
+    Err(err) =>
+      (
+        EXIT_CODE_SUCCESS,
+        remove_message +
+        "\nWarning: Failed to remove OS keychain credential: \{@credential.credential_backend_status_message(err)}",
+      )
+  }
 }

@@ -92,4 +92,3 @@ pub(open) trait Agent {
   fn get_provider_diff(Self, @provider.Provider, ApiFormat?) -> ProviderDiff raise
   fn get_temporary_override(Self, @provider.Provider, ApiFormat?) -> TemporaryOverride raise
 }
-

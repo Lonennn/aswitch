@@ -3,7 +3,6 @@
   "providers": [
     {
       "name": "OpenAI",
-      "api_key": "sk-your-openai-api-key-here",
       "openai_base_url": "https://api.openai.com/v1",
       "models": [
         {"name": "gpt-4"},
@@ -12,7 +11,6 @@
     },
     {
       "name": "Anthropic",
-      "api_key": "sk-ant-your-anthropic-api-key-here",
       "anthropic_base_url": "https://api.anthropic.com",
       "models": [
         {"name": "claude-3-opus-20240229"},
@@ -21,7 +19,6 @@
     },
     {
       "name": "Moonshot",
-      "api_key": "sk-your-moonshot-api-key-here",
       "openai_base_url": "https://api.moonshot.ai/v1",
       "anthropic_base_url": "https://api.moonshot.ai/v1",
       "models": [

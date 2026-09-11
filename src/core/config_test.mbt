@@ -1,9 +1,28 @@
 ///|
+test "config json can omit provider api_key" {
+  let json = try! @json.parse(
+    "{\n" +
+    "  \"providers\": [\n" +
+    "    {\n" +
+    "      \"name\": \"OpenAI\",\n" +
+    "      \"openai_base_url\": \"https://api.openai.com/v1\",\n" +
+    "      \"models\": [{ \"name\": \"gpt-4o\" }]\n" +
+    "    }\n" +
+    "  ]\n" +
+    "}",
+  )
+  let config : Config = try! @json.from_json(json)
+  let provider = config.get_provider("OpenAI").unwrap()
+  assert_true(provider.api_key is None)
+  assert_true(validate_config(config) is Ok(_))
+}
+
+///|
 test "resolve_provider exact match" {
   let config = Config::new()
   let provider = @provider.Provider::{
     name: "openai",
-    api_key: "key",
+    api_key: Some("key"),
     openai_base_url: Some("https://api.openai.com/v1"),
     anthropic_base_url: None,
     models: [@provider.Model::new(name="gpt-4")],
@@ -17,7 +36,7 @@ test "resolve_provider prefix match" {
   let config = Config::new()
   let provider = @provider.Provider::{
     name: "openai",
-    api_key: "key",
+    api_key: Some("key"),
     openai_base_url: Some("https://api.openai.com/v1"),
     anthropic_base_url: None,
     models: [@provider.Model::new(name="gpt-4")],
@@ -31,7 +50,7 @@ test "resolve_provider case-insensitive exact match" {
   let config = Config::new()
   let provider = @provider.Provider::{
     name: "OpenAI",
-    api_key: "key",
+    api_key: Some("key"),
     openai_base_url: Some("https://api.openai.com/v1"),
     anthropic_base_url: None,
     models: [@provider.Model::new(name="gpt-4")],
@@ -45,14 +64,14 @@ test "resolve_provider ambiguous prefix" {
   let config = Config::new()
   let p1 = @provider.Provider::{
     name: "openai",
-    api_key: "key1",
+    api_key: Some("key1"),
     openai_base_url: Some("https://api.openai.com/v1"),
     anthropic_base_url: None,
     models: [@provider.Model::new(name="gpt-4")],
   }
   let p2 = @provider.Provider::{
     name: "openrouter",
-    api_key: "key2",
+    api_key: Some("key2"),
     openai_base_url: Some("https://openrouter.ai/api/v1"),
     anthropic_base_url: None,
     models: [@provider.Model::new(name="llama")],
@@ -66,7 +85,7 @@ test "resolve_provider too short prefix" {
   let config = Config::new()
   let provider = @provider.Provider::{
     name: "openai",
-    api_key: "key",
+    api_key: Some("key"),
     openai_base_url: Some("https://api.openai.com/v1"),
     anthropic_base_url: None,
     models: [@provider.Model::new(name="gpt-4")],

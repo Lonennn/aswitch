@@ -36,6 +36,9 @@ pub fn print_help() -> Int {
   )
   println("  add <name> <api_key> <base_url> <model>")
   println(
+    "      Stores the API key in the OS keychain when available; falls back to legacy inline config when unavailable.",
+  )
+  println(
     "                              Quick add (OpenAI-compatible base URL)",
   )
   println(

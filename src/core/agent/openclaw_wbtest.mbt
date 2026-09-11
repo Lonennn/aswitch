@@ -96,7 +96,7 @@ test "get_temporary_override preserves existing openclaw settings" {
 
   let provider = @provider.Provider::{
     name: "temp-provider",
-    api_key: "sk-temp-key",
+    api_key: Some("sk-temp-key"),
     openai_base_url: Some("https://temp.example.com/v1"),
     anthropic_base_url: None,
     models: [@provider.Model::new(name="temp-model")],

@@ -6,7 +6,7 @@
 pub enum ValidationError {
   /// Provider has empty name
   EmptyProviderName
-  /// Provider has empty API key
+  /// Legacy inline API key is present but empty
   EmptyApiKey
   /// Provider has no API base URLs configured
   NoBaseUrls
@@ -32,9 +32,11 @@ pub fn validate_provider(
     return Err(EmptyProviderName)
   }
 
-  // Check empty API key
-  if provider.api_key.trim().is_empty() {
-    return Err(EmptyApiKey)
+  // A missing API key is valid metadata. If the legacy inline field is
+  // present, it must still be non-empty.
+  match provider.api_key {
+    Some(key) => if key.trim().is_empty() { return Err(EmptyApiKey) }
+    None => ()
   }
 
   // Check at least one base URL exists
@@ -87,7 +89,7 @@ pub fn validate_provider(
 pub fn validation_error_message(err : ValidationError) -> String {
   match err {
     EmptyProviderName => "Provider name cannot be empty"
-    EmptyApiKey => "Provider API key cannot be empty"
+    EmptyApiKey => "Provider API key cannot be empty when present"
     NoBaseUrls => "Provider must have at least one base URL configured"
     InvalidBaseUrl(url) => "Invalid base URL: \{url}"
     NoModels => "Provider must have at least one model configured"

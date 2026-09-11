@@ -12,6 +12,34 @@ moon run cmd/aswitch -- help
 moon build --release
 ```
 
+### Signed macOS Release
+
+Keychain access is tied to the executable's signing identity. For local builds,
+create a code-signing certificate named `ASwitch Local Signing` in the login
+keychain, then run:
+
+```bash
+scripts/build_macos_release.sh
+```
+
+The signed executable is written to
+`_build/native/release/build/cmd/aswitch/aswitch.exe`. Override the identity or
+stable identifier when needed:
+
+```bash
+scripts/build_macos_release.sh \
+  --identity "My Code Signing Certificate" \
+  --identifier "dev.example.aswitch"
+```
+
+For a distributable Developer ID build, enable hardened runtime and timestamping:
+
+```bash
+scripts/build_macos_release.sh \
+  --identity "Developer ID Application: Example Corp (TEAMID)" \
+  --mode distribution
+```
+
 ## Supported Agents
 
 - `claude-code` (aliases: `claude`, `claudecode`)

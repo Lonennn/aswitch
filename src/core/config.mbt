@@ -95,6 +95,20 @@ pub fn Config::deep_copy(self : Config) -> Config {
 pub const CONFIG_FILE_NAME : String = "aswitch.json"
 
 ///|
+fn ensure_aswitch_home_exists() -> Result[Unit, String] {
+  let home = @util.get_aswitch_home()
+  if @fs.path_exists(home) {
+    Ok(())
+  } else {
+    try @fs.create_dir(home) catch {
+      err => Err("Failed to create ASWITCH_HOME directory: \{err}")
+    } noraise {
+      _ => Ok(())
+    }
+  }
+}
+
+///|
 /// Get the default configuration file path
 /// Uses ASWITCH_HOME env var if set, otherwise uses home directory via HOME/USERPROFILE env vars
 pub fn get_config_path() -> String {
@@ -118,7 +132,8 @@ pub fn load_config(validate? : Bool = true) -> Config raise Error {
     guard validate_result is Ok(_) else {
       let err_msg = match validate_result.unwrap_err() {
         ValidationError::EmptyProviderName => "Provider name cannot be empty"
-        ValidationError::EmptyApiKey => "Provider API key cannot be empty"
+        ValidationError::EmptyApiKey =>
+          "Provider API key cannot be empty when present"
         ValidationError::NoBaseUrls =>
           "Provider must have at least one base URL configured"
         ValidationError::InvalidBaseUrl(url) => "Invalid base URL: \{url}"
@@ -140,6 +155,8 @@ pub fn load_config(validate? : Bool = true) -> Config raise Error {
 ///|
 /// Save configuration to file
 pub fn save_config(config : Config) -> Result[Unit, String] {
+  let ensure_result = ensure_aswitch_home_exists()
+  guard ensure_result is Ok(_) else { return Err(ensure_result.unwrap_err()) }
   let path = get_config_path()
   let content = config.to_json().stringify(indent=4)
   try @fs.write_string_to_file(path, content) catch {
@@ -155,6 +172,8 @@ pub fn save_providers_preserving_other_fields(
   config_path : String,
   providers : @list.List[@provider.Provider],
 ) -> Result[Unit, String] {
+  let ensure_result = ensure_aswitch_home_exists()
+  guard ensure_result is Ok(_) else { return Err(ensure_result.unwrap_err()) }
   let mut config_json = Json::object({})
   if @fs.path_exists(config_path) {
     let content = @fs.read_file_to_string(config_path) catch {

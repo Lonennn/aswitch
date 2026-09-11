@@ -93,7 +93,7 @@ test "apply_provider_to_json - updates env and preserves all other properties" {
   // Create a provider with 3 models
   let provider = @provider.Provider::{
     name: "test-provider",
-    api_key: "new-api-key-12345",
+    api_key: Some("new-api-key-12345"),
     openai_base_url: None,
     anthropic_base_url: Some("https://new-provider.example.com/api/v1"),
     models: [
@@ -200,7 +200,7 @@ test "apply_provider_to_json - with 2 models uses last model for sonnet and haik
   // Create a provider with only 2 models
   let provider = @provider.Provider::{
     name: "two-model-provider",
-    api_key: "two-model-key",
+    api_key: Some("two-model-key"),
     openai_base_url: None,
     anthropic_base_url: Some("https://two-model.example.com/api"),
     models: [
@@ -275,7 +275,7 @@ test "apply_provider_to_json - with 1 model uses same model for all" {
   // Create a provider with only 1 model
   let provider = @provider.Provider::{
     name: "single-model-provider",
-    api_key: "single-model-key",
+    api_key: Some("single-model-key"),
     openai_base_url: None,
     anthropic_base_url: Some("https://single.example.com/api"),
     models: [@provider.Model::new(name="only-model")],
@@ -332,7 +332,7 @@ test "apply_provider_to_json - with 1 model uses same model for all" {
 test "apply_provider_to_json - raises error when anthropic_base_url is None" {
   let provider = @provider.Provider::{
     name: "no-base-url-provider",
-    api_key: "some-key",
+    api_key: Some("some-key"),
     openai_base_url: Some("https://openai.example.com/v1"),
     anthropic_base_url: None,
     models: [@provider.Model::new(name="model-1")],
@@ -350,7 +350,7 @@ test "apply_provider_to_json - raises error when anthropic_base_url is None" {
 test "apply_provider_to_json - raises error when models is empty" {
   let provider = @provider.Provider::{
     name: "no-models-provider",
-    api_key: "some-key",
+    api_key: Some("some-key"),
     openai_base_url: None,
     anthropic_base_url: Some("https://example.com/api"),
     models: [],
@@ -375,7 +375,7 @@ test "apply_provider_to_json - works with minimal settings (no hooks/plugins)" {
   }
   let provider = @provider.Provider::{
     name: "test-provider",
-    api_key: "new-key",
+    api_key: Some("new-key"),
     openai_base_url: None,
     anthropic_base_url: Some("https://new.example.com/api"),
     models: [

@@ -182,7 +182,7 @@ fn OpenClaw::apply_provider_to_json(
   // Create provider entry
   let provider_entry = Map([])
   provider_entry["baseUrl"] = Json::string(base_url)
-  provider_entry["apiKey"] = Json::string(provider.api_key)
+  provider_entry["apiKey"] = Json::string(provider.require_api_key())
   provider_entry["api"] = Json::string(api_type)
 
   // Add models

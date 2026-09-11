@@ -2,6 +2,7 @@ import {
   "moonbitlang/async/stdio",
   "lonen44/aswitch/core",
   "lonen44/aswitch/core/agent",
+  "lonen44/aswitch/core/credential",
   "lonen44/aswitch/core/provider",
   "lonen44/aswitch/util",
   "lonen44/aswitch/terminal",

@@ -94,7 +94,7 @@ test "set_provider fails with invalid config" {
   // Setup: Create invalid config with duplicate provider names
   let provider1 = @provider.Provider::{
     name: "openai",
-    api_key: "sk-xxx",
+    api_key: Some("sk-xxx"),
     openai_base_url: Some("https://api.openai.com/v1"),
     anthropic_base_url: None,
     models: [@provider.Model::new(name="gpt-4o", context_limit=128000)],
@@ -102,7 +102,7 @@ test "set_provider fails with invalid config" {
 
   let provider2 = @provider.Provider::{
     name: "OpenAI", // Duplicate case-insensitive
-    api_key: "sk-yyy",
+    api_key: Some("sk-yyy"),
     openai_base_url: Some("https://api.openai.com/v1"),
     anthropic_base_url: None,
     models: [@provider.Model::new(name="gpt-4o", context_limit=128000)],
@@ -223,14 +223,20 @@ fn command_with_temp_aswitch_home(
   body : () -> Unit raise Error,
 ) -> Unit raise Error {
   let original_home = @sys.get_env_var("ASWITCH_HOME")
+  let original_disable_keychain = @sys.get_env_var("ASWITCH_DISABLE_KEYCHAIN")
   cleanup_command_temp_dir(temp_dir)
   try! @fs.create_dir(temp_dir)
   @sys.set_env_var("ASWITCH_HOME", temp_dir)
+  @sys.set_env_var("ASWITCH_DISABLE_KEYCHAIN", "1")
   defer {
     cleanup_command_temp_dir(temp_dir)
     match original_home {
       Some(home) => @sys.set_env_var("ASWITCH_HOME", home)
       None => @sys.unset_env_var("ASWITCH_HOME")
+    }
+    match original_disable_keychain {
+      Some(value) => @sys.set_env_var("ASWITCH_DISABLE_KEYCHAIN", value)
+      None => @sys.unset_env_var("ASWITCH_DISABLE_KEYCHAIN")
     }
   }
   body()
@@ -445,7 +451,7 @@ async test "render_temporary_command renders claude override from isolated confi
     write_test_config([
       @provider.Provider::{
         name: "seed",
-        api_key: "sk-test-'quoted'",
+        api_key: Some("sk-test-'quoted'"),
         openai_base_url: None,
         anthropic_base_url: Some("https://seed.example.com/anthropic"),
         models: [
@@ -516,7 +522,7 @@ async test "render_temporary_command renders opencode override with config conte
         write_test_config([
           @provider.Provider::{
             name: "seed",
-            api_key: "sk-opencode",
+            api_key: Some("sk-opencode"),
             openai_base_url: Some("https://seed.example.com/openai"),
             anthropic_base_url: Some("https://seed.example.com/anthropic"),
             models: [@provider.Model::new(name="seed-model")],
@@ -566,7 +572,7 @@ async test "render_temporary_command reports inferred opencode api format" {
         write_test_config([
           @provider.Provider::{
             name: "seed",
-            api_key: "sk-opencode",
+            api_key: Some("sk-opencode"),
             openai_base_url: Some("https://seed.example.com/openai"),
             anthropic_base_url: None,
             models: [@provider.Model::new(name="seed-model")],
@@ -586,19 +592,25 @@ async test "temporary_command rejects openclaw render-only workflow" {
   cleanup_command_temp_dir(temp_dir)
   try! @fs.create_dir(temp_dir)
   let original_home = @sys.get_env_var("ASWITCH_HOME")
+  let original_disable_keychain = @sys.get_env_var("ASWITCH_DISABLE_KEYCHAIN")
   @sys.set_env_var("ASWITCH_HOME", temp_dir)
+  @sys.set_env_var("ASWITCH_DISABLE_KEYCHAIN", "1")
   defer {
     cleanup_command_temp_dir(temp_dir)
     match original_home {
       Some(home) => @sys.set_env_var("ASWITCH_HOME", home)
       None => @sys.unset_env_var("ASWITCH_HOME")
     }
+    match original_disable_keychain {
+      Some(value) => @sys.set_env_var("ASWITCH_DISABLE_KEYCHAIN", value)
+      None => @sys.unset_env_var("ASWITCH_DISABLE_KEYCHAIN")
+    }
   }
 
   write_test_config([
     @provider.Provider::{
       name: "seed",
-      api_key: "sk-openclaw",
+      api_key: Some("sk-openclaw"),
       openai_base_url: Some("https://seed.example.com/openai"),
       anthropic_base_url: None,
       models: [@provider.Model::new(name="seed-model")],

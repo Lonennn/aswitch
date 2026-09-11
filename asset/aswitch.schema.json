@@ -25,7 +25,7 @@
         },
         "api_key": {
           "type": "string",
-          "description": "API key for the provider"
+          "description": "Optional legacy inline API key. New keys should be stored outside aswitch.json when a secure credential backend is available."
         },
         "openai_base_url": {
           "type": "string",
@@ -46,7 +46,7 @@
           "examples": [[{"name": "gpt-4"}, {"name": "gpt-3.5-turbo"}], [{"name": "claude-3-opus-20240229"}]]
         }
       },
-      "required": ["name", "api_key", "models"]
+      "required": ["name", "models"]
     },
     "Model": {
       "type": "object",

@@ -53,7 +53,7 @@ fn ClaudeCode::apply_provider_to_json(
   }
 
   // Set API key
-  env_map["ANTHROPIC_AUTH_TOKEN"] = Json::string(provider.api_key)
+  env_map["ANTHROPIC_AUTH_TOKEN"] = Json::string(provider.require_api_key())
 
   // Set base URL - anthropic_base_url is required
   let base_url = match provider.anthropic_base_url {

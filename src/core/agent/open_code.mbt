@@ -191,7 +191,7 @@ fn OpenCode::apply_provider_to_json(
   }
 
   // Set API key
-  options_map["apiKey"] = Json::string(provider.api_key)
+  options_map["apiKey"] = Json::string(provider.require_api_key())
 
   // Set base URL
   options_map["baseURL"] = Json::string(base_url)
