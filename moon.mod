@@ -3,7 +3,7 @@ name = "lonen44/aswitch"
 version = "0.6.0"
 
 import {
-  "moonbitlang/x@0.4.41",
+  "moonbitlang/x@0.5.5",
   "moonbitlang/async@0.20.3",
 }
 

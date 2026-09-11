@@ -14,7 +14,7 @@ pub(all) struct Config {
 
 ///|
 pub fn Config::new() -> Config {
-  { providers: @list.new() }
+  { providers: @list.new(), }
 }
 
 ///|
@@ -87,7 +87,7 @@ pub fn Config::deep_copy(self : Config) -> Config {
   let providers = self.providers
     .to_array()
     .map(fn(provider) { provider.deep_copy() })
-  Config::{ providers: @list.List(providers) }
+  Config::{ providers: @list.List(providers), }
 }
 
 ///|
@@ -101,7 +101,8 @@ fn ensure_aswitch_home_exists() -> Result[Unit, String] {
     Ok(())
   } else {
     try @fs.create_dir(home) catch {
-      err => Err("Failed to create ASWITCH_HOME directory: \{err}")
+      err =>
+        Err("Failed to create ASWITCH_HOME directory: \{Error::to_string(err)}")
     } noraise {
       _ => Ok(())
     }
@@ -158,9 +159,9 @@ pub fn save_config(config : Config) -> Result[Unit, String] {
   let ensure_result = ensure_aswitch_home_exists()
   guard ensure_result is Ok(_) else { return Err(ensure_result.unwrap_err()) }
   let path = get_config_path()
-  let content = config.to_json().stringify(indent=4)
+  let content = ToJson::to_json(config).stringify(indent=4)
   try @fs.write_string_to_file(path, content) catch {
-    err => Err("Failed to write config file: \{err}")
+    err => Err("Failed to write config file: \{Error::to_string(err)}")
   } noraise {
     _ => Ok(())
   }
@@ -177,7 +178,10 @@ pub fn save_providers_preserving_other_fields(
   let mut config_json = Json::object({})
   if @fs.path_exists(config_path) {
     let content = @fs.read_file_to_string(config_path) catch {
-      err => return Err("Failed to read existing config file: \{err}")
+      err =>
+        return Err(
+          "Failed to read existing config file: \{Error::to_string(err)}",
+        )
     }
     config_json = @json.parse(content) catch {
       err => return Err("Failed to parse existing config file: \{err}")
@@ -189,7 +193,8 @@ pub fn save_providers_preserving_other_fields(
       entries["providers"] = providers.to_json()
       let content = Json::object(entries).stringify(indent=4)
       @fs.write_string_to_file(config_path, content) catch {
-        err => return Err("Failed to write config file: \{err}")
+        err =>
+          return Err("Failed to write config file: \{Error::to_string(err)}")
       }
       Ok(())
     }

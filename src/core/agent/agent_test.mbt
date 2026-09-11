@@ -79,13 +79,13 @@ fn cleanup_temp_dir(temp_dir : String) -> Unit {
 ///|
 test "is_agent_installed returns true when Claude Code config file exists" {
   // Save original HOME
-  let original_home = @sys.get_env_var("HOME")
+  let original_home = @env.get_env_var("HOME")
 
   // Create temporary directory
   let temp_home = "_aswitch_test_claude_installed"
   cleanup_temp_dir(temp_home)
   try! @fs.create_dir(temp_home)
-  @sys.set_env_var("HOME", temp_home)
+  @env.set_env_var("HOME", temp_home)
 
   // Create .claude directory and settings.json
   let claude_dir = @path.Path(temp_home).join(".claude").to_string()
@@ -105,21 +105,21 @@ test "is_agent_installed returns true when Claude Code config file exists" {
 
   // Restore original HOME
   match original_home {
-    Some(home) => @sys.set_env_var("HOME", home)
-    None => @sys.unset_env_var("HOME")
+    Some(home) => @env.set_env_var("HOME", home)
+    None => @env.unset_env_var("HOME")
   }
 }
 
 ///|
 test "is_agent_installed returns false when Claude Code config file does not exist" {
   // Save original HOME
-  let original_home = @sys.get_env_var("HOME")
+  let original_home = @env.get_env_var("HOME")
 
   // Create temporary directory
   let temp_home = "_aswitch_test_claude_not_installed"
   cleanup_temp_dir(temp_home)
   try! @fs.create_dir(temp_home)
-  @sys.set_env_var("HOME", temp_home)
+  @env.set_env_var("HOME", temp_home)
 
   // Ensure .claude directory doesn't exist
   let claude_dir = @path.Path(temp_home).join(".claude").to_string()
@@ -137,23 +137,23 @@ test "is_agent_installed returns false when Claude Code config file does not exi
 
   // Restore original HOME
   match original_home {
-    Some(home) => @sys.set_env_var("HOME", home)
-    None => @sys.unset_env_var("HOME")
+    Some(home) => @env.set_env_var("HOME", home)
+    None => @env.unset_env_var("HOME")
   }
 }
 
 ///|
 test "is_agent_installed returns true when OpenCode config file exists" {
   // Save original HOME and XDG_CONFIG_HOME
-  let original_home = @sys.get_env_var("HOME")
-  let original_xdg = @sys.get_env_var("XDG_CONFIG_HOME")
+  let original_home = @env.get_env_var("HOME")
+  let original_xdg = @env.get_env_var("XDG_CONFIG_HOME")
 
   // Create temporary directory
   let temp_home = "_aswitch_test_opencode_installed"
   cleanup_temp_dir(temp_home)
   try! @fs.create_dir(temp_home)
-  @sys.set_env_var("HOME", temp_home)
-  @sys.unset_env_var("XDG_CONFIG_HOME") // Unset to test default ~/.config path
+  @env.set_env_var("HOME", temp_home)
+  @env.unset_env_var("XDG_CONFIG_HOME") // Unset to test default ~/.config path
 
   // Create .config/opencode directory and opencode.json
   let config_dir = @path.Path(temp_home).join(".config").to_string()
@@ -175,27 +175,27 @@ test "is_agent_installed returns true when OpenCode config file exists" {
 
   // Restore original environment
   match original_home {
-    Some(home) => @sys.set_env_var("HOME", home)
-    None => @sys.unset_env_var("HOME")
+    Some(home) => @env.set_env_var("HOME", home)
+    None => @env.unset_env_var("HOME")
   }
   match original_xdg {
-    Some(xdg) => @sys.set_env_var("XDG_CONFIG_HOME", xdg)
-    None => @sys.unset_env_var("XDG_CONFIG_HOME")
+    Some(xdg) => @env.set_env_var("XDG_CONFIG_HOME", xdg)
+    None => @env.unset_env_var("XDG_CONFIG_HOME")
   }
 }
 
 ///|
 test "is_agent_installed returns false when OpenCode config file does not exist" {
   // Save original HOME and XDG_CONFIG_HOME
-  let original_home = @sys.get_env_var("HOME")
-  let original_xdg = @sys.get_env_var("XDG_CONFIG_HOME")
+  let original_home = @env.get_env_var("HOME")
+  let original_xdg = @env.get_env_var("XDG_CONFIG_HOME")
 
   // Create temporary directory
   let temp_home = "_aswitch_test_opencode_not_installed"
   cleanup_temp_dir(temp_home)
   try! @fs.create_dir(temp_home)
-  @sys.set_env_var("HOME", temp_home)
-  @sys.unset_env_var("XDG_CONFIG_HOME") // Unset to test default ~/.config path
+  @env.set_env_var("HOME", temp_home)
+  @env.unset_env_var("XDG_CONFIG_HOME") // Unset to test default ~/.config path
 
   // Ensure opencode directory doesn't exist
   let opencode_dir = @path.Path(temp_home)
@@ -215,25 +215,25 @@ test "is_agent_installed returns false when OpenCode config file does not exist"
 
   // Restore original environment
   match original_home {
-    Some(home) => @sys.set_env_var("HOME", home)
-    None => @sys.unset_env_var("HOME")
+    Some(home) => @env.set_env_var("HOME", home)
+    None => @env.unset_env_var("HOME")
   }
   match original_xdg {
-    Some(xdg) => @sys.set_env_var("XDG_CONFIG_HOME", xdg)
-    None => @sys.unset_env_var("XDG_CONFIG_HOME")
+    Some(xdg) => @env.set_env_var("XDG_CONFIG_HOME", xdg)
+    None => @env.unset_env_var("XDG_CONFIG_HOME")
   }
 }
 
 ///|
 test "is_agent_installed returns true when OpenClaw config file exists" {
   // Save original HOME
-  let original_home = @sys.get_env_var("HOME")
+  let original_home = @env.get_env_var("HOME")
 
   // Create temporary directory
   let temp_home = "_aswitch_test_openclaw_installed"
   cleanup_temp_dir(temp_home)
   try! @fs.create_dir(temp_home)
-  @sys.set_env_var("HOME", temp_home)
+  @env.set_env_var("HOME", temp_home)
 
   // Create .openclaw directory and openclaw.json
   let openclaw_dir = @path.Path(temp_home).join(".openclaw").to_string()
@@ -252,21 +252,21 @@ test "is_agent_installed returns true when OpenClaw config file exists" {
 
   // Restore original HOME
   match original_home {
-    Some(home) => @sys.set_env_var("HOME", home)
-    None => @sys.unset_env_var("HOME")
+    Some(home) => @env.set_env_var("HOME", home)
+    None => @env.unset_env_var("HOME")
   }
 }
 
 ///|
 test "is_agent_installed returns false when OpenClaw config file does not exist" {
   // Save original HOME
-  let original_home = @sys.get_env_var("HOME")
+  let original_home = @env.get_env_var("HOME")
 
   // Create temporary directory
   let temp_home = "_aswitch_test_openclaw_not_installed"
   cleanup_temp_dir(temp_home)
   try! @fs.create_dir(temp_home)
-  @sys.set_env_var("HOME", temp_home)
+  @env.set_env_var("HOME", temp_home)
 
   // Ensure .openclaw directory doesn't exist
   let openclaw_dir = @path.Path(temp_home).join(".openclaw").to_string()
@@ -283,8 +283,8 @@ test "is_agent_installed returns false when OpenClaw config file does not exist"
 
   // Restore original HOME
   match original_home {
-    Some(home) => @sys.set_env_var("HOME", home)
-    None => @sys.unset_env_var("HOME")
+    Some(home) => @env.set_env_var("HOME", home)
+    None => @env.unset_env_var("HOME")
   }
 }
 

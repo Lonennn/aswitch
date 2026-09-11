@@ -80,11 +80,11 @@ fn cleanup_openclaw_temp_dir(temp_dir : String) -> Unit {
 
 ///|
 test "get_temporary_override preserves existing openclaw settings" {
-  let original_home = @sys.get_env_var("HOME")
+  let original_home = @env.get_env_var("HOME")
   let temp_home = "_aswitch_test_openclaw_temp_override"
   cleanup_openclaw_temp_dir(temp_home)
   try! @fs.create_dir(temp_home)
-  @sys.set_env_var("HOME", temp_home)
+  @env.set_env_var("HOME", temp_home)
 
   let openclaw_dir = @path.Path(temp_home).join(".openclaw").to_string()
   try! @fs.create_dir(openclaw_dir)
@@ -102,7 +102,7 @@ test "get_temporary_override preserves existing openclaw settings" {
     models: [@provider.Model::new(name="temp-model")],
   }
   let temporary_override = OpenClaw::get_temporary_override(
-    OpenClaw::{  },
+    OpenClaw::{ },
     provider,
     Some(OpenAI),
   )
@@ -131,7 +131,7 @@ test "get_temporary_override preserves existing openclaw settings" {
 
   cleanup_openclaw_temp_dir(temp_home)
   match original_home {
-    Some(home) => @sys.set_env_var("HOME", home)
-    None => @sys.unset_env_var("HOME")
+    Some(home) => @env.set_env_var("HOME", home)
+    None => @env.unset_env_var("HOME")
   }
 }

@@ -80,7 +80,7 @@ test "validate config with duplicate provider names returns error" {
     models: [@provider.Model::new(name="claude-3-opus", context_limit=200000)],
   }
 
-  let config = Config::{ providers: @list.List([provider1, provider2]) }
+  let config = Config::{ providers: @list.List([provider1, provider2]), }
   let result = validate_config(config)
   assert_true(result is Err(ValidationError::DuplicateProviderName(_)))
 }
@@ -94,7 +94,7 @@ test "validate valid config returns ok" {
     anthropic_base_url: None,
     models: [@provider.Model::new(name="gpt-4o", context_limit=128000)],
   }
-  let config = Config::{ providers: @list.List([provider]) }
+  let config = Config::{ providers: @list.List([provider]), }
   let result = validate_config(config)
   assert_true(result is Ok(_))
 }
@@ -108,7 +108,7 @@ test "config deep_copy returns independent provider list" {
     anthropic_base_url: None,
     models: [@provider.Model::new(name="gpt-4o", context_limit=128000)],
   }
-  let original = Config::{ providers: @list.List([provider]) }
+  let original = Config::{ providers: @list.List([provider]), }
   let copied = original.deep_copy()
   copied.providers = @list.new()
 

@@ -3,7 +3,7 @@ pub fn resolve_provider_credential(
   provider : @provider.Provider,
 ) -> Result[ResolvedCredential, String] {
   let env_var = provider_api_key_env_var(provider.name)
-  match @sys.get_env_var(env_var) {
+  match @env.get_env_var(env_var) {
     Some(value) =>
       if !value.trim().is_empty() {
         return Ok(ResolvedCredential::{
@@ -26,7 +26,7 @@ pub fn resolve_provider_credential(
   match provider.api_key {
     Some(key) =>
       if !key.trim().is_empty() {
-        Ok(ResolvedCredential::{ value: key, source: LegacyInline })
+        Ok(ResolvedCredential::{ value: key, source: LegacyInline, })
       } else {
         Err("Provider '\{provider.name}' has no resolvable API key")
       }

@@ -4,9 +4,9 @@ import {
 }
 
 fn get_home_dir() -> String raise Failure {
-  match @sys.get_env_var("HOME") {
+  match @env.get_env_var("HOME") {
     Some(h) => h
-    None => match @sys.get_env_var("USERPROFILE") {
+    None => match @env.get_env_var("USERPROFILE") {
       Some(h) => h
       None => raise Failure::Failure("Cannot determine home directory: neither HOME nor USERPROFILE is set")
     }

@@ -25,8 +25,8 @@ async fn with_temp_aswitch_home(
   test_suffix : String,
   body : async () -> Unit,
 ) -> Unit {
-  let original_home = @sys.get_env_var("ASWITCH_HOME")
-  let original_disable_keychain = @sys.get_env_var("ASWITCH_DISABLE_KEYCHAIN")
+  let original_home = @env.get_env_var("ASWITCH_HOME")
+  let original_disable_keychain = @env.get_env_var("ASWITCH_DISABLE_KEYCHAIN")
   if !@fs.path_exists("_aswitch_test") {
     try! @fs.create_dir("_aswitch_test")
   }
@@ -41,16 +41,16 @@ async fn with_temp_aswitch_home(
   defer {
     cleanup_temp_dir(temp_dir)
     match original_home {
-      Some(home) => @sys.set_env_var("ASWITCH_HOME", home)
-      None => @sys.unset_env_var("ASWITCH_HOME")
+      Some(home) => @env.set_env_var("ASWITCH_HOME", home)
+      None => @env.unset_env_var("ASWITCH_HOME")
     }
     match original_disable_keychain {
-      Some(value) => @sys.set_env_var("ASWITCH_DISABLE_KEYCHAIN", value)
-      None => @sys.unset_env_var("ASWITCH_DISABLE_KEYCHAIN")
+      Some(value) => @env.set_env_var("ASWITCH_DISABLE_KEYCHAIN", value)
+      None => @env.unset_env_var("ASWITCH_DISABLE_KEYCHAIN")
     }
   }
-  @sys.set_env_var("ASWITCH_HOME", temp_dir)
-  @sys.set_env_var("ASWITCH_DISABLE_KEYCHAIN", "1")
+  @env.set_env_var("ASWITCH_HOME", temp_dir)
+  @env.set_env_var("ASWITCH_DISABLE_KEYCHAIN", "1")
   body()
 }
 
@@ -152,7 +152,7 @@ async test "upsert_provider asks confirmation before overwrite and can cancel" {
       None,
       ["gpt-4o"],
     )
-    @core.save_config(@core.Config::{ providers: @list.List([initial]) }).unwrap()
+    @core.save_config(@core.Config::{ providers: @list.List([initial]), }).unwrap()
 
     let updated = single_provider(
       "OpenAI",
@@ -182,7 +182,7 @@ async test "upsert_provider overwrites provider when confirmed" {
       None,
       ["gpt-4o"],
     )
-    @core.save_config(@core.Config::{ providers: @list.List([initial]) }).unwrap()
+    @core.save_config(@core.Config::{ providers: @list.List([initial]), }).unwrap()
 
     let updated = single_provider(
       "openai",
@@ -217,7 +217,7 @@ async test "upsert_provider creates backup before saving updated config" {
       None,
       ["gpt-4o"],
     )
-    let initial_config = @core.Config::{ providers: @list.List([initial]) }
+    let initial_config = @core.Config::{ providers: @list.List([initial]), }
     @core.save_config(initial_config).unwrap()
     let config_path = @core.get_config_path()
 

@@ -1,7 +1,6 @@
 import {
   "moonbitlang/core/list",
   "moonbitlang/core/json",
-  "moonbitlang/core/ref",
   "moonbitlang/x/path",
   "moonbitlang/x/fs",
   "lonen44/aswitch/core/provider",
@@ -10,5 +9,5 @@ import {
 }
 
 import {
-  "moonbitlang/x/sys",
+  "moonbitlang/core/env",
 } for "wbtest"

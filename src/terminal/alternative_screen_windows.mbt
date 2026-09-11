@@ -21,7 +21,7 @@ let windows_alternate_screen_prompt = "\nPress any key to close..."
 ///|
 #cfg(platform="windows")
 fn is_windows_terminal() -> Bool {
-  match @sys.get_env_var("WT_SESSION") {
+  match @env.get_env_var("WT_SESSION") {
     Some(session) => !@util.is_blank(session)
     None => false
   }

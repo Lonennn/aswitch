@@ -63,7 +63,7 @@ fn generate_provider_diff(
   let updated_str = updated_json.stringify(indent=2)
   let diff_output = @util.generate_json_diff(original_str, updated_str)
 
-  ProviderDiff::{ config_path, diff_output }
+  ProviderDiff::{ config_path, diff_output, }
 }
 
 ///|
@@ -91,19 +91,19 @@ let agent_meta : Array[AgentMeta] = [
     canonical_name: ClaudeCode::canonical_name(),
     aliases: ClaudeCode::nicknames(),
     get_config_path: () => ClaudeCode::get_config_file_path(),
-    create_instance: () => ClaudeCode::{  },
+    create_instance: () => ClaudeCode::{ },
   },
   AgentMeta::{
     canonical_name: OpenCode::canonical_name(),
     aliases: OpenCode::nicknames(),
     get_config_path: () => OpenCode::get_config_file_path(),
-    create_instance: () => OpenCode::{  },
+    create_instance: () => OpenCode::{ },
   },
   AgentMeta::{
     canonical_name: OpenClaw::canonical_name(),
     aliases: OpenClaw::nicknames(),
     get_config_path: () => OpenClaw::get_config_file_path(),
-    create_instance: () => OpenClaw::{  },
+    create_instance: () => OpenClaw::{ },
   },
 ]
 

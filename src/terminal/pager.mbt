@@ -23,7 +23,7 @@ fn get_default_pager() -> String {
 /// Resolve the pager command to use.
 /// Priority: $PAGER environment variable → platform default pager → None
 pub fn resolve_pager() -> String? {
-  match @sys.get_env_var("PAGER") {
+  match @env.get_env_var("PAGER") {
     Some(pager) =>
       if @util.is_blank(pager) {
         None

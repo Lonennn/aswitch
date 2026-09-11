@@ -6,7 +6,7 @@ pub const DISABLE_KEYCHAIN_ENV : String = "ASWITCH_DISABLE_KEYCHAIN"
 
 ///|
 fn is_keychain_disabled() -> Bool {
-  match @sys.get_env_var(DISABLE_KEYCHAIN_ENV) {
+  match @env.get_env_var(DISABLE_KEYCHAIN_ENV) {
     Some(value) => {
       let normalized = value.trim().to_lower()
       normalized == "1" || normalized == "true" || normalized == "yes"
@@ -97,7 +97,7 @@ pub fn read_os_keychain_secret(
   }
   let account = @utf8.encode(canonical_credential_name(provider_name))
   match decode_keychain_read_result(keychain_read_ffi(account)) {
-    Ok(Some(secret)) => Ok(Some({ value: secret, source: OSKeychain }))
+    Ok(Some(secret)) => Ok(Some({ value: secret, source: OSKeychain, }))
     Ok(None) => Ok(None)
     Err(err) => Err(err)
   }

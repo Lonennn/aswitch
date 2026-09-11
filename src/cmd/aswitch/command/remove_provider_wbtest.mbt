@@ -46,7 +46,7 @@ async test "run_remove_provider supports case-insensitive provider lookup" {
       None,
       ["gpt-4o"],
     )
-    @core.save_config(@core.Config::{ providers: @list.List([openai]) }).unwrap()
+    @core.save_config(@core.Config::{ providers: @list.List([openai]), }).unwrap()
 
     let result = run_remove_provider(
       "openai",
@@ -87,7 +87,7 @@ async test "run_remove_provider can cancel operation" {
       None,
       ["gpt-4o"],
     )
-    @core.save_config(@core.Config::{ providers: @list.List([openai]) }).unwrap()
+    @core.save_config(@core.Config::{ providers: @list.List([openai]), }).unwrap()
 
     let result = run_remove_provider(
       "openai",

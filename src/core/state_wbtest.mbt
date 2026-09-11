@@ -30,7 +30,7 @@ test "UsageState::get_agent_state returns None for unknown agent" {
 
 ///|
 test "load_usage_state returns empty state when file missing" {
-  let original_home = @sys.get_env_var("ASWITCH_HOME")
+  let original_home = @env.get_env_var("ASWITCH_HOME")
   let temp_dir = "_aswitch_test_state_load_missing"
   try! @fs.create_dir(temp_dir)
   defer {
@@ -38,11 +38,11 @@ test "load_usage_state returns empty state when file missing" {
       _ => ()
     }
     match original_home {
-      Some(home) => @sys.set_env_var("ASWITCH_HOME", home)
-      None => @sys.unset_env_var("ASWITCH_HOME")
+      Some(home) => @env.set_env_var("ASWITCH_HOME", home)
+      None => @env.unset_env_var("ASWITCH_HOME")
     }
   }
-  @sys.set_env_var("ASWITCH_HOME", temp_dir)
+  @env.set_env_var("ASWITCH_HOME", temp_dir)
 
   let state = load_usage_state()
   assert_true(state.last_agent is None)
@@ -51,7 +51,7 @@ test "load_usage_state returns empty state when file missing" {
 
 ///|
 test "save and load usage state roundtrip" {
-  let original_home = @sys.get_env_var("ASWITCH_HOME")
+  let original_home = @env.get_env_var("ASWITCH_HOME")
   let temp_dir = "_aswitch_test_state_roundtrip"
   try! @fs.create_dir(temp_dir)
   defer {
@@ -63,11 +63,11 @@ test "save and load usage state roundtrip" {
       _ => ()
     }
     match original_home {
-      Some(home) => @sys.set_env_var("ASWITCH_HOME", home)
-      None => @sys.unset_env_var("ASWITCH_HOME")
+      Some(home) => @env.set_env_var("ASWITCH_HOME", home)
+      None => @env.unset_env_var("ASWITCH_HOME")
     }
   }
-  @sys.set_env_var("ASWITCH_HOME", temp_dir)
+  @env.set_env_var("ASWITCH_HOME", temp_dir)
 
   let state = UsageState::new()
   state.set_agent_state("claude-code", "seed", Some("anthropic"))
@@ -98,7 +98,7 @@ test "ToJson and FromJson for UsageState" {
   let state = UsageState::new()
   state.set_agent_state("claude-code", "seed", Some("anthropic"))
 
-  let json = state.to_json()
+  let json = ToJson::to_json(state)
   let json_str = json.stringify(indent=2)
 
   let parsed = try! @json.parse(json_str)

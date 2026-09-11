@@ -81,13 +81,13 @@ fn cleanup_open_code_temp_dir(temp_dir : String) -> Unit {
 
 ///|
 test "get_temporary_override preserves existing opencode settings" {
-  let original_home = @sys.get_env_var("HOME")
-  let original_xdg = @sys.get_env_var("XDG_CONFIG_HOME")
+  let original_home = @env.get_env_var("HOME")
+  let original_xdg = @env.get_env_var("XDG_CONFIG_HOME")
   let temp_home = "_aswitch_test_opencode_temp_override"
   cleanup_open_code_temp_dir(temp_home)
   try! @fs.create_dir(temp_home)
-  @sys.set_env_var("HOME", temp_home)
-  @sys.unset_env_var("XDG_CONFIG_HOME")
+  @env.set_env_var("HOME", temp_home)
+  @env.unset_env_var("XDG_CONFIG_HOME")
 
   let config_dir = @path.Path(temp_home).join(".config").to_string()
   try! @fs.create_dir(config_dir)
@@ -107,7 +107,7 @@ test "get_temporary_override preserves existing opencode settings" {
     models: [@provider.Model::new(name="temp-model")],
   }
   let temporary_override = OpenCode::get_temporary_override(
-    OpenCode::{  },
+    OpenCode::{ },
     provider,
     Some(OpenAI),
   )
@@ -131,12 +131,12 @@ test "get_temporary_override preserves existing opencode settings" {
 
   cleanup_open_code_temp_dir(temp_home)
   match original_home {
-    Some(home) => @sys.set_env_var("HOME", home)
-    None => @sys.unset_env_var("HOME")
+    Some(home) => @env.set_env_var("HOME", home)
+    None => @env.unset_env_var("HOME")
   }
   match original_xdg {
-    Some(xdg) => @sys.set_env_var("XDG_CONFIG_HOME", xdg)
-    None => @sys.unset_env_var("XDG_CONFIG_HOME")
+    Some(xdg) => @env.set_env_var("XDG_CONFIG_HOME", xdg)
+    None => @env.unset_env_var("XDG_CONFIG_HOME")
   }
 }
 

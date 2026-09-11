@@ -51,7 +51,7 @@ fn resolve_temporary_selection(
     }
   }
 
-  Ok(ResolvedTemporarySelection::{ agent, provider: provider_with_credential })
+  Ok(ResolvedTemporarySelection::{ agent, provider: provider_with_credential, })
 }
 
 ///|
@@ -260,7 +260,7 @@ fn string_to_utf8_bytes(str : String, append_nul : Bool) -> Bytes {
 ///|
 fn apply_env_vars(env_vars : Array[@agent.EnvVar]) -> Unit {
   for env_var in env_vars {
-    @sys.set_env_var(env_var.key, env_var.value)
+    @env.set_env_var(env_var.key, env_var.value)
   }
 }
 

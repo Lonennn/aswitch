@@ -25,7 +25,7 @@ pub fn get_state_path() -> String {
 ///|
 /// Create an empty usage state
 pub fn UsageState::new() -> UsageState {
-  { last_agent: None, agent_states: {} }
+  { last_agent: None, agent_states: {}, }
 }
 
 ///|
@@ -37,7 +37,9 @@ pub fn load_usage_state() -> UsageState {
   }
   let content = @fs.read_file_to_string(path) catch {
     err => {
-      println("Failed to read file '\{path}', \{err}, ignore the state")
+      println(
+        "Failed to read file '\{path}', \{Error::to_string(err)}, ignore the state",
+      )
       return UsageState::new()
     }
   }
@@ -61,11 +63,11 @@ pub fn save_usage_state(state : UsageState) -> Result[Unit, String] {
   let path = get_state_path()
   let parent_dir = @path.Path(path).dirname().to_string()
   @util.create_dirs(parent_dir) catch {
-    err => return Err("Failed to create directory: \{err}")
+    err => return Err("Failed to create directory: \{Error::to_string(err)}")
   }
-  let content = state.to_json().stringify(indent=2)
+  let content = ToJson::to_json(state).stringify(indent=2)
   try @fs.write_string_to_file(path, content) catch {
-    err => Err("Failed to write state file: \{err}")
+    err => Err("Failed to write state file: \{Error::to_string(err)}")
   } noraise {
     _ => Ok(())
   }
@@ -89,5 +91,5 @@ pub fn UsageState::set_agent_state(
   api_format : String?,
 ) -> Unit {
   self.last_agent = Some(agent)
-  self.agent_states.set(agent, { provider, api_format })
+  self.agent_states.set(agent, { provider, api_format, })
 }

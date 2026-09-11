@@ -11,7 +11,7 @@ pub fn init_config() -> Int {
 
     @util.create_dirs(parent) catch {
       e => {
-        println("Failed to create directory \{parent}: \{e}")
+        println("Failed to create directory \{parent}: \{Error::to_string(e)}")
         return EXIT_CODE_FAILED_TO_CREATE_DIR
       }
     }
@@ -23,7 +23,7 @@ pub fn init_config() -> Int {
     let content = config_json.stringify(indent=4)
     try @fs.write_string_to_file(path, content) catch {
       e => {
-        println("Error initializing config: \{e}")
+        println("Error initializing config: \{Error::to_string(e)}")
         EXIT_CODE_CONFIG_ERROR
       }
     } noraise {
@@ -35,7 +35,7 @@ pub fn init_config() -> Int {
   } else {
     let content = @fs.read_file_to_string(path) catch {
       e => {
-        println("Error patching config schema field: \{e}")
+        println("Error patching config schema field: \{Error::to_string(e)}")
         return EXIT_CODE_CONFIG_ERROR
       }
     }
@@ -57,7 +57,9 @@ pub fn init_config() -> Int {
           let updated_content = Json::object(entries).stringify(indent=4)
           try @fs.write_string_to_file(path, updated_content) catch {
             e => {
-              println("Error patching config schema field: \{e}")
+              println(
+                "Error patching config schema field: \{Error::to_string(e)}",
+              )
               EXIT_CODE_CONFIG_ERROR
             }
           } noraise {

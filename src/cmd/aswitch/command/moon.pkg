@@ -7,20 +7,20 @@ import {
   "lonen44/aswitch/util",
   "lonen44/aswitch/terminal",
   "moonbitlang/core/debug",
+  "moonbitlang/core/env",
   "moonbitlang/core/json",
   "moonbitlang/core/buffer",
   "moonbitlang/core/encoding/utf8",
   "moonbitlang/core/list",
   "moonbitlang/x/fs",
   "moonbitlang/x/path",
-  "moonbitlang/x/sys",
 }
 
 import {
   "moonbitlang/async",
+  "moonbitlang/core/env",
   "moonbitlang/core/json",
   "moonbitlang/x/path",
-  "moonbitlang/x/sys",
 } for "wbtest"
 
 options(

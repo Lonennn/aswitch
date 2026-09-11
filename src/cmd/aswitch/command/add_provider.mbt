@@ -276,7 +276,7 @@ async fn upsert_provider(
     config.providers,
     provider_to_save,
   )
-  let updated_config = @core.Config::{ providers: updated_providers }
+  let updated_config = @core.Config::{ providers: updated_providers, }
   let validate_config_result = @core.validate_config(updated_config)
   guard validate_config_result is Ok(_) else {
     return Err(

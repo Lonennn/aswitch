@@ -1,19 +1,19 @@
 ///|
 fn with_credential_env(body : () -> Unit raise Error) -> Unit raise Error {
-  let original_disable = @sys.get_env_var("ASWITCH_DISABLE_KEYCHAIN")
-  let original_openai = @sys.get_env_var("ASWITCH_OPENAI_API_KEY")
+  let original_disable = @env.get_env_var("ASWITCH_DISABLE_KEYCHAIN")
+  let original_openai = @env.get_env_var("ASWITCH_OPENAI_API_KEY")
   defer {
     match original_disable {
-      Some(value) => @sys.set_env_var("ASWITCH_DISABLE_KEYCHAIN", value)
-      None => @sys.unset_env_var("ASWITCH_DISABLE_KEYCHAIN")
+      Some(value) => @env.set_env_var("ASWITCH_DISABLE_KEYCHAIN", value)
+      None => @env.unset_env_var("ASWITCH_DISABLE_KEYCHAIN")
     }
     match original_openai {
-      Some(value) => @sys.set_env_var("ASWITCH_OPENAI_API_KEY", value)
-      None => @sys.unset_env_var("ASWITCH_OPENAI_API_KEY")
+      Some(value) => @env.set_env_var("ASWITCH_OPENAI_API_KEY", value)
+      None => @env.unset_env_var("ASWITCH_OPENAI_API_KEY")
     }
   }
-  @sys.set_env_var("ASWITCH_DISABLE_KEYCHAIN", "1")
-  @sys.unset_env_var("ASWITCH_OPENAI_API_KEY")
+  @env.set_env_var("ASWITCH_DISABLE_KEYCHAIN", "1")
+  @env.unset_env_var("ASWITCH_OPENAI_API_KEY")
   body()
 }
 
@@ -65,7 +65,7 @@ test "keychain read result rejects malformed packets" {
 ///|
 test "resolve_provider_credential prefers environment variable" {
   with_credential_env(fn() raise {
-    @sys.set_env_var("ASWITCH_OPENAI_API_KEY", "sk-env")
+    @env.set_env_var("ASWITCH_OPENAI_API_KEY", "sk-env")
     let provider = credential_test_provider(Some("sk-inline"))
     let resolved = resolve_provider_credential(provider).unwrap()
     assert_true(resolved.value == "sk-env")

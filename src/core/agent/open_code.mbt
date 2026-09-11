@@ -31,7 +31,7 @@ pub fn OpenCode::get_config_file_path() -> String {
 /// Supports Unix/macOS (XDG_CONFIG_HOME or HOME) and Windows (APPDATA)
 fn OpenCode::get_config_dir() -> String {
   // Try XDG_CONFIG_HOME first (Unix standard)
-  let dir = match @sys.get_env_var("XDG_CONFIG_HOME") {
+  let dir = match @env.get_env_var("XDG_CONFIG_HOME") {
     Some(config_home) => @path.Path::join(config_home, "opencode")
     None => @path.Path::join(@util.get_user_home(), ".config").join("opencode")
   }
@@ -287,7 +287,7 @@ fn OpenCode::get_temporary_override(
   TemporaryOverride::{
     executable: "opencode",
     args: [],
-    env_vars: [EnvVar::{ key: "OPENCODE_CONFIG_CONTENT", value: content }],
+    env_vars: [EnvVar::{ key: "OPENCODE_CONFIG_CONTENT", value: content, }],
     temp_files: [],
     api_format: selected_api_format,
   }

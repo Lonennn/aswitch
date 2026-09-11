@@ -2,7 +2,7 @@
 
 ///|
 impl Show for Command with fn output(self, logger) -> Unit {
-  logger.write_string(self.to_repr().to_string())
+  logger.write_string(@debug.Debug::to_repr(self).to_string())
 }
 
 ///|
@@ -108,10 +108,10 @@ test "set_provider fails with invalid config" {
     models: [@provider.Model::new(name="gpt-4o", context_limit=128000)],
   }
 
-  let config = @core.Config::{ providers: @list.List([provider1, provider2]) }
+  let config = @core.Config::{ providers: @list.List([provider1, provider2]), }
 
   // Create 100% isolated temporary directory for test config - NO RISK to user data
-  let original_home = @sys.get_env_var("ASWITCH_HOME")
+  let original_home = @env.get_env_var("ASWITCH_HOME")
   // Use unique directory name that will never conflict with user files
   let temp_dir = "_aswitch_test_temp_config"
   // Create temp directory (will fail if already exists, which is safe)
@@ -128,9 +128,9 @@ test "set_provider fails with invalid config" {
       _ => ()
     }
     // Restore original environment
-    @sys.set_env_var("ASWITCH_HOME", original_home.unwrap_or(""))
+    @env.set_env_var("ASWITCH_HOME", original_home.unwrap_or(""))
   }
-  @sys.set_env_var("ASWITCH_HOME", temp_dir)
+  @env.set_env_var("ASWITCH_HOME", temp_dir)
 
   // Save test config to ISOLATED temp directory - never touches user's real config
   @core.save_config(config).unwrap()
@@ -222,21 +222,21 @@ fn command_with_temp_aswitch_home(
   temp_dir : String,
   body : () -> Unit raise Error,
 ) -> Unit raise Error {
-  let original_home = @sys.get_env_var("ASWITCH_HOME")
-  let original_disable_keychain = @sys.get_env_var("ASWITCH_DISABLE_KEYCHAIN")
+  let original_home = @env.get_env_var("ASWITCH_HOME")
+  let original_disable_keychain = @env.get_env_var("ASWITCH_DISABLE_KEYCHAIN")
   cleanup_command_temp_dir(temp_dir)
   try! @fs.create_dir(temp_dir)
-  @sys.set_env_var("ASWITCH_HOME", temp_dir)
-  @sys.set_env_var("ASWITCH_DISABLE_KEYCHAIN", "1")
+  @env.set_env_var("ASWITCH_HOME", temp_dir)
+  @env.set_env_var("ASWITCH_DISABLE_KEYCHAIN", "1")
   defer {
     cleanup_command_temp_dir(temp_dir)
     match original_home {
-      Some(home) => @sys.set_env_var("ASWITCH_HOME", home)
-      None => @sys.unset_env_var("ASWITCH_HOME")
+      Some(home) => @env.set_env_var("ASWITCH_HOME", home)
+      None => @env.unset_env_var("ASWITCH_HOME")
     }
     match original_disable_keychain {
-      Some(value) => @sys.set_env_var("ASWITCH_DISABLE_KEYCHAIN", value)
-      None => @sys.unset_env_var("ASWITCH_DISABLE_KEYCHAIN")
+      Some(value) => @env.set_env_var("ASWITCH_DISABLE_KEYCHAIN", value)
+      None => @env.unset_env_var("ASWITCH_DISABLE_KEYCHAIN")
     }
   }
   body()
@@ -247,21 +247,21 @@ fn command_with_temp_xdg_config_home(
   temp_dir : String,
   body : () -> Unit raise Error,
 ) -> Unit raise Error {
-  let original_home = @sys.get_env_var("HOME")
-  let original_xdg = @sys.get_env_var("XDG_CONFIG_HOME")
+  let original_home = @env.get_env_var("HOME")
+  let original_xdg = @env.get_env_var("XDG_CONFIG_HOME")
   cleanup_command_temp_dir(temp_dir)
   try! @fs.create_dir(temp_dir)
-  @sys.set_env_var("HOME", temp_dir)
-  @sys.set_env_var("XDG_CONFIG_HOME", temp_dir)
+  @env.set_env_var("HOME", temp_dir)
+  @env.set_env_var("XDG_CONFIG_HOME", temp_dir)
   defer {
     cleanup_command_temp_dir(temp_dir)
     match original_home {
-      Some(home) => @sys.set_env_var("HOME", home)
-      None => @sys.unset_env_var("HOME")
+      Some(home) => @env.set_env_var("HOME", home)
+      None => @env.unset_env_var("HOME")
     }
     match original_xdg {
-      Some(xdg) => @sys.set_env_var("XDG_CONFIG_HOME", xdg)
-      None => @sys.unset_env_var("XDG_CONFIG_HOME")
+      Some(xdg) => @env.set_env_var("XDG_CONFIG_HOME", xdg)
+      None => @env.unset_env_var("XDG_CONFIG_HOME")
     }
   }
   body()
@@ -269,7 +269,7 @@ fn command_with_temp_xdg_config_home(
 
 ///|
 fn write_test_config(providers : Array[@provider.Provider]) -> Unit {
-  let config = @core.Config::{ providers: @list.List(providers) }
+  let config = @core.Config::{ providers: @list.List(providers), }
   @core.save_config(config).unwrap()
 }
 
@@ -591,19 +591,19 @@ async test "temporary_command rejects openclaw render-only workflow" {
   let temp_dir = "_aswitch_test_temp_command_openclaw"
   cleanup_command_temp_dir(temp_dir)
   try! @fs.create_dir(temp_dir)
-  let original_home = @sys.get_env_var("ASWITCH_HOME")
-  let original_disable_keychain = @sys.get_env_var("ASWITCH_DISABLE_KEYCHAIN")
-  @sys.set_env_var("ASWITCH_HOME", temp_dir)
-  @sys.set_env_var("ASWITCH_DISABLE_KEYCHAIN", "1")
+  let original_home = @env.get_env_var("ASWITCH_HOME")
+  let original_disable_keychain = @env.get_env_var("ASWITCH_DISABLE_KEYCHAIN")
+  @env.set_env_var("ASWITCH_HOME", temp_dir)
+  @env.set_env_var("ASWITCH_DISABLE_KEYCHAIN", "1")
   defer {
     cleanup_command_temp_dir(temp_dir)
     match original_home {
-      Some(home) => @sys.set_env_var("ASWITCH_HOME", home)
-      None => @sys.unset_env_var("ASWITCH_HOME")
+      Some(home) => @env.set_env_var("ASWITCH_HOME", home)
+      None => @env.unset_env_var("ASWITCH_HOME")
     }
     match original_disable_keychain {
-      Some(value) => @sys.set_env_var("ASWITCH_DISABLE_KEYCHAIN", value)
-      None => @sys.unset_env_var("ASWITCH_DISABLE_KEYCHAIN")
+      Some(value) => @env.set_env_var("ASWITCH_DISABLE_KEYCHAIN", value)
+      None => @env.unset_env_var("ASWITCH_DISABLE_KEYCHAIN")
     }
   }
 

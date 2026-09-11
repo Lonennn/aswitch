@@ -323,9 +323,9 @@ fn OpenClaw::get_temporary_override(
   TemporaryOverride::{
     executable: "openclaw",
     args: [],
-    env_vars: [EnvVar::{ key: "OPENCLAW_CONFIG_PATH", value: temp_path }],
+    env_vars: [EnvVar::{ key: "OPENCLAW_CONFIG_PATH", value: temp_path, }],
     temp_files: [
-      TempFile::{ path: temp_path, content: updated_json.stringify(indent=2) },
+      TempFile::{ path: temp_path, content: updated_json.stringify(indent=2), },
     ],
     api_format: selected_api_format,
   }
