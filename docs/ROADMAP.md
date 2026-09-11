@@ -94,6 +94,7 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 |------|------------|----------------|--------|
 | **✅ Shell Integration** (Zsh & PowerShell completed 2026-04-28) | We believe that shell completions and aliases will reduce command execution time by 50% because users currently type full commands. | Command completion usage | S (1-2 weeks) |
 | **✅ Temporary Provider Override** (Completed 2026-04-24) | We believe that non-persistent provider overrides will unlock one-off tasks, CI jobs, and per-command experimentation because `set` currently rewrites agent config files even when the user only needs a temporary switch. | % of switches done without file writes | M (2-3 weeks) |
+| **CI Build & Check Automation** | We believe that running `moon check` and `moon build cmd/aswitch` in CI will catch regressions earlier because the project currently relies on local discipline for basic validation before merge. | Failed CI rate / pre-merge regression catch rate | S (1 week) |
 | **Codex Support** | We believe that supporting Codex will expand ASwitch coverage for OpenAI-native coding workflows because users who switch between Claude Code, OpenCode, OpenClaw, and Codex should be able to manage provider selection from the same config. | Active Codex users / successful switches | M (2-3 weeks) |
 | **Unset Command** | We believe that an `unset` command will make provider switching safer and more reversible because users need a first-class way to remove ASwitch-managed provider settings from an agent without manually editing JSON files. | Successful restore/unset operations | S (1-2 weeks) |
 
@@ -102,6 +103,7 @@ ASwitch is a command-line tool for switching AI model providers across multiple 
 - [x] PowerShell completions (completed 2026-04-28)
 - [ ] Bash/Fish completions
 - [x] Temporary provider override workflow for one command or one shell session (`command` / `exec`, completed 2026-04-24)
+- [ ] CI workflow that runs `moon check` and `moon build cmd/aswitch` on pull requests and main branch updates
 - [x] Remember last used provider: `set`, `exec` (`run`), and `command` commands recall the previously used agent and provider from `~/.aswitch/state.json` so subsequent invocations do not require these arguments (completed 2026-05-25)
 - [x] Agent and provider name prefix matching for `set`, `exec` (`run`), and `command` commands: users can type unique prefixes instead of full names (e.g., `clau` resolves to `claude-code`, `ope` resolves to `open-code` if unambiguous; ambiguous prefixes produce an error listing candidates) (completed 2026-05-31)
 - [ ] Codex agent implementation with provider apply, dry-run diff, detection, aliases, and temporary override support
@@ -174,6 +176,7 @@ Q2 2026 (Completed - Agent Expansion):
 
 Q3 2026 (Current - Developer Experience):
 ├── Shell Completions (Zsh ✅, PowerShell ✅, Bash/Fish pending)
+├── CI Build & Check Automation
 ├── Provider Presets
 ├── Codex Agent Support
 ├── Unset Command
@@ -217,10 +220,11 @@ Q1 2027 (Exploration - Advanced):
 ## Immediate Priorities (Next 30-60 Days)
 
 1. Deliver package distribution (Homebrew first, then apt/scoop).
-2. Add Codex agent support.
-3. Add `unset` command support.
-4. Add shell completions for Bash/Fish (Zsh & PowerShell already complete).
-5. Add built-in provider presets for common model providers (OpenAI, Anthropic, Moonshot, DeepSeek, etc.).
+2. Add CI workflow coverage for `moon check` and `moon build cmd/aswitch`.
+3. Add Codex agent support.
+4. Add `unset` command support.
+5. Add shell completions for Bash/Fish (Zsh & PowerShell already complete).
+6. Add built-in provider presets for common model providers (OpenAI, Anthropic, Moonshot, DeepSeek, etc.).
 
 ---
 
