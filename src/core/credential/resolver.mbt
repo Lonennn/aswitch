@@ -17,6 +17,10 @@ pub fn resolve_provider_credential(
   match read_os_keychain_secret(provider.name) {
     Ok(Some(credential)) => return Ok(credential)
     Ok(None) | Err(Unavailable) => ()
+    Err(Denied) =>
+      return Err(
+        "Credential lookup for provider '\{provider.name}' was denied by the OS keychain. Set \{env_var} or clear and re-store the credential with the current Apple-signed executable",
+      )
     Err(state) =>
       return Err(
         "Credential lookup for provider '\{provider.name}' stopped because the OS keychain is \{credential_backend_status_message(state)}",
