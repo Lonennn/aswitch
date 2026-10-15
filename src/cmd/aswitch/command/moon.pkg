@@ -1,4 +1,7 @@
+supported_targets = "native"
+
 import {
+  "moonbit-community/proton_clipboard",
   "moonbitlang/async/stdio",
   "lonen44/aswitch/core",
   "lonen44/aswitch/core/agent",
@@ -26,20 +29,20 @@ import {
 options(
   "native-stub": [ "launcher.c" ],
   targets: {
-    "add_provider.mbt": [ "native", "llvm" ],
-    "add_provider_wbtest.mbt": [ "native", "llvm" ],
-    "command.mbt": [ "native", "llvm" ],
-    "command_wbtest.mbt": [ "native", "llvm" ],
-    "exit_code.mbt": [ "native", "llvm" ],
-    "help.mbt": [ "native", "llvm" ],
-    "init_config.mbt": [ "native", "llvm" ],
+    "add_provider.mbt": [ "native" ],
+    "add_provider_wbtest.mbt": [ "native" ],
+    "command.mbt": [ "native" ],
+    "command_wbtest.mbt": [ "native" ],
+    "exit_code.mbt": [ "native" ],
+    "help.mbt": [ "native" ],
+    "init_config.mbt": [ "native" ],
     "launcher.c": [ "native" ],
-    "list_agents.mbt": [ "native", "llvm" ],
-    "list_providers.mbt": [ "native", "llvm" ],
-    "prompt.mbt": [ "native", "llvm" ],
-    "remove_provider.mbt": [ "native", "llvm" ],
-    "remove_provider_wbtest.mbt": [ "native", "llvm" ],
-    "set_provider.mbt": [ "native", "llvm" ],
-    "temporary_provider.mbt": [ "native", "llvm" ],
+    "list_agents.mbt": [ "native" ],
+    "list_providers.mbt": [ "native" ],
+    "prompt.mbt": [ "native" ],
+    "remove_provider.mbt": [ "native" ],
+    "remove_provider_wbtest.mbt": [ "native" ],
+    "set_provider.mbt": [ "native" ],
+    "temporary_provider.mbt": [ "native" ],
   },
 )

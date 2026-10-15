@@ -5,6 +5,7 @@ version = "0.6.0"
 import {
   "moonbitlang/x@0.5.5",
   "moonbitlang/async@0.20.3",
+  "moonbit-community/proton_clipboard@0.2.9",
 }
 
 readme = "README.mbt.md"

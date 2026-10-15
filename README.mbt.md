@@ -18,7 +18,7 @@ aswitch providers
 aswitch agents
 aswitch set <agent> [provider] [openai|anthropic] [--dry-run|-n]
 aswitch run [agent] [provider] [--api-format openai|anthropic] [--print-command] [-- <args...>]
-aswitch command [agent] [provider] [--api-format openai|anthropic] [--raw]
+aswitch command [agent] [provider] [--api-format openai|anthropic] [--raw] [--copy]
 aswitch add
 aswitch add <name> <api_key> <base_url> <model>
 aswitch add --name <name> --api-key <key> --model <model> \
@@ -63,7 +63,9 @@ The `run` command is the fastest way to start an agent with a temporary
 provider override without modifying any config files. The `command`
 subcommand shows the resolved agent, provider, API format, and shell command
 without executing it. Use `--raw` when a caller needs only the shell command on
-stdout for scripting.
+stdout for scripting. Use `--copy` to copy it instead (takes precedence over
+`--raw`). Copied commands start with a space to help avoid shell history when
+configured; clipboard history may still retain credentials.
 
 ## Configuration
 

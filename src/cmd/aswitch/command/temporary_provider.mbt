@@ -144,6 +144,15 @@ fn render_temporary_command_buffer(
 }
 
 ///|
+fn copy_command_to_clipboard_with(
+  command : String,
+  write_text : (String) -> Result[Unit, String],
+) -> Result[Unit, String] {
+  // Add leading space to avoid being recorded by the shell history
+  write_text(" " + command)
+}
+
+///|
 /// This function is async because it may render the command inside a
 /// temporary terminal buffer (@terminal.display_in_temporary_terminal_buffer)
 /// to prevent secrets from leaking into terminal scrollback.
@@ -151,14 +160,14 @@ pub async fn temporary_command(
   agent_name : String?,
   provider_name : String?,
   api_format : @agent.ApiFormat?,
-  raw? : Bool = false,
+  output? : CommandOutput = Display,
 ) -> Int {
   let state = @core.load_usage_state()
 
   let resolved_agent_name = resolve_agent_from_state(
     agent_name,
     state,
-    usage="Usage: aswitch command [agent] [provider] [--api-format <fmt>] [--raw]",
+    usage="Usage: aswitch command [agent] [provider] [--api-format <fmt>] [--raw] [--copy]",
     print_resolution=false,
   )
   guard resolved_agent_name is Ok(agent) else {
@@ -181,7 +190,7 @@ pub async fn temporary_command(
         None => {
           println("Error: No previous provider found for agent '\{agent}'")
           println(
-            "Usage: aswitch command [agent] [provider] [--api-format <fmt>] [--raw]",
+            "Usage: aswitch command [agent] [provider] [--api-format <fmt>] [--raw] [--copy]",
           )
           return EXIT_CODE_CONFIG_ERROR
         }
@@ -215,24 +224,36 @@ pub async fn temporary_command(
   )
   let save_result = @core.save_usage_state(state)
   if save_result is Err(err) {
-    if raw {
+    if output is Raw {
       @stdio.stderr.write("Warning: Failed to save usage state: \{err}\n")
     } else {
       println("Warning: Failed to save usage state: \{err}")
     }
   }
 
-  if raw {
-    println(rendered_command.command)
-  } else {
-    @terminal.display_in_temporary_terminal_buffer(
-      render_temporary_command_buffer(
-        selection.agent.name(),
-        selection.provider.name,
-        rendered_command.temporary_override.api_format,
-        rendered_command.command,
-      ),
-    )
+  match output {
+    Clipboard =>
+      match
+        copy_command_to_clipboard_with(
+          rendered_command.command,
+          @proton_clipboard.write_text,
+        ) {
+        Ok(_) => println("Command copied to clipboard.")
+        Err(err) => {
+          println("Error: Failed to copy command to clipboard: \{err}")
+          return EXIT_CODE_CONFIG_ERROR
+        }
+      }
+    Raw => println(rendered_command.command)
+    Display =>
+      @terminal.display_in_temporary_terminal_buffer(
+        render_temporary_command_buffer(
+          selection.agent.name(),
+          selection.provider.name,
+          rendered_command.temporary_override.api_format,
+          rendered_command.command,
+        ),
+      )
   }
 
   EXIT_CODE_SUCCESS

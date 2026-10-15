@@ -384,11 +384,11 @@ test "init_config returns error for non-object config root" {
 test "parse_args maps temporary command and exec variants" {
   match
     parse_args(["command", "claude-code", "seed", "--api-format", "anthropic"]) {
-    TemporaryCommand(agent~, provider~, api_format~, raw~) => {
+    TemporaryCommand(agent~, provider~, api_format~, output~) => {
       assert_true(agent == Some("claude-code"))
       assert_true(provider == Some("seed"))
       assert_true(api_format is Some(@agent.Anthropic))
-      assert_false(raw)
+      assert_true(output is Display)
     }
     other => fail("Expected TemporaryCommand, got \{other}")
   }
@@ -397,11 +397,21 @@ test "parse_args maps temporary command and exec variants" {
     parse_args([
       "command", "--raw", "claude-code", "seed", "--api-format", "anthropic",
     ]) {
-    TemporaryCommand(agent~, provider~, api_format~, raw~) => {
+    TemporaryCommand(agent~, provider~, api_format~, output~) => {
       assert_true(agent == Some("claude-code"))
       assert_true(provider == Some("seed"))
       assert_true(api_format is Some(@agent.Anthropic))
-      assert_true(raw)
+      assert_true(output is Raw)
+    }
+    other => fail("Expected TemporaryCommand, got \{other}")
+  }
+
+  match parse_args(["command", "--copy", "claude-code", "seed"]) {
+    TemporaryCommand(agent~, provider~, api_format~, output~) => {
+      assert_true(agent == Some("claude-code"))
+      assert_true(provider == Some("seed"))
+      assert_true(api_format is None)
+      assert_true(output is Clipboard)
     }
     other => fail("Expected TemporaryCommand, got \{other}")
   }
@@ -510,6 +520,22 @@ test "render_temporary_command_buffer shows inferred api format" {
       #|Command:
       #|OPENCODE_CONFIG_CONTENT='{}' opencode
     ),
+  )
+}
+
+///|
+test "copy command helper passes payload and preserves clipboard errors" {
+  let received = Ref("")
+  let success = copy_command_to_clipboard_with("claude", fn(payload) {
+    received.val = payload
+    Ok(())
+  })
+  assert_true(success is Ok(_))
+  assert_true(received.val == " claude")
+
+  assert_true(
+    copy_command_to_clipboard_with("secret", fn(_) { Err("unavailable") }) ==
+    Err("unavailable"),
   )
 }
 
@@ -677,11 +703,11 @@ test "parse_args exec with no args omits both" {
 ///|
 test "parse_args command with only agent omits provider" {
   match parse_args(["command", "claudecode"]) {
-    TemporaryCommand(agent~, provider~, api_format~, raw~) => {
+    TemporaryCommand(agent~, provider~, api_format~, output~) => {
       assert_true(agent == Some("claudecode"))
       assert_true(provider is None)
       assert_true(api_format is None)
-      assert_false(raw)
+      assert_true(output is Display)
     }
     other => fail("Expected TemporaryCommand, got \{other}")
   }
@@ -690,11 +716,11 @@ test "parse_args command with only agent omits provider" {
 ///|
 test "parse_args command with no args omits both" {
   match parse_args(["command"]) {
-    TemporaryCommand(agent~, provider~, api_format~, raw~) => {
+    TemporaryCommand(agent~, provider~, api_format~, output~) => {
       assert_true(agent is None)
       assert_true(provider is None)
       assert_true(api_format is None)
-      assert_false(raw)
+      assert_true(output is Display)
     }
     other => fail("Expected TemporaryCommand, got \{other}")
   }

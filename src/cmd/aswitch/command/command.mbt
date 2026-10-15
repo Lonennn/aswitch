@@ -1,4 +1,12 @@
 ///|
+/// Output destination and presentation for a temporary shell command.
+pub enum CommandOutput {
+  Display
+  Raw
+  Clipboard
+} derive(Debug, Eq)
+
+///|
 /// Available CLI commands
 pub enum Command {
   /// Initialize configuration
@@ -19,8 +27,7 @@ pub enum Command {
     agent~ : String?,
     provider~ : String?,
     api_format~ : @agent.ApiFormat?,
-    /// Print only the rendered shell command, without the informational buffer.
-    raw~ : Bool
+    output~ : CommandOutput
   )
   /// Execute a command with a temporary provider override
   TemporaryExec(
@@ -256,13 +263,13 @@ fn parse_temporary_command(args : Array[String]) -> Command {
   guard parse_result is Ok((filtered_args, api_format)) else {
     return Command::ErrorParameter(parse_result.unwrap_err())
   }
-  let mut raw = false
+  let mut output = CommandOutput::Display
   let positional_args : Array[String] = []
   for arg in filtered_args {
-    if arg == "--raw" {
-      raw = true
-    } else {
-      positional_args.push(arg)
+    match arg {
+      "--copy" => output = Clipboard
+      "--raw" => if output != Clipboard { output = Raw }
+      _ => positional_args.push(arg)
     }
   }
   match positional_args {
@@ -271,20 +278,20 @@ fn parse_temporary_command(args : Array[String]) -> Command {
         agent=Some(agent),
         provider=Some(provider),
         api_format~,
-        raw~,
+        output~,
       )
     [agent] =>
       Command::TemporaryCommand(
         agent=Some(agent),
         provider=None,
         api_format~,
-        raw~,
+        output~,
       )
     [] =>
-      Command::TemporaryCommand(agent=None, provider=None, api_format~, raw~)
+      Command::TemporaryCommand(agent=None, provider=None, api_format~, output~)
     _ =>
       Command::ErrorParameter(
-        "Error: 'command' requires [agent] [provider] and optional --api-format <openai|anthropic> or --raw",
+        "Error: 'command' requires [agent] [provider] and optional --api-format <openai|anthropic>, --raw, or --copy",
       )
   }
 }
