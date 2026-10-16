@@ -59,13 +59,7 @@ aswitch run claude-code anthropic -- claude
 aswitch run -- claude
 ```
 
-The `run` command is the fastest way to start an agent with a temporary
-provider override without modifying any config files. The `command`
-subcommand shows the resolved agent, provider, API format, and shell command
-without executing it. Use `--raw` when a caller needs only the shell command on
-stdout for scripting. Use `--copy` to copy it instead (takes precedence over
-`--raw`). Copied commands start with a space to help avoid shell history when
-configured; clipboard history may still retain credentials.
+The `run` command is the fastest way to start an agent with a temporary provider override without modifying any config files. The `command` subcommand shows the resolved agent, provider, API format, and shell command without executing it. Use `--raw` when a caller needs only the shell command on stdout for scripting. Use `--copy` to copy it instead (takes precedence over `--raw`). Copied commands start with a space to help avoid shell history when configured; clipboard history may still retain credentials.
 
 ## Configuration
 
@@ -123,7 +117,6 @@ See the complete [Shell Completion Installation Guide](./docs/shell-completions.
 
 ## Development
 
-See the [build guide](./docs/building.md) for building from source,
-running locally, and signing macOS releases.
+See the [build guide](./docs/building.md) for building from source, running locally, and signing macOS releases.
 
 See the [development guide](./docs/development.md) for development guidance.
