@@ -289,12 +289,7 @@ pub impl Agent for OpenClaw with fn apply_provider(_self, provider, api_format) 
 }
 
 ///|
-/// Generate a diff of what changes would be made without writing to disk
-fn OpenClaw::get_provider_diff_impl(
-  _ : OpenClaw,
-  provider : @provider.Provider,
-  api_format : ApiFormat?,
-) -> ProviderDiff raise Error {
+pub impl Agent for OpenClaw with fn get_provider_diff(_, provider, api_format) -> ProviderDiff raise Error {
   let config_path = OpenClaw::get_config_file_path()
   generate_provider_diff(config_path, fn(settings) raise {
     OpenClaw::apply_provider_to_json(settings, provider, api_format)
@@ -302,19 +297,10 @@ fn OpenClaw::get_provider_diff_impl(
 }
 
 ///|
-pub impl Agent for OpenClaw with fn get_provider_diff(
-  self,
+pub impl Agent for OpenClaw with fn get_temporary_override(
+  _,
   provider,
   api_format,
-) -> ProviderDiff raise Error {
-  OpenClaw::get_provider_diff_impl(self, provider, api_format)
-}
-
-///|
-fn OpenClaw::get_temporary_override_impl(
-  _ : OpenClaw,
-  provider : @provider.Provider,
-  api_format : ApiFormat?,
 ) -> TemporaryOverride raise Error {
   let config_path = OpenClaw::get_config_file_path()
   let settings_json = load_agent_settings_json(config_path)
@@ -338,15 +324,6 @@ fn OpenClaw::get_temporary_override_impl(
     ],
     api_format: selected_api_format,
   }
-}
-
-///|
-pub impl Agent for OpenClaw with fn get_temporary_override(
-  self,
-  provider,
-  api_format,
-) -> TemporaryOverride raise Error {
-  OpenClaw::get_temporary_override_impl(self, provider, api_format)
 }
 
 ///|

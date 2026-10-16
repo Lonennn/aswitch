@@ -139,12 +139,7 @@ pub impl Agent for ClaudeCode with fn apply_provider(_, provider, _) -> Unit rai
 }
 
 ///|
-/// Generate a diff of what changes would be made without writing to disk
-fn ClaudeCode::get_provider_diff_impl(
-  _ : ClaudeCode,
-  provider : @provider.Provider,
-  _ : ApiFormat?,
-) -> ProviderDiff raise Error {
+pub impl Agent for ClaudeCode with fn get_provider_diff(_, provider, _) -> ProviderDiff raise Error {
   let config_path = ClaudeCode::get_config_file_path()
   generate_provider_diff(config_path, fn(settings) raise {
     ClaudeCode::apply_provider_to_json(settings, provider)
@@ -152,20 +147,7 @@ fn ClaudeCode::get_provider_diff_impl(
 }
 
 ///|
-pub impl Agent for ClaudeCode with fn get_provider_diff(
-  self,
-  provider,
-  api_format,
-) -> ProviderDiff raise Error {
-  ClaudeCode::get_provider_diff_impl(self, provider, api_format)
-}
-
-///|
-fn ClaudeCode::get_temporary_override_impl(
-  _ : ClaudeCode,
-  provider : @provider.Provider,
-  _ : ApiFormat?,
-) -> TemporaryOverride raise Error {
+pub impl Agent for ClaudeCode with fn get_temporary_override(_, provider, _) -> TemporaryOverride raise Error {
   let updated_json = ClaudeCode::apply_provider_to_json(
     Json::object(Map([])),
     provider,
@@ -216,15 +198,6 @@ fn ClaudeCode::get_temporary_override_impl(
     temp_files: [],
     api_format: Anthropic,
   }
-}
-
-///|
-pub impl Agent for ClaudeCode with fn get_temporary_override(
-  self,
-  provider,
-  api_format,
-) -> TemporaryOverride raise Error {
-  ClaudeCode::get_temporary_override_impl(self, provider, api_format)
 }
 
 ///|
