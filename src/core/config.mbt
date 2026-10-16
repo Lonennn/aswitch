@@ -13,8 +13,20 @@ pub(all) struct Config {
 } derive(Debug, Eq, ToJson, FromJson)
 
 ///|
+pub extend Config with Debug::{to_repr}
+
+///|
+pub extend Config with Eq::{not_equal, equal}
+
+///|
+pub extend Config with ToJson::{to_json}
+
+///|
+pub extend Config with FromJson::{from_json}
+
+///|
 pub fn Config::new() -> Config {
-  { providers: @list.new(), }
+  { providers: @list.List([]), }
 }
 
 ///|
@@ -118,7 +130,7 @@ pub fn get_config_path() -> String {
 
 ///|
 /// Load configuration from file
-pub fn load_config(validate? : Bool = true) -> Config raise Error {
+pub fn load_config(validate~ : Bool = true) -> Config raise Error {
   let path = get_config_path()
   if !@fs.path_exists(path) {
     return Config::new()
@@ -190,7 +202,7 @@ pub fn save_providers_preserving_other_fields(
 
   match config_json {
     Json::Object(entries) => {
-      entries["providers"] = providers.to_json()
+      entries["providers"] = Json(providers)
       let content = Json::object(entries).stringify(indent=4)
       @fs.write_string_to_file(config_path, content) catch {
         err =>

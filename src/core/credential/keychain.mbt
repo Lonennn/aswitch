@@ -23,12 +23,12 @@ extern "c" fn keychain_read_ffi(account : Bytes) -> Bytes = "aswitch_keychain_re
 ///|
 #cfg(any(target="native", target="llvm"))
 #borrow(account, secret)
-extern "c" fn keychain_write_ffi(account : Bytes, secret : Bytes) -> Int = "aswitch_keychain_write"
+extern "c" fn keychain_write_ffi(account : Bytes, secret : Bytes) -> Int32 = "aswitch_keychain_write"
 
 ///|
 #cfg(any(target="native", target="llvm"))
 #borrow(account)
-extern "c" fn keychain_delete_ffi(account : Bytes) -> Int = "aswitch_keychain_delete"
+extern "c" fn keychain_delete_ffi(account : Bytes) -> Int32 = "aswitch_keychain_delete"
 
 ///|
 #cfg(not(any(target="native", target="llvm")))
@@ -38,18 +38,18 @@ fn keychain_read_ffi(_account : Bytes) -> Bytes {
 
 ///|
 #cfg(not(any(target="native", target="llvm")))
-fn keychain_write_ffi(_account : Bytes, _secret : Bytes) -> Int {
+fn keychain_write_ffi(_account : Bytes, _secret : Bytes) -> Int32 {
   2 // Unavailable
 }
 
 ///|
 #cfg(not(any(target="native", target="llvm")))
-fn keychain_delete_ffi(_account : Bytes) -> Int {
+fn keychain_delete_ffi(_account : Bytes) -> Int32 {
   2 // Unavailable
 }
 
 ///|
-fn keychain_status_from_code(code : Int) -> CredentialBackendStatus {
+fn keychain_status_from_code(code : Int32) -> CredentialBackendStatus {
   match code {
     0 => Resolved
     1 => Missing

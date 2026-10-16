@@ -1,6 +1,8 @@
 ///|
 test "supported_agents returns canonical agent names" {
-  assert_true(supported_agents() == ["Claude Code", "OpenCode", "OpenClaw"])
+  assert_true(
+    @agent.supported_agents() == ["Claude Code", "OpenCode", "OpenClaw"],
+  )
 }
 
 ///|
@@ -11,39 +13,41 @@ test "get_agent_config_path returns correct path for supported agents" {
   let openclaw_part = @path.Path::join(".openclaw", "openclaw.json").to_string()
 
   assert_true(
-    get_agent_config_path("claude-code").unwrap().contains(claude_part),
-  )
-  assert_true(get_agent_config_path("claude").unwrap().contains(claude_part))
-  assert_true(
-    get_agent_config_path("claudecode").unwrap().contains(claude_part),
-  )
-
-  assert_true(
-    get_agent_config_path("open-code").unwrap().contains(opencode_part),
+    @agent.get_agent_config_path("claude-code").unwrap().contains(claude_part),
   )
   assert_true(
-    get_agent_config_path("opencode").unwrap().contains(opencode_part),
+    @agent.get_agent_config_path("claude").unwrap().contains(claude_part),
+  )
+  assert_true(
+    @agent.get_agent_config_path("claudecode").unwrap().contains(claude_part),
   )
 
   assert_true(
-    get_agent_config_path("openclaw").unwrap().contains(openclaw_part),
+    @agent.get_agent_config_path("open-code").unwrap().contains(opencode_part),
   )
   assert_true(
-    get_agent_config_path("open-claw").unwrap().contains(openclaw_part),
+    @agent.get_agent_config_path("opencode").unwrap().contains(opencode_part),
+  )
+
+  assert_true(
+    @agent.get_agent_config_path("openclaw").unwrap().contains(openclaw_part),
+  )
+  assert_true(
+    @agent.get_agent_config_path("open-claw").unwrap().contains(openclaw_part),
   )
 }
 
 ///|
 test "get_agent_config_path returns None for unsupported agents" {
-  assert_true(get_agent_config_path("invalid") == None)
-  assert_true(get_agent_config_path("cursor") == None)
-  assert_true(get_agent_config_path("") == None)
+  assert_true(@agent.get_agent_config_path("invalid") == None)
+  assert_true(@agent.get_agent_config_path("cursor") == None)
+  assert_true(@agent.get_agent_config_path("") == None)
 }
 
 ///|
 test "is_agent_installed returns false for unsupported agents" {
-  assert_false(is_agent_installed("invalid"))
-  assert_false(is_agent_installed("cursor"))
+  assert_false(@agent.is_agent_installed("invalid"))
+  assert_false(@agent.is_agent_installed("cursor"))
 }
 
 ///|
@@ -94,9 +98,9 @@ test "is_agent_installed returns true when Claude Code config file exists" {
   try! @fs.write_string_to_file(config_path, "{}")
 
   // Test the function
-  assert_true(is_agent_installed("claude-code"))
-  assert_true(is_agent_installed("claude"))
-  assert_true(is_agent_installed("claudecode"))
+  assert_true(@agent.is_agent_installed("claude-code"))
+  assert_true(@agent.is_agent_installed("claude"))
+  assert_true(@agent.is_agent_installed("claudecode"))
 
   // Clean up
   try! @fs.remove_file(config_path)
@@ -128,9 +132,9 @@ test "is_agent_installed returns false when Claude Code config file does not exi
   }
 
   // Test the function
-  assert_false(is_agent_installed("claude-code"))
-  assert_false(is_agent_installed("claude"))
-  assert_false(is_agent_installed("claudecode"))
+  assert_false(@agent.is_agent_installed("claude-code"))
+  assert_false(@agent.is_agent_installed("claude"))
+  assert_false(@agent.is_agent_installed("claudecode"))
 
   // Clean up
   cleanup_temp_dir(temp_home)
@@ -164,8 +168,8 @@ test "is_agent_installed returns true when OpenCode config file exists" {
   try! @fs.write_string_to_file(config_path, "{}")
 
   // Test the function
-  assert_true(is_agent_installed("open-code"))
-  assert_true(is_agent_installed("opencode"))
+  assert_true(@agent.is_agent_installed("open-code"))
+  assert_true(@agent.is_agent_installed("opencode"))
 
   // Clean up
   try! @fs.remove_file(config_path)
@@ -207,8 +211,8 @@ test "is_agent_installed returns false when OpenCode config file does not exist"
   }
 
   // Test the function
-  assert_false(is_agent_installed("open-code"))
-  assert_false(is_agent_installed("opencode"))
+  assert_false(@agent.is_agent_installed("open-code"))
+  assert_false(@agent.is_agent_installed("opencode"))
 
   // Clean up
   cleanup_temp_dir(temp_home)
@@ -242,8 +246,8 @@ test "is_agent_installed returns true when OpenClaw config file exists" {
   try! @fs.write_string_to_file(config_path, "{}")
 
   // Test the function
-  assert_true(is_agent_installed("openclaw"))
-  assert_true(is_agent_installed("open-claw"))
+  assert_true(@agent.is_agent_installed("openclaw"))
+  assert_true(@agent.is_agent_installed("open-claw"))
 
   // Clean up
   try! @fs.remove_file(config_path)
@@ -275,8 +279,8 @@ test "is_agent_installed returns false when OpenClaw config file does not exist"
   }
 
   // Test the function
-  assert_false(is_agent_installed("openclaw"))
-  assert_false(is_agent_installed("open-claw"))
+  assert_false(@agent.is_agent_installed("openclaw"))
+  assert_false(@agent.is_agent_installed("open-claw"))
 
   // Clean up
   cleanup_temp_dir(temp_home)
@@ -290,37 +294,37 @@ test "is_agent_installed returns false when OpenClaw config file does not exist"
 
 ///|
 test "resolve_agent_name exact match canonical" {
-  assert_true(resolve_agent_name("Claude Code") is Ok("Claude Code"))
-  assert_true(resolve_agent_name("OpenCode") is Ok("OpenCode"))
-  assert_true(resolve_agent_name("OpenClaw") is Ok("OpenClaw"))
+  assert_true(@agent.resolve_agent_name("Claude Code") is Ok("Claude Code"))
+  assert_true(@agent.resolve_agent_name("OpenCode") is Ok("OpenCode"))
+  assert_true(@agent.resolve_agent_name("OpenClaw") is Ok("OpenClaw"))
 }
 
 ///|
 test "resolve_agent_name exact match alias" {
-  assert_true(resolve_agent_name("claude") is Ok("Claude Code"))
-  assert_true(resolve_agent_name("claude-code") is Ok("Claude Code"))
-  assert_true(resolve_agent_name("opencode") is Ok("OpenCode"))
+  assert_true(@agent.resolve_agent_name("claude") is Ok("Claude Code"))
+  assert_true(@agent.resolve_agent_name("claude-code") is Ok("Claude Code"))
+  assert_true(@agent.resolve_agent_name("opencode") is Ok("OpenCode"))
 }
 
 ///|
 test "resolve_agent_name prefix match" {
-  assert_true(resolve_agent_name("clau") is Ok("Claude Code"))
-  assert_true(resolve_agent_name("openco") is Ok("OpenCode"))
-  assert_true(resolve_agent_name("opencl") is Ok("OpenClaw"))
+  assert_true(@agent.resolve_agent_name("clau") is Ok("Claude Code"))
+  assert_true(@agent.resolve_agent_name("openco") is Ok("OpenCode"))
+  assert_true(@agent.resolve_agent_name("opencl") is Ok("OpenClaw"))
 }
 
 ///|
 test "resolve_agent_name ambiguous prefix" {
-  assert_true(resolve_agent_name("open") is Err(_))
+  assert_true(@agent.resolve_agent_name("open") is Err(_))
 }
 
 ///|
 test "resolve_agent_name too short prefix" {
-  assert_true(resolve_agent_name("c") is Err(_))
+  assert_true(@agent.resolve_agent_name("c") is Err(_))
 }
 
 ///|
 test "resolve_agent_name unknown agent" {
-  assert_true(resolve_agent_name("unknown") is Err(_))
-  assert_true(resolve_agent_name("cursor") is Err(_))
+  assert_true(@agent.resolve_agent_name("unknown") is Err(_))
+  assert_true(@agent.resolve_agent_name("cursor") is Err(_))
 }

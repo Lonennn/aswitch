@@ -3,7 +3,7 @@
 
 ///|
 /// Print all configured providers
-pub fn list_providers() -> Int {
+pub fn list_providers() -> Int32 {
   let config = @core.load_config() catch {
     err => {
       println(err)

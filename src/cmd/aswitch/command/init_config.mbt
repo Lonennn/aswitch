@@ -4,7 +4,7 @@ const SCHEMA_URL = "https://raw.githubusercontent.com/Lonennn/aswitch/master/ass
 
 ///|
 /// Initialize configuration file with JSON schema reference if it doesn't exist
-pub fn init_config() -> Int {
+pub fn init_config() -> Int32 {
   let path = @core.get_config_path()
   if !@fs.path_exists(path) {
     let parent = @path.Path(path).dirname()

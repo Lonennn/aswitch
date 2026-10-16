@@ -19,8 +19,14 @@ pub enum ValidationError {
   /// Model has empty name
   EmptyModelName
   /// Model has invalid context window size
-  InvalidContextWindow(Int)
+  InvalidContextWindow(Int32)
 } derive(Debug, Eq)
+
+///|
+pub extend ValidationError with Eq::{not_equal, equal}
+
+///|
+pub extend ValidationError with Debug::{to_repr}
 
 ///|
 /// Validate a single Provider configuration
@@ -117,7 +123,7 @@ fn validate_model(model : @provider.Model) -> Result[Unit, ValidationError] {
 /// Validate entire Config structure
 pub fn validate_config(config : Config) -> Result[Unit, ValidationError] {
   // Check for duplicate provider names (case-insensitive)
-  let mut seen_names = @list.new()
+  let mut seen_names = @list.List([])
   for provider in config.providers.iter() {
     let lower_name = provider.name.to_lower()
     if seen_names.contains(lower_name) {

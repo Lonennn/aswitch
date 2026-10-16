@@ -110,7 +110,7 @@ test "config deep_copy returns independent provider list" {
   }
   let original = Config::{ providers: @list.List([provider]), }
   let copied = original.deep_copy()
-  copied.providers = @list.new()
+  copied.providers = @list.List([])
 
   assert_true(original.providers.length() == 1)
   assert_true(copied.providers.length() == 0)

@@ -1,6 +1,6 @@
 ///|
 /// Print usage information
-pub fn print_help() -> Int {
+pub fn print_help() -> Int32 {
   println("aswitch - AI Model Provider Configuration Manager")
   println("")
   println("Usage: aswitch <command> [arguments]")

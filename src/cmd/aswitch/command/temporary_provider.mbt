@@ -14,7 +14,7 @@ priv struct RenderedTemporaryCommand {
 fn resolve_temporary_selection(
   agent_name : String,
   provider_name : String,
-) -> Result[ResolvedTemporarySelection, Int] {
+) -> Result[ResolvedTemporarySelection, Int32] {
   let agent_result = @agent.create(agent_name)
   guard agent_result is Some(agent) else {
     println("Error: Unknown agent '\{agent_name}'")
@@ -59,8 +59,8 @@ fn render_temporary_command(
   agent_name : String,
   provider_name : String,
   api_format : @agent.ApiFormat?,
-  extra_args? : Array[String] = [],
-) -> Result[RenderedTemporaryCommand, Int] {
+  extra_args~ : Array[String] = [],
+) -> Result[RenderedTemporaryCommand, Int32] {
   let selection_result = resolve_temporary_selection(agent_name, provider_name)
   guard selection_result is Ok(selection) else {
     return Err(selection_result.unwrap_err())
@@ -88,7 +88,7 @@ fn render_temporary_command(
 fn prepare_temporary_override(
   temporary_override : @agent.TemporaryOverride,
   agent_display_name : String,
-) -> Result[Unit, Int] {
+) -> Result[Unit, Int32] {
   @agent.prepare_temporary_override(temporary_override) catch {
     err => {
       println(
@@ -103,8 +103,8 @@ fn prepare_temporary_override(
 ///|
 fn resolve_provider_name(
   name : String,
-  print_resolution? : Bool = true,
-) -> Result[String, Int] {
+  print_resolution~ : Bool = true,
+) -> Result[String, Int32] {
   let config = @core.load_config() catch {
     err => {
       println("Error: Failed to load config file, \{err}")
@@ -160,8 +160,8 @@ pub async fn temporary_command(
   agent_name : String?,
   provider_name : String?,
   api_format : @agent.ApiFormat?,
-  output? : CommandOutput = Display,
-) -> Int {
+  output~ : CommandOutput = Display,
+) -> Int32 {
   let state = @core.load_usage_state()
 
   let resolved_agent_name = resolve_agent_from_state(
@@ -264,7 +264,7 @@ pub async fn temporary_command(
 extern "c" fn launch_command_ffi(
   executable : Bytes,
   args : FixedArray[Bytes],
-) -> Int = "aswitch_launch_command"
+) -> Int32 = "aswitch_launch_command"
 
 ///|
 fn string_to_utf8_bytes(str : String, append_nul : Bool) -> Bytes {
@@ -315,7 +315,7 @@ pub async fn temporary_exec(
   api_format : @agent.ApiFormat?,
   command : Array[String],
   print_command : Bool,
-) -> Int {
+) -> Int32 {
   let state = @core.load_usage_state()
 
   let resolved_agent_name = resolve_agent_from_state(
@@ -418,8 +418,8 @@ fn resolve_agent_from_state(
   agent_name : String?,
   state : @core.UsageState,
   usage~ : String,
-  print_resolution? : Bool = true,
-) -> Result[String, Int] {
+  print_resolution~ : Bool = true,
+) -> Result[String, Int32] {
   match agent_name {
     Some(name) =>
       match @agent.resolve_agent_name(name) {

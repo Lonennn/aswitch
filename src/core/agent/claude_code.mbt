@@ -5,6 +5,15 @@
 pub struct ClaudeCode {}
 
 ///|
+pub extend ClaudeCode with Agent::{
+  name,
+  apply_provider,
+  supports_render_only,
+  get_provider_diff,
+  get_temporary_override,
+}
+
+///|
 pub fn ClaudeCode::canonical_name() -> String {
   "Claude Code"
 }
@@ -131,7 +140,7 @@ pub impl Agent for ClaudeCode with fn apply_provider(_, provider, _) -> Unit rai
 
 ///|
 /// Generate a diff of what changes would be made without writing to disk
-fn ClaudeCode::get_provider_diff(
+fn ClaudeCode::get_provider_diff_impl(
   _ : ClaudeCode,
   provider : @provider.Provider,
   _ : ApiFormat?,
@@ -148,11 +157,11 @@ pub impl Agent for ClaudeCode with fn get_provider_diff(
   provider,
   api_format,
 ) -> ProviderDiff raise Error {
-  ClaudeCode::get_provider_diff(self, provider, api_format)
+  ClaudeCode::get_provider_diff_impl(self, provider, api_format)
 }
 
 ///|
-fn ClaudeCode::get_temporary_override(
+fn ClaudeCode::get_temporary_override_impl(
   _ : ClaudeCode,
   provider : @provider.Provider,
   _ : ApiFormat?,
@@ -215,7 +224,7 @@ pub impl Agent for ClaudeCode with fn get_temporary_override(
   provider,
   api_format,
 ) -> TemporaryOverride raise Error {
-  ClaudeCode::get_temporary_override(self, provider, api_format)
+  ClaudeCode::get_temporary_override_impl(self, provider, api_format)
 }
 
 ///|

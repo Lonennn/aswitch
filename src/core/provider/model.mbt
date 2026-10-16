@@ -4,9 +4,9 @@ pub(all) struct Model {
   /// Model name
   name : String
   /// Optional context window limit (in tokens)
-  context_limit : Int?
+  context_limit : Int32?
   /// Optional output limit (in tokens)
-  output_limit : Int?
+  output_limit : Int32?
   /// Input modalities (default: [Text])
   input_modality : Array[Modality]
   /// Output modalities (default: [Text])
@@ -14,11 +14,20 @@ pub(all) struct Model {
 } derive(Debug, Eq, ToJson)
 
 ///|
+pub extend Model with ToJson::{to_json}
+
+///|
+pub extend Model with Debug::{to_repr}
+
+///|
+pub extend Model with Eq::{not_equal, equal}
+
+///|
 /// Create a Model with default modality settings (Text for input and output)
 pub fn Model::new(
   name~ : String,
-  context_limit? : Int,
-  output_limit? : Int,
+  context_limit? : Int32,
+  output_limit? : Int32,
 ) -> Model {
   Model::{
     name,
@@ -54,7 +63,7 @@ impl FromJson for Model with fn from_json(json, path) {
           raise JsonDecodeError((path.add_key("name"), "Missing field name"))
       }
       // Optional Int? fields
-      let context_limit : Int? = match map.get("context_limit") {
+      let context_limit : Int32? = match map.get("context_limit") {
         Some(Json::Null) | None => None
         Some(Json::Number(n, ..)) => Some(n.to_int())
         Some(_) =>
@@ -62,7 +71,7 @@ impl FromJson for Model with fn from_json(json, path) {
             (path.add_key("context_limit"), "Expected number"),
           )
       }
-      let output_limit : Int? = match map.get("output_limit") {
+      let output_limit : Int32? = match map.get("output_limit") {
         Some(Json::Null) | None => None
         Some(Json::Number(n, ..)) => Some(n.to_int())
         Some(_) =>

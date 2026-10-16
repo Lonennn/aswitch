@@ -14,6 +14,18 @@ pub(all) struct Provider {
 } derive(Debug, Eq, ToJson, FromJson)
 
 ///|
+pub extend Provider with ToJson::{to_json}
+
+///|
+pub extend Provider with FromJson::{from_json}
+
+///|
+pub extend Provider with Debug::{to_repr}
+
+///|
+pub extend Provider with Eq::{not_equal, equal}
+
+///|
 pub suberror ProviderLackApiKeyError {
   ProviderLackApiKeyError(String)
 }
@@ -101,3 +113,15 @@ pub(all) enum Modality {
   Vision
   Audio
 } derive(Debug, Eq, ToJson, FromJson)
+
+///|
+pub extend Modality with ToJson::{to_json}
+
+///|
+pub extend Modality with FromJson::{from_json}
+
+///|
+pub extend Modality with Debug::{to_repr}
+
+///|
+pub extend Modality with Eq::{not_equal, equal}

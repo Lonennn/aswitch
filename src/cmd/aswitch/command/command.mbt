@@ -7,6 +7,12 @@ pub enum CommandOutput {
 } derive(Debug, Eq)
 
 ///|
+pub extend CommandOutput with Debug::{to_repr}
+
+///|
+pub extend CommandOutput with Eq::{not_equal, equal}
+
+///|
 /// Available CLI commands
 pub enum Command {
   /// Initialize configuration
@@ -58,6 +64,9 @@ pub enum Command {
   /// Some parameters error
   ErrorParameter(String)
 } derive(Debug)
+
+///|
+pub extend Command with Debug::{to_repr}
 
 ///|
 /// Parse set/switch command arguments and extract dry-run flag
@@ -298,7 +307,7 @@ fn parse_temporary_command(args : Array[String]) -> Command {
 
 ///|
 fn parse_temporary_exec(args : Array[String]) -> Command {
-  let mut separator_index : Int? = None
+  let mut separator_index : Int32? = None
   for i in 0..<args.length() {
     if args[i] == "--" {
       separator_index = Some(i)

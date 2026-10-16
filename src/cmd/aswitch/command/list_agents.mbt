@@ -1,6 +1,6 @@
 ///|
 /// Print all supported agents, grouped by installation status
-pub fn list_agents() -> Int {
+pub fn list_agents() -> Int32 {
   let agents = @agent.supported_agents()
 
   // Split into installed and not installed

@@ -5,6 +5,15 @@
 pub struct OpenClaw {}
 
 ///|
+pub extend OpenClaw with Agent::{
+  apply_provider,
+  get_provider_diff,
+  name,
+  supports_render_only,
+  get_temporary_override,
+}
+
+///|
 const AI_API_OPENAI = "openai-completions"
 
 ///|
@@ -281,7 +290,7 @@ pub impl Agent for OpenClaw with fn apply_provider(_self, provider, api_format) 
 
 ///|
 /// Generate a diff of what changes would be made without writing to disk
-fn OpenClaw::get_provider_diff(
+fn OpenClaw::get_provider_diff_impl(
   _ : OpenClaw,
   provider : @provider.Provider,
   api_format : ApiFormat?,
@@ -298,11 +307,11 @@ pub impl Agent for OpenClaw with fn get_provider_diff(
   provider,
   api_format,
 ) -> ProviderDiff raise Error {
-  OpenClaw::get_provider_diff(self, provider, api_format)
+  OpenClaw::get_provider_diff_impl(self, provider, api_format)
 }
 
 ///|
-fn OpenClaw::get_temporary_override(
+fn OpenClaw::get_temporary_override_impl(
   _ : OpenClaw,
   provider : @provider.Provider,
   api_format : ApiFormat?,
@@ -337,7 +346,7 @@ pub impl Agent for OpenClaw with fn get_temporary_override(
   provider,
   api_format,
 ) -> TemporaryOverride raise Error {
-  OpenClaw::get_temporary_override(self, provider, api_format)
+  OpenClaw::get_temporary_override_impl(self, provider, api_format)
 }
 
 ///|

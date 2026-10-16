@@ -5,6 +5,15 @@
 pub struct OpenCode {}
 
 ///|
+pub extend OpenCode with Agent::{
+  name,
+  apply_provider,
+  supports_render_only,
+  get_temporary_override,
+  get_provider_diff,
+}
+
+///|
 const AI_SDK_OPENAI = "@ai-sdk/openai-compatible"
 
 ///|
@@ -268,7 +277,7 @@ pub impl Agent for OpenCode with fn apply_provider(_self, provider, api_format) 
 }
 
 ///|
-fn OpenCode::get_temporary_override(
+fn OpenCode::get_temporary_override_impl(
   _ : OpenCode,
   provider : @provider.Provider,
   api_format : ApiFormat?,
@@ -295,7 +304,7 @@ fn OpenCode::get_temporary_override(
 
 ///|
 /// Generate a diff of what changes would be made without writing to disk
-fn OpenCode::get_provider_diff(
+fn OpenCode::get_provider_diff_impl(
   _ : OpenCode,
   provider : @provider.Provider,
   api_format : ApiFormat?,
@@ -312,7 +321,7 @@ pub impl Agent for OpenCode with fn get_provider_diff(
   provider,
   api_format,
 ) -> ProviderDiff raise Error {
-  OpenCode::get_provider_diff(self, provider, api_format)
+  OpenCode::get_provider_diff_impl(self, provider, api_format)
 }
 
 ///|
@@ -321,7 +330,7 @@ pub impl Agent for OpenCode with fn get_temporary_override(
   provider,
   api_format,
 ) -> TemporaryOverride raise Error {
-  OpenCode::get_temporary_override(self, provider, api_format)
+  OpenCode::get_temporary_override_impl(self, provider, api_format)
 }
 
 ///|

@@ -5,7 +5,7 @@
 const DEFAULT_MAX_BACKUPS = 5
 
 ///|
-fn backup_file_path(config_path : String, index : Int) -> String {
+fn backup_file_path(config_path : String, index : Int32) -> String {
   "\{config_path}.bak.\{index}"
 }
 
@@ -18,8 +18,8 @@ fn copy_file(src : String, dst : String) -> Unit raise Error {
 ///|
 fn rotate_backups(
   config_path : String,
-  index : Int,
-  max_backups : Int,
+  index : Int32,
+  max_backups : Int32,
 ) -> Unit raise Error {
   if index > max_backups {
     ()

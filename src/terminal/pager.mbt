@@ -1,5 +1,5 @@
 ///|
-extern "c" fn aswitch_is_stdout_tty() -> Int = "aswitch_is_stdout_tty"
+extern "c" fn aswitch_is_stdout_tty() -> Int32 = "aswitch_is_stdout_tty"
 
 ///|
 /// Check whether stdout is connected to a terminal (TTY).

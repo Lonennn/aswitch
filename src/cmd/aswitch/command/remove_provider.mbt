@@ -1,6 +1,6 @@
 ///|
 /// Remove a provider from configuration by name
-pub async fn remove_provider(name : String) -> Int {
+pub async fn remove_provider(name : String) -> Int32 {
   let result = run_remove_provider(name, read_stdin_line, println)
   match result {
     (EXIT_CODE_SUCCESS, message) => {
@@ -23,7 +23,7 @@ async fn run_remove_provider(
   name : String,
   read_line : async () -> String?,
   write_line : (String) -> Unit,
-) -> (Int, String) {
+) -> (Int32, String) {
   let provider_name = name.trim().to_owned()
   if provider_name.is_empty() {
     return (EXIT_CODE_CONFIG_ERROR, "Error: provider name cannot be empty")

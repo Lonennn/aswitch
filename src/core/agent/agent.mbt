@@ -6,6 +6,12 @@ pub(all) enum ApiFormat {
 } derive(Eq, Debug)
 
 ///|
+pub extend ApiFormat with Debug::{to_repr}
+
+///|
+pub extend ApiFormat with Eq::{not_equal, equal}
+
+///|
 /// Struct to hold provider diff information for dry-run mode
 pub struct ProviderDiff {
   config_path : String
@@ -44,7 +50,7 @@ pub(open) trait Agent {
 
 ///|
 /// Minimum length for prefix matching
-pub const MIN_PREFIX_LENGTH : Int = 2
+pub const MIN_PREFIX_LENGTH : Int32 = 2
 
 ///|
 /// Shared helper to generate provider diff for any agent type
@@ -249,7 +255,7 @@ fn render_shell_word(value : String) -> String {
 ///|
 pub fn render_posix_shell_command(
   temporary_override : TemporaryOverride,
-  extra_args? : Array[String] = [],
+  extra_args~ : Array[String] = [],
 ) -> String {
   let parts : Array[String] = []
   for env_var in temporary_override.env_vars {

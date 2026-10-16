@@ -37,12 +37,20 @@ pub(all) enum ApiFormat {
   OpenAI
   Anthropic
 } derive(Eq, @debug.Debug)
+pub fn ApiFormat::equal(Self, Self) -> Bool
+pub fn ApiFormat::not_equal(Self, Self) -> Bool
+pub fn ApiFormat::to_repr(Self) -> @debug.Repr
 
 pub struct ClaudeCode {
 }
+pub fn ClaudeCode::apply_provider(Self, @provider.Provider, ApiFormat?) -> Unit raise
 pub fn ClaudeCode::canonical_name() -> String
 pub fn ClaudeCode::get_config_file_path() -> String
+pub fn ClaudeCode::get_provider_diff(Self, @provider.Provider, ApiFormat?) -> ProviderDiff raise
+pub fn ClaudeCode::get_temporary_override(Self, @provider.Provider, ApiFormat?) -> TemporaryOverride raise
+pub fn ClaudeCode::name(Self) -> String
 pub fn ClaudeCode::nicknames() -> Array[String]
+pub fn ClaudeCode::supports_render_only(Self) -> Bool
 pub impl Agent for ClaudeCode
 
 pub struct EnvVar {
@@ -52,16 +60,26 @@ pub struct EnvVar {
 
 pub struct OpenClaw {
 }
+pub fn OpenClaw::apply_provider(Self, @provider.Provider, ApiFormat?) -> Unit raise
 pub fn OpenClaw::canonical_name() -> String
 pub fn OpenClaw::get_config_file_path() -> String
+pub fn OpenClaw::get_provider_diff(Self, @provider.Provider, ApiFormat?) -> ProviderDiff raise
+pub fn OpenClaw::get_temporary_override(Self, @provider.Provider, ApiFormat?) -> TemporaryOverride raise
+pub fn OpenClaw::name(Self) -> String
 pub fn OpenClaw::nicknames() -> Array[String]
+pub fn OpenClaw::supports_render_only(Self) -> Bool
 pub impl Agent for OpenClaw
 
 pub struct OpenCode {
 }
+pub fn OpenCode::apply_provider(Self, @provider.Provider, ApiFormat?) -> Unit raise
 pub fn OpenCode::canonical_name() -> String
 pub fn OpenCode::get_config_file_path() -> String
+pub fn OpenCode::get_provider_diff(Self, @provider.Provider, ApiFormat?) -> ProviderDiff raise
+pub fn OpenCode::get_temporary_override(Self, @provider.Provider, ApiFormat?) -> TemporaryOverride raise
+pub fn OpenCode::name(Self) -> String
 pub fn OpenCode::nicknames() -> Array[String]
+pub fn OpenCode::supports_render_only(Self) -> Bool
 pub impl Agent for OpenCode
 
 pub struct ProviderDiff {

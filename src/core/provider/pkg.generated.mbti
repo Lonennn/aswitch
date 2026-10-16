@@ -19,6 +19,11 @@ pub(all) enum Modality {
   Vision
   Audio
 } derive(Eq, ToJson, @debug.Debug, @json.FromJson)
+pub fn Modality::equal(Self, Self) -> Bool
+pub fn Modality::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Modality::not_equal(Self, Self) -> Bool
+pub fn Modality::to_json(Self) -> Json
+pub fn Modality::to_repr(Self) -> @debug.Repr
 
 pub(all) struct Model {
   name : String
@@ -28,7 +33,11 @@ pub(all) struct Model {
   output_modality : Array[Modality]
 } derive(Eq, ToJson, @debug.Debug)
 pub fn Model::deep_copy(Self) -> Self
+pub fn Model::equal(Self, Self) -> Bool
 pub fn Model::new(name~ : String, context_limit? : Int, output_limit? : Int) -> Self
+pub fn Model::not_equal(Self, Self) -> Bool
+pub fn Model::to_json(Self) -> Json
+pub fn Model::to_repr(Self) -> @debug.Repr
 
 pub(all) struct Provider {
   name : String
@@ -38,7 +47,12 @@ pub(all) struct Provider {
   models : Array[Model]
 } derive(Eq, ToJson, @debug.Debug, @json.FromJson)
 pub fn Provider::deep_copy(Self) -> Self
+pub fn Provider::equal(Self, Self) -> Bool
+pub fn Provider::from_json(Json, @json.JsonPath) -> Self raise @json.JsonDecodeError
+pub fn Provider::not_equal(Self, Self) -> Bool
 pub fn Provider::require_api_key(Self) -> String raise
+pub fn Provider::to_json(Self) -> Json
+pub fn Provider::to_repr(Self) -> @debug.Repr
 pub fn Provider::with_api_key(Self, String) -> Self
 pub fn Provider::without_api_key(Self) -> Self
 

@@ -1,6 +1,6 @@
 ///|
 /// Add or update a provider using interactive prompts
-pub async fn add_provider_interactive() -> Int {
+pub async fn add_provider_interactive() -> Int32 {
   println("Interactive provider setup")
   println("Press Ctrl+D (EOF) to cancel")
   println("")
@@ -25,7 +25,7 @@ pub async fn add_provider(
   model : String,
   openai_base_url : String?,
   anthropic_base_url : String?,
-) -> Int {
+) -> Int32 {
   let provider = @provider.Provider::{
     name,
     api_key: Some(api_key),

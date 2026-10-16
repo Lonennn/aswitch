@@ -9,7 +9,7 @@ pub fn set_provider(
   provider_name : String?,
   api_format : @agent.ApiFormat?,
   dry_run : Bool,
-) -> Int {
+) -> Int32 {
   let config_path = @core.get_config_path()
   println("Loading configuration from: \{config_path}")
 

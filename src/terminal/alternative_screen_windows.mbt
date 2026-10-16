@@ -1,10 +1,10 @@
 ///|
 #cfg(platform="windows")
-extern "c" fn aswitch_prepare_stdout_for_alternate_screen() -> Int = "aswitch_prepare_stdout_for_alternate_screen"
+extern "c" fn aswitch_prepare_stdout_for_alternate_screen() -> Int32 = "aswitch_prepare_stdout_for_alternate_screen"
 
 ///|
 #cfg(platform="windows")
-extern "c" fn aswitch_wait_for_any_key() -> Int = "aswitch_wait_for_any_key"
+extern "c" fn aswitch_wait_for_any_key() -> Int32 = "aswitch_wait_for_any_key"
 
 ///|
 #cfg(platform="windows")

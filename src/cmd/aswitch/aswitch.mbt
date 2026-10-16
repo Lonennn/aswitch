@@ -20,7 +20,7 @@ async fn main {
 }
 
 ///|
-async fn execute_command(command : @command.Command) -> Int {
+async fn execute_command(command : @command.Command) -> Int32 {
   match command {
     @command.Command::Init => @command.init_config()
     @command.Command::ListProviders => @command.list_providers()
@@ -68,7 +68,7 @@ async fn execute_command(command : @command.Command) -> Int {
 
 ///|
 /// Print version information
-pub fn print_version() -> Int {
+pub fn print_version() -> Int32 {
   println("aswitch \{ASWITCH_VERSION}")
   0
 }

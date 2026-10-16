@@ -6,11 +6,23 @@ pub(all) struct AgentState {
 } derive(ToJson, FromJson)
 
 ///|
+pub extend AgentState with ToJson::{to_json}
+
+///|
+pub extend AgentState with FromJson::{from_json}
+
+///|
 /// Global usage state tracking last agent and per-agent states
 pub(all) struct UsageState {
   mut last_agent : String?
   agent_states : Map[String, AgentState]
 } derive(ToJson, FromJson)
+
+///|
+pub extend UsageState with ToJson::{to_json}
+
+///|
+pub extend UsageState with FromJson::{from_json}
 
 ///|
 /// Default file name for usage state
