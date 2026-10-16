@@ -125,3 +125,5 @@ See the complete [Shell Completion Installation Guide](./docs/shell-completions.
 
 See the [build guide](./docs/building.md) for building from source,
 running locally, and signing macOS releases.
+
+See the [development guide](./docs/development.md) for development guidance.
